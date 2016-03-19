@@ -56,7 +56,7 @@ def _6to4_query(v, vtype, value):
             numbers = list(map(int, ipconv.split('.')))
 
         try:
-            return '2002:{:02x}{:02x}:{:02x}{:02x}::1/48'.format(*numbers)
+            return '2002:{0:02x}{1:02x}:{2:02x}{3:02x}::1/48'.format(*numbers)
         except:
             return False
 
