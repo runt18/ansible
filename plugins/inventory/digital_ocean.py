@@ -469,7 +469,7 @@ or environment variables (DO_CLIENT_ID and DO_API_KEY)'''
     def sanitize_dict(self, d):
         new_dict = {}
         for k, v in d.items():
-            if v != None:
+            if v is not None:
                 new_dict[self.to_safe(str(k))] = self.to_safe(str(v))
         return new_dict
 

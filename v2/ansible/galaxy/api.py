@@ -104,13 +104,13 @@ class GalaxyAPI(object):
             url = '%s/roles/%d/%s/?page_size=50' % (self.baseurl, int(role_id), related)
             data = json.load(urlopen(url))
             results = data['results']
-            done = (data.get('next', None) == None)
+            done = (data.get('next', None) is None)
             while not done:
                 url = '%s%s' % (self.baseurl, data['next'])
                 self.galaxy.display.display(url)
                 data = json.load(urlopen(url))
                 results += data['results']
-                done = (data.get('next', None) == None)
+                done = (data.get('next', None) is None)
             return results
         except:
             return None
@@ -129,13 +129,13 @@ class GalaxyAPI(object):
                 results = data
             done = True
             if "next" in data:
-                done = (data.get('next', None) == None)
+                done = (data.get('next', None) is None)
             while not done:
                 url = '%s%s' % (self.baseurl, data['next'])
                 self.galaxy.display.display(url)
                 data = json.load(urlopen(url))
                 results += data['results']
-                done = (data.get('next', None) == None)
+                done = (data.get('next', None) is None)
             return results
         except Exception as error:
             raise AnsibleError("Failed to download the %s list: %s" % (what, str(error)))

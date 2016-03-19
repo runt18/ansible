@@ -67,7 +67,7 @@ class TestFilters(unittest.TestCase):
 
     def test_bool_none(self):
         a = ansible.runner.filter_plugins.core.bool(None)
-        assert a == None
+        assert a is None
 
     def test_bool_true(self):
         a = ansible.runner.filter_plugins.core.bool(True)
