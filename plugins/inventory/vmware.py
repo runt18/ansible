@@ -196,9 +196,9 @@ class VMwareInventory(object):
         for attr in ('datastore', 'network', 'vm'):
             try:
                 value = getattr(host, attr)
-                host_info['%ss' % attr] = self._get_obj_info(value, depth=0)
+                host_info['{0!s}s'.format(attr)] = self._get_obj_info(value, depth=0)
             except AttributeError:
-                host_info['%ss' % attr] = []
+                host_info['{0!s}s'.format(attr)] = []
         for k, v in self._get_obj_info(host.summary, depth=0).items():
             if isinstance(v, collections.MutableMapping):
                 for k2, v2 in v.items():
@@ -210,8 +210,8 @@ class VMwareInventory(object):
         except Exception, e:
             print >> sys.stderr, e
         host_info = self._flatten_dict(host_info, prefix)
-        if ('%s_ipAddress' % prefix) in host_info:
-            host_info['ansible_ssh_host'] = host_info['%s_ipAddress' % prefix]
+        if ('{0!s}_ipAddress'.format(prefix)) in host_info:
+            host_info['ansible_ssh_host'] = host_info['{0!s}_ipAddress'.format(prefix)]
         return host_info
 
     def _get_vm_info(self, vm, prefix='vmware'):
@@ -224,9 +224,9 @@ class VMwareInventory(object):
         for attr in ('datastore', 'network'):
             try:
                 value = getattr(vm, attr)
-                vm_info['%ss' % attr] = self._get_obj_info(value, depth=0)
+                vm_info['{0!s}s'.format(attr)] = self._get_obj_info(value, depth=0)
             except AttributeError:
-                vm_info['%ss' % attr] = []
+                vm_info['{0!s}s'.format(attr)] = []
         try:
             vm_info['resourcePool'] = self._get_obj_info(vm.resourcePool, depth=0)
         except AttributeError:
@@ -244,8 +244,8 @@ class VMwareInventory(object):
             elif k != 'vm':
                 vm_info[k] = v
         vm_info = self._flatten_dict(vm_info, prefix)
-        if ('%s_ipAddress' % prefix) in vm_info:
-            vm_info['ansible_ssh_host'] = vm_info['%s_ipAddress' % prefix]
+        if ('{0!s}_ipAddress'.format(prefix)) in vm_info:
+            vm_info['ansible_ssh_host'] = vm_info['{0!s}_ipAddress'.format(prefix)]
         return vm_info
 
     def _add_host(self, inv, parent_group, host_name):

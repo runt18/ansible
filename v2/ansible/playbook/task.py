@@ -98,15 +98,15 @@ class Task(Base, Conditional, Taggable, Become):
        ''' return the name of the task '''
 
        if self._role and self.name:
-           return "%s : %s" % (self._role.get_name(), self.name)
+           return "{0!s} : {1!s}".format(self._role.get_name(), self.name)
        elif self.name:
            return self.name
        else:
            flattened_args = self._merge_kv(self.args)
            if self._role:
-               return "%s : %s %s" % (self._role.get_name(), self.action, flattened_args)
+               return "{0!s} : {1!s} {2!s}".format(self._role.get_name(), self.action, flattened_args)
            else:
-               return "%s %s" % (self.action, flattened_args)
+               return "{0!s} {1!s}".format(self.action, flattened_args)
 
     def _merge_kv(self, ds):
         if ds is None:
@@ -118,7 +118,7 @@ class Task(Base, Conditional, Taggable, Become):
             for (k,v) in ds.iteritems():
                 if k.startswith('_'):
                     continue
-                buf = buf + "%s=%s " % (k,v)
+                buf = buf + "{0!s}={1!s} ".format(k, v)
             buf = buf.strip()
             return buf
 
@@ -129,14 +129,14 @@ class Task(Base, Conditional, Taggable, Become):
 
     def __repr__(self):
         ''' returns a human readable representation of the task '''
-        return "TASK: %s" % self.get_name()
+        return "TASK: {0!s}".format(self.get_name())
 
     def _preprocess_loop(self, ds, new_ds, k, v):
         ''' take a lookup plugin name and store it correctly '''
 
         loop_name = k.replace("with_", "")
         if new_ds.get('loop') is not None:
-            raise AnsibleError("duplicate loop in task: %s" % loop_name)
+            raise AnsibleError("duplicate loop in task: {0!s}".format(loop_name))
         new_ds['loop'] = loop_name
         new_ds['loop_args'] = v
 

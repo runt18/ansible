@@ -67,12 +67,12 @@ class TestVaultLib(unittest.TestCase):
                  '_add_header',
                  '_split_header',]
         for slot in slots:
-            assert hasattr(v, slot), "VaultLib is missing the %s method" % slot
+            assert hasattr(v, slot), "VaultLib is missing the {0!s} method".format(slot)
 
     def test_is_encrypted(self):
         v = VaultLib(None)
         assert not v.is_encrypted(u"foobar"), "encryption check on plaintext failed"
-        data = u"$ANSIBLE_VAULT;9.9;TEST\n%s" % hexlify(b"ansible")
+        data = u"$ANSIBLE_VAULT;9.9;TEST\n{0!s}".format(hexlify(b"ansible"))
         assert v.is_encrypted(data), "encryption check on headered text failed"
 
     def test_add_header(self):
@@ -124,7 +124,7 @@ class TestVaultLib(unittest.TestCase):
             raise SkipTest
         v = VaultLib('ansible')
         v.cipher_name = 'AES'
-        data = "$ANSIBLE_VAULT;9.9;TEST\n%s" % hexlify(six.b("ansible"))
+        data = "$ANSIBLE_VAULT;9.9;TEST\n{0!s}".format(hexlify(six.b("ansible")))
         error_hit = False
         try:
             enc_data = v.encrypt(data)
@@ -156,4 +156,4 @@ class TestVaultLib(unittest.TestCase):
         except errors.AnsibleError as e:
             error_hit = True
         assert not error_hit, "An error was thrown when trying to encrypt data without the cipher set"
-        assert v.cipher_name == "AES256", "cipher name is not set to AES256: %s" % v.cipher_name
+        assert v.cipher_name == "AES256", "cipher name is not set to AES256: {0!s}".format(v.cipher_name)

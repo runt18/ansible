@@ -138,7 +138,7 @@ class DataLoader():
         '''
 
         if not self.path_exists(file_name) or not self.is_file(file_name):
-            raise AnsibleParserError("the file_name '%s' does not exist, or is not readable" % file_name)
+            raise AnsibleParserError("the file_name '{0!s}' does not exist, or is not readable".format(file_name))
 
         show_content = True
         try:
@@ -149,7 +149,7 @@ class DataLoader():
                     show_content = False
             return (data, show_content)
         except (IOError, OSError) as e:
-            raise AnsibleParserError("an error occurred while trying to read the file '%s': %s" % (file_name, str(e)))
+            raise AnsibleParserError("an error occurred while trying to read the file '{0!s}': {1!s}".format(file_name, str(e)))
 
     def _handle_error(self, yaml_exc, file_name, show_content):
         '''

@@ -57,7 +57,7 @@ class TestVaultEditor(TestCase):
                  'write_data',
                  'shuffle_files']
         for slot in slots:         
-            assert hasattr(v, slot), "VaultLib is missing the %s method" % slot
+            assert hasattr(v, slot), "VaultLib is missing the {0!s} method".format(slot)
 
     def test_decrypt_1_0(self):
         if self._is_fips():
@@ -84,7 +84,7 @@ class TestVaultEditor(TestCase):
 
         shutil.rmtree(dirpath)
         assert error_hit == False, "error decrypting 1.0 file"            
-        assert fdata.strip() == "foo", "incorrect decryption of 1.0 file: %s" % fdata.strip() 
+        assert fdata.strip() == "foo", "incorrect decryption of 1.0 file: {0!s}".format(fdata.strip()) 
 
     def test_decrypt_1_1_newline(self):
         if not HAS_AES or not HAS_COUNTER or not HAS_PBKDF2:
@@ -135,7 +135,7 @@ class TestVaultEditor(TestCase):
 
         shutil.rmtree(dirpath)
         assert error_hit == False, "error decrypting 1.1 file"
-        assert fdata.strip() == "foo", "incorrect decryption of 1.1 file: %s" % fdata.strip()
+        assert fdata.strip() == "foo", "incorrect decryption of 1.1 file: {0!s}".format(fdata.strip())
 
 
     def test_rekey_migration(self):
@@ -173,8 +173,8 @@ class TestVaultEditor(TestCase):
         except errors.AnsibleError, e:
             error_hit = True
 
-        assert vl.cipher_name == "AES256", "wrong cipher name set after rekey: %s" % vl.cipher_name
+        assert vl.cipher_name == "AES256", "wrong cipher name set after rekey: {0!s}".format(vl.cipher_name)
         assert error_hit == False, "error decrypting migrated 1.0 file"            
-        assert dec_data.strip() == "foo", "incorrect decryption of rekeyed/migrated file: %s" % dec_data
+        assert dec_data.strip() == "foo", "incorrect decryption of rekeyed/migrated file: {0!s}".format(dec_data)
 
 

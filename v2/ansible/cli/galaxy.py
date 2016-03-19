@@ -63,8 +63,8 @@ class GalaxyCLI(CLI):
         ''' create an options parser for bin/ansible '''
 
         self.parser = CLI.base_parser(
-            usage = "usage: %%prog [%s] [--help] [options] ..." % "|".join(self.VALID_ACTIONS),
-            epilog = "\nSee '%s <command> --help' for more information on a specific command.\n\n" % os.path.basename(sys.argv[0])
+            usage = "usage: %prog [{0!s}] [--help] [options] ...".format("|".join(self.VALID_ACTIONS)),
+            epilog = "\nSee '{0!s} <command> --help' for more information on a specific command.\n\n".format(os.path.basename(sys.argv[0]))
         )
 
 
@@ -129,7 +129,7 @@ class GalaxyCLI(CLI):
             api_server = self.options.api_server
             self.api = GalaxyAPI(self.galaxy, api_server)
             if not self.api:
-                raise AnsibleError("The API server (%s) is not responding, please try again later." % api_server)
+                raise AnsibleError("The API server ({0!s}) is not responding, please try again later.".format(api_server))
 
         self.execute()
 
@@ -171,9 +171,9 @@ class GalaxyCLI(CLI):
         role_path = os.path.join(init_path, role_name)
         if os.path.exists(role_path):
             if os.path.isfile(role_path):
-                raise AnsibleError("- the path %s already exists, but is a file - aborting" % role_path)
+                raise AnsibleError("- the path {0!s} already exists, but is a file - aborting".format(role_path))
             elif not force:
-                raise AnsibleError("- the directory %s already exists." % role_path + \
+                raise AnsibleError("- the directory {0!s} already exists.".format(role_path) + \
                             "you can use --force to re-initialize this directory,\n" + \
                             "however it will reset any main.yml files that may have\n" + \
                                 "been modified there already.")
@@ -231,9 +231,9 @@ class GalaxyCLI(CLI):
             elif dir not in ('files','templates'):
                 # just write a (mostly) empty YAML file for main.yml
                 f = open(main_yml_path, 'w')
-                f.write('---\n# %s file for %s\n' % (dir,role_name))
+                f.write('---\n# {0!s} file for {1!s}\n'.format(dir, role_name))
                 f.close()
-        self.display.display("- %s was created successfully" % role_name)
+        self.display.display("- {0!s} was created successfully".format(role_name))
 
     def execute_info(self):
         """
@@ -277,22 +277,22 @@ class GalaxyCLI(CLI):
                 role_info.update(role_spec)
 
             if role_info:
-                self.display.display("- %s:" % (role))
+                self.display.display("- {0!s}:".format((role)))
                 for k in sorted(role_info.keys()):
 
                     if k in self.SKIP_INFO_KEYS:
                         continue
 
                     if isinstance(role_info[k], dict):
-                        self.display.display("\t%s: " % (k))
+                        self.display.display("\t{0!s}: ".format((k)))
                         for key in sorted(role_info[k].keys()):
                             if key in self.SKIP_INFO_KEYS:
                                 continue
-                            self.display.display("\t\t%s: %s" % (key, role_info[k][key]))
+                            self.display.display("\t\t{0!s}: {1!s}".format(key, role_info[k][key]))
                     else:
-                        self.display.display("\t%s: %s" % (k, role_info[k]))
+                        self.display.display("\t{0!s}: {1!s}".format(k, role_info[k]))
             else:
-                self.display.display("- the role %s was not found" % role)
+                self.display.display("- the role {0!s} was not found".format(role))
 
     def execute_install(self):
         """
@@ -364,7 +364,7 @@ class GalaxyCLI(CLI):
                     else:
                         role_data = self.api.lookup_role_by_name(role_src)
                         if not role_data:
-                            self.display.warning("- sorry, %s was not found on %s." % (role_src, self.options.api_server))
+                            self.display.warning("- sorry, {0!s} was not found on {1!s}.".format(role_src, self.options.api_server))
                             self.exit_without_ignore()
                             continue
 
@@ -382,8 +382,8 @@ class GalaxyCLI(CLI):
                                 role["version"] = 'master'
                         elif role['version'] != 'master':
                             if role_versions and role.version not in [a.get('name', None) for a in role_versions]:
-                                self.display.warning('role is %s' % role)
-                                self.display.warning("- the specified version (%s) was not found in the list of available versions (%s)." % (role.version, role_versions))
+                                self.display.warning('role is {0!s}'.format(role))
+                                self.display.warning("- the specified version ({0!s}) was not found in the list of available versions ({1!s}).".format(role.version, role_versions))
                                 self.exit_without_ignore()
                                 continue
 
@@ -420,7 +420,7 @@ class GalaxyCLI(CLI):
                 #            print '- dependency %s is already installed, skipping.' % dep["name"]
 
             if not tmp_file or not installed:
-                self.display.warning("- %s was NOT installed successfully." % role.name)
+                self.display.warning("- {0!s} was NOT installed successfully.".format(role.name))
                 self.exit_without_ignore()
         return 0
 
@@ -437,11 +437,11 @@ class GalaxyCLI(CLI):
             role = GalaxyRole(self.galaxy, role_name)
             try:
                 if role.remove():
-                    self.display.display('- successfully removed %s' % role_name)
+                    self.display.display('- successfully removed {0!s}'.format(role_name))
                 else:
-                    self.display.display('- %s is not installed, skipping.' % role_name)
+                    self.display.display('- {0!s} is not installed, skipping.'.format(role_name))
             except Exception as e:
-                raise AnsibleError("Failed to remove role %s: %s" % (role_name, str(e)))
+                raise AnsibleError("Failed to remove role {0!s}: {1!s}".format(role_name, str(e)))
 
         return 0
 
@@ -467,17 +467,17 @@ class GalaxyCLI(CLI):
                 if not version:
                     version = "(unknown version)"
                 # show some more info about single roles here
-                self.display.display("- %s, %s" % (self.name, version))
+                self.display.display("- {0!s}, {1!s}".format(self.name, version))
             else:
-                self.display.display("- the role %s was not found" % self.name)
+                self.display.display("- the role {0!s} was not found".format(self.name))
         else:
             # show all valid roles in the roles_path directory
             roles_path = self.get_opt('roles_path')
             roles_path = os.path.expanduser(roles_path)
             if not os.path.exists(roles_path):
-                raise AnsibleOptionsError("- the path %s does not exist. Please specify a valid path with --roles-path" % roles_path)
+                raise AnsibleOptionsError("- the path {0!s} does not exist. Please specify a valid path with --roles-path".format(roles_path))
             elif not os.path.isdir(roles_path):
-                raise AnsibleOptionsError("- %s exists, but it is not a directory. Please specify a valid path with --roles-path" % roles_path)
+                raise AnsibleOptionsError("- {0!s} exists, but it is not a directory. Please specify a valid path with --roles-path".format(roles_path))
             path_files = os.listdir(roles_path)
             for path_file in path_files:
                 if gr.metadata:
@@ -487,5 +487,5 @@ class GalaxyCLI(CLI):
                         version = install_info.get("version", None)
                     if not version:
                         version = "(unknown version)"
-                    self.display.display("- %s, %s" % (path_file, version))
+                    self.display.display("- {0!s}, {1!s}".format(path_file, version))
         return 0

@@ -78,7 +78,7 @@ class Conditional:
             return conditional
 
         # a Jinja2 evaluation that results in something Python can eval!
-        presented = "{%% if %s %%} True {%% else %%} False {%% endif %%}" % conditional
+        presented = "{{% if {0!s} %}} True {{% else %}} False {{% endif %}}".format(conditional)
         conditional = templar.template(presented)
 
         val = conditional.strip()
@@ -92,11 +92,11 @@ class Conditional:
             elif "is defined" in original:
                 return False
             else:
-                raise AnsibleError("error while evaluating conditional: %s (%s)" % (original, presented))
+                raise AnsibleError("error while evaluating conditional: {0!s} ({1!s})".format(original, presented))
         elif val == "True":
             return True
         elif val == "False":
             return False
         else:
-            raise AnsibleError("unable to evaluate conditional: %s" % original)
+            raise AnsibleError("unable to evaluate conditional: {0!s}".format(original))
 

@@ -69,16 +69,16 @@ class Task(object):
             if x in utils.plugins.module_finder:
 
                 if 'action' in ds:
-                    raise errors.AnsibleError("multiple actions specified in task: '%s' and '%s'" % (x, ds.get('name', ds['action'])))
+                    raise errors.AnsibleError("multiple actions specified in task: '{0!s}' and '{1!s}'".format(x, ds.get('name', ds['action'])))
                 if isinstance(ds[x], dict):
                     if 'args' in ds:
-                        raise errors.AnsibleError("can't combine args: and a dict for %s: in task %s" % (x, ds.get('name', "%s: %s" % (x, ds[x]))))
+                        raise errors.AnsibleError("can't combine args: and a dict for {0!s}: in task {1!s}".format(x, ds.get('name', "{0!s}: {1!s}".format(x, ds[x]))))
                     ds['args'] = ds[x]
                     ds[x] = ''
                 elif ds[x] is None:
                     ds[x] = ''
                 if not isinstance(ds[x], basestring):
-                    raise errors.AnsibleError("action specified for task %s has invalid type %s" % (ds.get('name', "%s: %s" % (x, ds[x])), type(ds[x])))
+                    raise errors.AnsibleError("action specified for task {0!s} has invalid type {1!s}".format(ds.get('name', "{0!s}: {1!s}".format(x, ds[x])), type(ds[x])))
                 ds['action'] = x + " " + ds[x]
                 ds.pop(x)
 
@@ -93,7 +93,7 @@ class Task(object):
                     ds['items_lookup_terms'] = ds[x]
                     ds.pop(x)
                 else:
-                    raise errors.AnsibleError("cannot find lookup plugin named %s for usage in with_%s" % (plugin_name, plugin_name))
+                    raise errors.AnsibleError("cannot find lookup plugin named {0!s} for usage in with_{1!s}".format(plugin_name, plugin_name))
 
             elif x in [ 'changed_when', 'failed_when', 'when']:
                 if isinstance(ds[x], basestring):
@@ -107,12 +107,12 @@ class Task(object):
                 utils.deprecated("The 'when_' conditional has been removed. Switch to using the regular unified 'when' statements as described on docs.ansible.com.","1.5", removed=True)
 
                 if 'when' in ds:
-                    raise errors.AnsibleError("multiple when_* statements specified in task %s" % (ds.get('name', ds['action'])))
+                    raise errors.AnsibleError("multiple when_* statements specified in task {0!s}".format((ds.get('name', ds['action']))))
                 when_name = x.replace("when_","")
-                ds['when'] = "%s %s" % (when_name, ds[x])
+                ds['when'] = "{0!s} {1!s}".format(when_name, ds[x])
                 ds.pop(x)
             elif not x in Task.VALID_KEYS:
-                raise errors.AnsibleError("%s is not a legal parameter in an Ansible task or handler" % x)
+                raise errors.AnsibleError("{0!s} is not a legal parameter in an Ansible task or handler".format(x))
 
         self.module_vars    = module_vars
         self.play_vars      = play_vars
@@ -155,13 +155,13 @@ class Task(object):
 
         # Fail out if user specifies privilege escalation params in conflict
         if (ds.get('become') or ds.get('become_user') or ds.get('become_pass')) and (ds.get('sudo') or ds.get('sudo_user') or ds.get('sudo_pass')):
-            raise errors.AnsibleError('incompatible parameters ("become", "become_user", "become_pass") and sudo params "sudo", "sudo_user", "sudo_pass" in task: %s' % self.name)
+            raise errors.AnsibleError('incompatible parameters ("become", "become_user", "become_pass") and sudo params "sudo", "sudo_user", "sudo_pass" in task: {0!s}'.format(self.name))
 
         if (ds.get('become') or ds.get('become_user') or ds.get('become_pass')) and (ds.get('su') or ds.get('su_user') or ds.get('su_pass')):
-            raise errors.AnsibleError('incompatible parameters ("become", "become_user", "become_pass") and su params "su", "su_user", "sudo_pass" in task: %s' % self.name)
+            raise errors.AnsibleError('incompatible parameters ("become", "become_user", "become_pass") and su params "su", "su_user", "sudo_pass" in task: {0!s}'.format(self.name))
 
         if (ds.get('sudo') or ds.get('sudo_user') or ds.get('sudo_pass')) and (ds.get('su') or ds.get('su_user') or ds.get('su_pass')):
-            raise errors.AnsibleError('incompatible parameters ("su", "su_user", "su_pass") and sudo params "sudo", "sudo_user", "sudo_pass" in task: %s' % self.name)
+            raise errors.AnsibleError('incompatible parameters ("su", "su_user", "su_pass") and sudo params "sudo", "sudo_user", "sudo_pass" in task: {0!s}'.format(self.name))
 
         self.become        = utils.boolean(ds.get('become', play.become))
         self.become_method = ds.get('become_method', play.become_method)
@@ -204,7 +204,7 @@ class Task(object):
             raise errors.AnsibleError("the 'action' and 'local_action' attributes can not be used together")
         # Both are NOT defined
         elif (not 'action' in ds) and (not 'local_action' in ds):
-            raise errors.AnsibleError("'action' or 'local_action' attribute missing in task \"%s\"" % ds.get('name', '<Unnamed>'))
+            raise errors.AnsibleError("'action' or 'local_action' attribute missing in task \"{0!s}\"".format(ds.get('name', '<Unnamed>')))
         # Only one of them is defined
         elif 'local_action' in ds:
             self.action      = ds.get('local_action', '')
@@ -216,9 +216,9 @@ class Task(object):
 
         if isinstance(self.action, dict):
             if 'module' not in self.action:
-                raise errors.AnsibleError("'module' attribute missing from action in task \"%s\"" % ds.get('name', '%s' % self.action))
+                raise errors.AnsibleError("'module' attribute missing from action in task \"{0!s}\"".format(ds.get('name', '{0!s}'.format(self.action))))
             if self.args:
-                raise errors.AnsibleError("'args' cannot be combined with dict 'action' in task \"%s\"" % ds.get('name', '%s' % self.action))
+                raise errors.AnsibleError("'args' cannot be combined with dict 'action' in task \"{0!s}\"".format(ds.get('name', '{0!s}'.format(self.action))))
             self.args = self.action
             self.action = self.args.pop('module')
 
@@ -269,7 +269,7 @@ class Task(object):
 
         # action should be a string
         if not isinstance(self.action, basestring):
-            raise errors.AnsibleError("action is of type '%s' and not a string in task. name: %s" % (type(self.action).__name__, self.name))
+            raise errors.AnsibleError("action is of type '{0!s}' and not a string in task. name: {1!s}".format(type(self.action).__name__, self.name))
 
         # notify can be a string or a list, store as a list
         if isinstance(self.notify, basestring):
@@ -280,12 +280,12 @@ class Task(object):
             tokens = split_args(self.action)
         except Exception, e:
             if "unbalanced" in str(e):
-                raise errors.AnsibleError("There was an error while parsing the task %s.\n" % repr(self.action) + \
+                raise errors.AnsibleError("There was an error while parsing the task {0!s}.\n".format(repr(self.action)) + \
                                           "Make sure quotes are matched or escaped properly")
             else:
                 raise
         if len(tokens) < 1:
-            raise errors.AnsibleError("invalid/missing action in task. name: %s" % self.name)
+            raise errors.AnsibleError("invalid/missing action in task. name: {0!s}".format(self.name))
         self.module_name = tokens[0]
         self.module_args = ''
         if len(tokens) > 1:

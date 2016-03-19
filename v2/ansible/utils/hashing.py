@@ -45,7 +45,7 @@ def secure_hash_s(data, hash_func=sha1):
     digest = hash_func()
     try:
         if not isinstance(data, basestring):
-            data = "%s" % data
+            data = "{0!s}".format(data)
         digest.update(data)
     except UnicodeEncodeError:
         digest.update(data.encode('utf-8'))
@@ -66,7 +66,7 @@ def secure_hash(filename, hash_func=sha1):
             block = infile.read(blocksize)
         infile.close()
     except IOError as e:
-        raise AnsibleError("error while accessing the file %s, error was: %s" % (filename, e))
+        raise AnsibleError("error while accessing the file {0!s}, error was: {1!s}".format(filename, e))
     return digest.hexdigest()
 
 # The checksum algorithm must match with the algorithm in ShellModule.checksum() method

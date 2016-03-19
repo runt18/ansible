@@ -40,11 +40,11 @@ class Connection(object):
         # we're running as root on the local system so do some
         # trivial checks for ensuring 'host' is actually a chroot'able dir
         if not os.path.isdir(self.chroot):
-            raise errors.AnsibleError("%s is not a directory" % self.chroot)
+            raise errors.AnsibleError("{0!s} is not a directory".format(self.chroot))
 
         chrootsh = os.path.join(self.chroot, 'bin/sh')
         if not utils.is_executable(chrootsh):
-            raise errors.AnsibleError("%s does not look like a chrootable dir (/bin/sh missing)" % self.chroot)
+            raise errors.AnsibleError("{0!s} does not look like a chrootable dir (/bin/sh missing)".format(self.chroot))
 
         self.chroot_cmd = distutils.spawn.find_executable('chroot')
         if not self.chroot_cmd:
@@ -66,7 +66,7 @@ class Connection(object):
         ''' run a command on the chroot '''
 
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -76,9 +76,9 @@ class Connection(object):
         if executable:
             local_cmd = [self.chroot_cmd, self.chroot, executable, '-c', cmd]
         else:
-            local_cmd = '%s "%s" %s' % (self.chroot_cmd, self.chroot, cmd)
+            local_cmd = '{0!s} "{1!s}" {2!s}'.format(self.chroot_cmd, self.chroot, cmd)
 
-        vvv("EXEC %s" % (local_cmd), host=self.chroot)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.chroot)
         p = subprocess.Popen(local_cmd, shell=isinstance(local_cmd, basestring),
                              cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,
@@ -95,17 +95,17 @@ class Connection(object):
         normpath = os.path.normpath(out_path)
         out_path = os.path.join(self.chroot, normpath[1:])
 
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.chroot)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.chroot)
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         try:
             shutil.copyfile(in_path, out_path)
         except shutil.Error:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to copy: %s and %s are the same" % (in_path, out_path))
+            raise errors.AnsibleError("failed to copy: {0!s} and {1!s} are the same".format(in_path, out_path))
         except IOError:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to transfer file to %s" % out_path)
+            raise errors.AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def fetch_file(self, in_path, out_path):
         ''' fetch a file from chroot to local '''
@@ -115,17 +115,17 @@ class Connection(object):
         normpath = os.path.normpath(in_path)
         in_path = os.path.join(self.chroot, normpath[1:])
 
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.chroot)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.chroot)
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         try:
             shutil.copyfile(in_path, out_path)
         except shutil.Error:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to copy: %s and %s are the same" % (in_path, out_path))
+            raise errors.AnsibleError("failed to copy: {0!s} and {1!s} are the same".format(in_path, out_path))
         except IOError:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to transfer file to %s" % out_path)
+            raise errors.AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def close(self):
         ''' terminate the connection; nothing to do here '''

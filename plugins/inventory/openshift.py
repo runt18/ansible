@@ -61,7 +61,7 @@ def get_config(env_var, config_var):
     if not result:
         result = get_from_rhc_config(config_var)
     if not result:
-        print "failed=True msg='missing %s'" % env_var
+        print "failed=True msg='missing {0!s}'".format(env_var)
         sys.exit(1)
     return result
 
@@ -85,15 +85,14 @@ def passwd_setup(top_level_url, username, password):
 
 username = get_config('ANSIBLE_OPENSHIFT_USERNAME', 'default_rhlogin')
 password = get_config('ANSIBLE_OPENSHIFT_PASSWORD', 'password')
-broker_url = 'https://%s/broker/rest/' % get_config('ANSIBLE_OPENSHIFT_BROKER', 'libra_server')
+broker_url = 'https://{0!s}/broker/rest/'.format(get_config('ANSIBLE_OPENSHIFT_BROKER', 'libra_server'))
 
 
 passwd_setup(broker_url, username, password)
 
 response = get_json_from_api(broker_url + '/domains')
 
-response = get_json_from_api("%s/domains/%s/applications" %
-                             (broker_url, response[0]['id']))
+response = get_json_from_api("{0!s}/domains/{1!s}/applications".format(broker_url, response[0]['id']))
 
 result = {}
 for app in response:

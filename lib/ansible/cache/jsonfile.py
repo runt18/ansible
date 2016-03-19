@@ -45,7 +45,7 @@ class CacheModule(BaseCacheModule):
             try:
                 os.makedirs(self._cache_dir)
             except (OSError,IOError), e:
-                utils.warning("error while trying to create cache dir %s : %s" % (self._cache_dir, str(e)))
+                utils.warning("error while trying to create cache dir {0!s} : {1!s}".format(self._cache_dir, str(e)))
                 return None
 
     def get(self, key):
@@ -56,11 +56,11 @@ class CacheModule(BaseCacheModule):
         if self.has_expired(key):
            raise KeyError
 
-        cachefile = "%s/%s" % (self._cache_dir, key)
+        cachefile = "{0!s}/{1!s}".format(self._cache_dir, key)
         try:
             f = codecs.open(cachefile, 'r', encoding='utf-8')
         except (OSError,IOError), e:
-            utils.warning("error while trying to read %s : %s" % (cachefile, str(e)))
+            utils.warning("error while trying to read {0!s} : {1!s}".format(cachefile, str(e)))
         else:
             value = json.load(f)
             self._cache[key] = value
@@ -72,11 +72,11 @@ class CacheModule(BaseCacheModule):
 
         self._cache[key] = value
 
-        cachefile = "%s/%s" % (self._cache_dir, key)
+        cachefile = "{0!s}/{1!s}".format(self._cache_dir, key)
         try:
             f = codecs.open(cachefile, 'w', encoding='utf-8')
         except (OSError,IOError), e:
-            utils.warning("error while trying to write to %s : %s" % (cachefile, str(e)))
+            utils.warning("error while trying to write to {0!s} : {1!s}".format(cachefile, str(e)))
         else:
             f.write(utils.jsonify(value))
         finally:
@@ -84,14 +84,14 @@ class CacheModule(BaseCacheModule):
 
     def has_expired(self, key):
 
-        cachefile = "%s/%s" % (self._cache_dir, key)
+        cachefile = "{0!s}/{1!s}".format(self._cache_dir, key)
         try:
             st = os.stat(cachefile)
         except (OSError,IOError), e:
             if e.errno == errno.ENOENT:
                 return False
             else:
-                utils.warning("error while trying to stat %s : %s" % (cachefile, str(e)))
+                utils.warning("error while trying to stat {0!s} : {1!s}".format(cachefile, str(e)))
 
         if time.time() - st.st_mtime <= self._timeout:
             return False
@@ -108,7 +108,7 @@ class CacheModule(BaseCacheModule):
         return keys
 
     def contains(self, key):
-        cachefile = "%s/%s" % (self._cache_dir, key)
+        cachefile = "{0!s}/{1!s}".format(self._cache_dir, key)
 
         if key in self._cache:
             return True
@@ -122,12 +122,12 @@ class CacheModule(BaseCacheModule):
             if e.errno == errno.ENOENT:
                 return False
             else:
-                utils.warning("error while trying to stat %s : %s" % (cachefile, str(e)))
+                utils.warning("error while trying to stat {0!s} : {1!s}".format(cachefile, str(e)))
 
     def delete(self, key):
         del self._cache[key]
         try:
-            os.remove("%s/%s" % (self._cache_dir, key))
+            os.remove("{0!s}/{1!s}".format(self._cache_dir, key))
         except (OSError,IOError), e:
             pass #TODO: only pass on non existing?
 

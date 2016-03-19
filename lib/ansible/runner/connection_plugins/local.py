@@ -50,7 +50,7 @@ class Connection(object):
 
         # su requires to be run from a terminal, and therefore isn't supported here (yet?)
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -64,7 +64,7 @@ class Connection(object):
                 local_cmd = cmd
         executable = executable.split()[0] if executable else None
 
-        vvv("EXEC %s" % (local_cmd), host=self.host)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.host)
         p = subprocess.Popen(local_cmd, shell=isinstance(local_cmd, basestring),
                              cwd=self.runner.basedir, executable=executable,
                              stdin=subprocess.PIPE,
@@ -91,10 +91,10 @@ class Connection(object):
                     chunk = p.stderr.read()
                 else:
                     stdout, stderr = p.communicate()
-                    raise errors.AnsibleError('timeout waiting for %s password prompt:\n' % self.runner.become_method + become_output)
+                    raise errors.AnsibleError('timeout waiting for {0!s} password prompt:\n'.format(self.runner.become_method) + become_output)
                 if not chunk:
                     stdout, stderr = p.communicate()
-                    raise errors.AnsibleError('%s output closed while waiting for password prompt:\n' % self.runner.become_method + become_output)
+                    raise errors.AnsibleError('{0!s} output closed while waiting for password prompt:\n'.format(self.runner.become_method) + become_output)
                 become_output += chunk
             if success_key not in become_output:
                 p.stdin.write(self.runner.become_pass + '\n')
@@ -107,20 +107,20 @@ class Connection(object):
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to local '''
 
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         try:
             shutil.copyfile(in_path, out_path)
         except shutil.Error:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to copy: %s and %s are the same" % (in_path, out_path))
+            raise errors.AnsibleError("failed to copy: {0!s} and {1!s} are the same".format(in_path, out_path))
         except IOError:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to transfer file to %s" % out_path)
+            raise errors.AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def fetch_file(self, in_path, out_path):
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
         ''' fetch a file from local to local -- for copatibility '''
         self.put_file(in_path, out_path)
 

@@ -34,7 +34,7 @@ class Connector(object):
     def connect(self, host, port, user, password, transport, private_key_file, delegate_host):
         conn = utils.plugins.connection_loader.get(transport, self.runner, host, port, user=user, password=password, private_key_file=private_key_file)
         if conn is None:
-            raise AnsibleError("unsupported connection type: %s" % transport)
+            raise AnsibleError("unsupported connection type: {0!s}".format(transport))
         conn.delegate = delegate_host
         if private_key_file:
             # If private key is readable by user other than owner, flag an error

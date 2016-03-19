@@ -172,7 +172,7 @@ class ModuleArgsParser:
             # this can happen with modules which take no params, like ping:
             args = None
         else:
-            raise AnsibleParserError("unexpected parameter type in action: %s" % type(thing), obj=self._task_ds)
+            raise AnsibleParserError("unexpected parameter type in action: {0!s}".format(type(thing)), obj=self._task_ds)
         return args
 
     def _normalize_new_style_args(self, thing):
@@ -208,7 +208,7 @@ class ModuleArgsParser:
 
         else:
             # need a dict or a string, so giving up
-            raise AnsibleParserError("unexpected parameter type in action: %s" % type(thing), obj=self._task_ds)
+            raise AnsibleParserError("unexpected parameter type in action: {0!s}".format(type(thing)), obj=self._task_ds)
 
         return (action, args)
 

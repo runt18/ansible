@@ -85,7 +85,7 @@ class Base:
 
     @staticmethod
     def _generic_g(prop_name, self):
-        method = "_get_attr_%s" % prop_name
+        method = "_get_attr_{0!s}".format(prop_name)
         if method in dir(self):
             return getattr(self, method)()
 
@@ -133,7 +133,7 @@ class Base:
         ''' infrequently used method to do some pre-processing of legacy terms '''
 
         for base_class in self.__class__.mro():
-            method = getattr(self, "_preprocess_data_%s" % base_class.__name__.lower(), None)
+            method = getattr(self, "_preprocess_data_{0!s}".format(base_class.__name__.lower()), None)
             if method:
                 return method(ds)
         return ds
@@ -170,7 +170,7 @@ class Base:
         for name in self._get_base_attributes():
             # copy the value over unless a _load_field method is defined
             if name in ds:
-                method = getattr(self, '_load_%s' % name, None)
+                method = getattr(self, '_load_{0!s}'.format(name), None)
                 if method:
                     self._attributes[name] = method(name, ds[name])
                 else:
@@ -206,7 +206,7 @@ class Base:
         valid_attrs = frozenset(name for name in self._get_base_attributes())
         for key in ds:
             if key not in valid_attrs:
-                raise AnsibleParserError("'%s' is not a valid attribute for a %s" % (key, self.__class__.__name__), obj=ds)
+                raise AnsibleParserError("'{0!s}' is not a valid attribute for a {1!s}".format(key, self.__class__.__name__), obj=ds)
 
     def validate(self, all_vars=dict()):
         ''' validation that is done at parse time, not load time '''
@@ -215,7 +215,7 @@ class Base:
         for (name, attribute) in iteritems(self._get_base_attributes()):
 
             # run validator only if present
-            method = getattr(self, '_validate_%s' % name, None)
+            method = getattr(self, '_validate_{0!s}'.format(name), None)
             if method:
                 method(attribute, name, getattr(self, name))
 
@@ -251,14 +251,14 @@ class Base:
                 if not attribute.required:
                     continue
                 else:
-                    raise AnsibleParserError("the field '%s' is required but was not set" % name)
+                    raise AnsibleParserError("the field '{0!s}' is required but was not set".format(name))
 
             try:
                 # if the attribute contains a variable, template it now
                 value = templar.template(getattr(self, name))
 
                 # run the post-validator if present
-                method = getattr(self, '_post_validate_%s' % name, None)
+                method = getattr(self, '_post_validate_{0!s}'.format(name), None)
                 if method:
                     value = method(attribute, value, all_vars, templar._fail_on_undefined_errors)
                 else:
@@ -279,10 +279,10 @@ class Base:
                 setattr(self, name, value)
 
             except (TypeError, ValueError) as e:
-                raise AnsibleParserError("the field '%s' has an invalid value (%s), and could not be converted to an %s. Error was: %s" % (name, value, attribute.isa, e), obj=self.get_ds())
+                raise AnsibleParserError("the field '{0!s}' has an invalid value ({1!s}), and could not be converted to an {2!s}. Error was: {3!s}".format(name, value, attribute.isa, e), obj=self.get_ds())
             except UndefinedError as e:
                 if templar._fail_on_undefined_errors:
-                    raise AnsibleParserError("the field '%s' has an invalid value, which appears to include a variable that is undefined. The error was: %s" % (name,e), obj=self.get_ds())
+                    raise AnsibleParserError("the field '{0!s}' has an invalid value, which appears to include a variable that is undefined. The error was: {1!s}".format(name, e), obj=self.get_ds())
 
     def serialize(self):
         '''

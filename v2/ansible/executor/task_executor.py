@@ -252,7 +252,7 @@ class TaskExecutor:
         for attempt in range(retries):
             if attempt > 0:
                 # FIXME: this should use the callback/message passing mechanism
-                print("FAILED - RETRYING: %s (%d retries left)" % (self._task, retries-attempt))
+                print("FAILED - RETRYING: {0!s} ({1:d} retries left)".format(self._task, retries-attempt))
                 result['attempts'] = attempt + 1
 
             debug("running the handler")
@@ -265,7 +265,7 @@ class TaskExecutor:
                 try:
                     result = json.loads(result.get('stdout'))
                 except ValueError, e:
-                    return dict(failed=True, msg="The async task did not return valid JSON: %s" % str(e))
+                    return dict(failed=True, msg="The async task did not return valid JSON: {0!s}".format(str(e)))
 
                 if self._task.poll > 0:
                     result = self._poll_async_result(result=result)
@@ -328,7 +328,7 @@ class TaskExecutor:
         # that (with a sleep for "poll" seconds between each retry) until the
         # async time limit is exceeded.
 
-        async_task = Task().load(dict(action='async_status jid=%s' % async_jid))
+        async_task = Task().load(dict(action='async_status jid={0!s}'.format(async_jid)))
 
         # Because this is an async task, the action handler is async. However,
         # we need the 'normal' action handler for the status check, so get it
@@ -387,7 +387,7 @@ class TaskExecutor:
 
         connection = connection_loader.get(conn_type, self._connection_info, self._new_stdin)
         if not connection:
-            raise AnsibleError("the connection plugin '%s' was not found" % conn_type)
+            raise AnsibleError("the connection plugin '{0!s}' was not found".format(conn_type))
 
         return connection
 
@@ -398,7 +398,7 @@ class TaskExecutor:
 
         if self._task.action in action_loader:
             if self._task.async != 0:
-                raise AnsibleError("async mode is not supported with the %s module" % module_name)
+                raise AnsibleError("async mode is not supported with the {0!s} module".format(module_name))
             handler_name = self._task.action
         elif self._task.async == 0:
             handler_name = 'normal'
@@ -415,7 +415,7 @@ class TaskExecutor:
         )
 
         if not handler:
-            raise AnsibleError("the handler '%s' was not found" % handler_name)
+            raise AnsibleError("the handler '{0!s}' was not found".format(handler_name))
 
         return handler
 

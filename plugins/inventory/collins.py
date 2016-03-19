@@ -189,10 +189,10 @@ class CollinsInventory(object):
         # Locates all assets matching the provided query, exhausting pagination.
         while True:
             if num_retries == self.collins_max_retries:
-                raise MaxRetriesError("Maximum of %s retries reached; giving up" % \
-                    self.collins_max_retries)
+                raise MaxRetriesError("Maximum of {0!s} retries reached; giving up".format( \
+                    self.collins_max_retries))
             query_parameters['page'] = cur_page
-            query_url = "%s?%s" % (
+            query_url = "{0!s}?{1!s}".format(
                 (CollinsDefaults.ASSETS_API_ENDPOINT % self.collins_host),
                 urllib.urlencode(query_parameters, doseq=True)
             )
@@ -252,15 +252,15 @@ class CollinsInventory(object):
 
         cache_path = config.get('collins', 'cache_path')
         self.cache_path_cache = cache_path + \
-            '/ansible-collins-%s.cache' % self.collins_asset_type
+            '/ansible-collins-{0!s}.cache'.format(self.collins_asset_type)
         self.cache_path_inventory = cache_path + \
-            '/ansible-collins-%s.index' % self.collins_asset_type
+            '/ansible-collins-{0!s}.index'.format(self.collins_asset_type)
         self.cache_max_age = config.getint('collins', 'cache_max_age')
 
         log_path = config.get('collins', 'log_path')
         self.log_location = log_path + '/ansible-collins.log'
-        self.basic_auth_header = "Basic %s" % base64.encodestring(
-            '%s:%s' % (self.collins_username, self.collins_password))[:-1]
+        self.basic_auth_header = "Basic {0!s}".format(base64.encodestring(
+            '{0!s}:{1!s}'.format(self.collins_username, self.collins_password))[:-1])
 
     def parse_cli_args(self):
         """ Command line argument processing """
@@ -329,7 +329,7 @@ class CollinsInventory(object):
             # the name of the asset's current STATE from its dictionary.
             if 'STATE' in asset['ASSET'] and asset['ASSET']['STATE']:
                 state_inventory_key = self.to_safe(
-                    'STATE-%s' % asset['ASSET']['STATE']['NAME'])
+                    'STATE-{0!s}'.format(asset['ASSET']['STATE']['NAME']))
                 self.push(self.inventory, state_inventory_key, asset_identifier)
 
             # Indexes asset by all user-defined Collins attributes.
@@ -337,7 +337,7 @@ class CollinsInventory(object):
                 for attrib_block in asset['ATTRIBS'].keys():
                     for attrib in asset['ATTRIBS'][attrib_block].keys():
                         asset['COLLINS'][attrib] = asset['ATTRIBS'][attrib_block][attrib]
-                        attrib_key = self.to_safe('%s-%s' % (attrib, asset['ATTRIBS'][attrib_block][attrib]))
+                        attrib_key = self.to_safe('{0!s}-{1!s}'.format(attrib, asset['ATTRIBS'][attrib_block][attrib]))
                         self.push(self.inventory, attrib_key, asset_identifier)
 
             # Indexes asset by all built-in Collins attributes.
@@ -345,7 +345,7 @@ class CollinsInventory(object):
                 if attribute not in CollinsDefaults.SPECIAL_ATTRIBUTES:
                     attribute_val = asset['ASSET'][attribute]
                     if attribute_val is not None:
-                        attrib_key = self.to_safe('%s-%s' % (attribute, attribute_val))
+                        attrib_key = self.to_safe('{0!s}-{1!s}'.format(attribute, attribute_val))
                         self.push(self.inventory, attrib_key, asset_identifier)
 
             # Indexes asset by hardware product information.
@@ -354,7 +354,7 @@ class CollinsInventory(object):
                     product = asset['HARDWARE']['BASE']['PRODUCT']
                     if product:
                         product_key = self.to_safe(
-                            'HARDWARE-PRODUCT-%s' % asset['HARDWARE']['BASE']['PRODUCT'])
+                            'HARDWARE-PRODUCT-{0!s}'.format(asset['HARDWARE']['BASE']['PRODUCT']))
                         self.push(self.inventory, product_key, asset_identifier)
 
             # Indexing now complete, adds the host details to the asset cache.

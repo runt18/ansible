@@ -84,7 +84,7 @@ class Display:
             if host is None:
                 self.display(msg, color='blue')
             else:
-                self.display("<%s> %s" % (host, msg), color='blue', screen_only=True)
+                self.display("<{0!s}> {1!s}".format(host, msg), color='blue', screen_only=True)
 
     def deprecated(self, msg, version, removed=False):
         ''' used to print out a deprecation message.'''
@@ -94,12 +94,12 @@ class Display:
 
         if not removed:
             if version:
-                new_msg = "\n[DEPRECATION WARNING]: %s. This feature will be removed in version %s." % (msg, version)
+                new_msg = "\n[DEPRECATION WARNING]: {0!s}. This feature will be removed in version {1!s}.".format(msg, version)
             else:
-                new_msg = "\n[DEPRECATION WARNING]: %s. This feature will be removed in a future release." % (msg)
+                new_msg = "\n[DEPRECATION WARNING]: {0!s}. This feature will be removed in a future release.".format((msg))
             new_msg = new_msg + " Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.\n\n"
         else:
-            raise AnsibleError("[DEPRECATED]: %s.  Please update your playbooks." % msg)
+            raise AnsibleError("[DEPRECATED]: {0!s}.  Please update your playbooks.".format(msg))
 
         wrapped = textwrap.wrap(new_msg, 79)
         new_msg = "\n".join(wrapped) + "\n"
@@ -109,7 +109,7 @@ class Display:
             self._deprecations[new_msg] = 1
 
     def warning(self, msg):
-        new_msg = "\n[WARNING]: %s" % msg
+        new_msg = "\n[WARNING]: {0!s}".format(msg)
         wrapped = textwrap.wrap(new_msg, 79)
         new_msg = "\n".join(wrapped) + "\n"
         if new_msg not in self._warns:
@@ -130,10 +130,10 @@ class Display:
         if star_len < 0:
             star_len = 3
         stars = "*" * star_len
-        self.display("\n%s %s" % (msg, stars), color=color)
+        self.display("\n{0!s} {1!s}".format(msg, stars), color=color)
 
     def error(self, msg):
-        new_msg = "\n[ERROR]: %s" % msg
+        new_msg = "\n[ERROR]: {0!s}".format(msg)
         wrapped = textwrap.wrap(new_msg, 79)
         new_msg = "\n".join(wrapped) + "\n"
         if new_msg not in self._errors:

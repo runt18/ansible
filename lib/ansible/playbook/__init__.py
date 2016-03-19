@@ -115,7 +115,7 @@ class PlayBook(object):
         if stats is None:
             arguments.append('stats')
         if arguments:
-            raise Exception('PlayBook missing required arguments: %s' % ', '.join(arguments))
+            raise Exception('PlayBook missing required arguments: {0!s}'.format(', '.join(arguments)))
 
         if extra_vars is None:
             extra_vars = {}
@@ -213,7 +213,7 @@ class PlayBook(object):
                 (k,v) = unquote(t).split("=", 1)
                 new_vars[k] = template(basedir, v, new_vars)
             except ValueError, e:
-                raise errors.AnsibleError('included playbook variables must be in the form k=v, got: %s' % t)
+                raise errors.AnsibleError('included playbook variables must be in the form k=v, got: {0!s}'.format(t))
 
         return (new_vars, unquote(tokens[0]))
 
@@ -259,13 +259,13 @@ class PlayBook(object):
         play_basedirs = []
 
         if type(playbook_data) != list:
-            raise errors.AnsibleError("parse error: playbooks must be formatted as a YAML list, got %s" % type(playbook_data))
+            raise errors.AnsibleError("parse error: playbooks must be formatted as a YAML list, got {0!s}".format(type(playbook_data)))
 
         basedir = os.path.dirname(path) or '.'
         utils.plugins.push_basedir(basedir)
         for play in playbook_data:
             if type(play) != dict:
-                raise errors.AnsibleError("parse error: each play in a playbook must be a YAML dictionary (hash), received: %s" % play)
+                raise errors.AnsibleError("parse error: each play in a playbook must be a YAML dictionary (hash), received: {0!s}".format(play))
 
             if 'include' in play:
                 # a playbook (list of plays) decided to include some other list of plays
@@ -466,7 +466,7 @@ class PlayBook(object):
         ansible.callbacks.set_task(self.runner_callbacks, task)
 
         if task.role_name:
-            name = '%s | %s' % (task.role_name, task.name)
+            name = '{0!s} | {1!s}'.format(task.role_name, task.name)
         else:
             name = task.name
 
@@ -572,7 +572,7 @@ class PlayBook(object):
                 self.callbacks.on_notify(host, x.name)
                 x.notified_by.append(host)
         if not found:
-            raise errors.AnsibleError("change handler (%s) is not defined" % handler_name)
+            raise errors.AnsibleError("change handler ({0!s}) is not defined".format(handler_name))
 
     # *****************************************************
 
@@ -652,9 +652,9 @@ class PlayBook(object):
 
         buf = StringIO.StringIO()
         for x in replay_hosts:
-            buf.write("%s\n" % x)
+            buf.write("{0!s}\n".format(x))
         basedir = C.shell_expand_path(C.RETRY_FILES_SAVE_PATH)
-        filename = "%s.retry" % os.path.basename(self.filename)
+        filename = "{0!s}.retry".format(os.path.basename(self.filename))
         filename = filename.replace(".yml","")
         filename = os.path.join(basedir, filename)
 

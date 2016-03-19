@@ -267,7 +267,7 @@ class Inventory:
             else:
                 return [ hosts[left] ]
         except IndexError:
-            raise errors.AnsibleError("no hosts matching the pattern '%s' were found" % pat)
+            raise errors.AnsibleError("no hosts matching the pattern '{0!s}' were found".format(pat))
 
     def _hosts_in_unenumerated_pattern(self, pattern):
         """ Get all host names matching the pattern """

@@ -41,5 +41,5 @@ class LookupModule(LookupBase):
                     res = templar.template(template_data, preserve_trailing_newlines=True)
                     ret.append(res)
             else:
-                raise AnsibleError("the template file %s could not be found for the lookup" % term)
+                raise AnsibleError("the template file {0!s} could not be found for the lookup".format(term))
         return ret

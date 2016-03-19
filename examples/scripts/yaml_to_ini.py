@@ -161,17 +161,17 @@ if __name__ == "__main__":
             continue
 
         hosts = record.hosts
-        result = result + "[%s]\n" % record.name
+        result = result + "[{0!s}]\n".format(record.name)
         for h in hosts:
-            result = result + "%s\n" % h.name
+            result = result + "{0!s}\n".format(h.name)
         result = result + "\n"
 
         groupfiledir = os.path.join(dirname, "group_vars")
         if not os.path.exists(groupfiledir):
-            print "* creating: %s" % groupfiledir
+            print "* creating: {0!s}".format(groupfiledir)
             os.makedirs(groupfiledir)
         groupfile = os.path.join(groupfiledir, group_name)
-        print "* writing group variables for %s into %s" % (group_name, groupfile)
+        print "* writing group variables for {0!s} into {1!s}".format(group_name, groupfile)
         groupfh = open(groupfile, 'w')
         groupfh.write(yaml.dump(record.get_variables()))
         groupfh.close()
@@ -179,10 +179,10 @@ if __name__ == "__main__":
     for (host_name, host_record) in yamlp._hosts.iteritems():
         hostfiledir = os.path.join(dirname, "host_vars")
         if not os.path.exists(hostfiledir):
-            print "* creating: %s" % hostfiledir
+            print "* creating: {0!s}".format(hostfiledir)
             os.makedirs(hostfiledir)
         hostfile = os.path.join(hostfiledir, host_record.name)
-        print "* writing host variables for %s into %s" % (host_record.name, hostfile)
+        print "* writing host variables for {0!s} into {1!s}".format(host_record.name, hostfile)
         hostfh = open(hostfile, 'w')
         hostfh.write(yaml.dump(host_record.get_variables()))
         hostfh.close()
@@ -198,9 +198,9 @@ if __name__ == "__main__":
     fdh.close()
 
     print "* COMPLETE: review your new inventory file and replace your original when ready"
-    print "*           new inventory file saved as %s" % newfilepath
-    print "*           edit group specific variables in %s/group_vars/" % dirname
-    print "*           edit host specific variables in %s/host_vars/" % dirname
+    print "*           new inventory file saved as {0!s}".format(newfilepath)
+    print "*           edit group specific variables in {0!s}/group_vars/".format(dirname)
+    print "*           edit host specific variables in {0!s}/host_vars/".format(dirname)
 
     # now need to write this to disk as (oldname).new
     # and inform the user

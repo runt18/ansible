@@ -31,10 +31,10 @@ if os.getenv('ANSIBLE_ETCD_URL') is not None:
 class etcd():
     def __init__(self, url=ANSIBLE_ETCD_URL):
         self.url = url
-        self.baseurl = '%s/v1/keys' % (self.url)
+        self.baseurl = '{0!s}/v1/keys'.format((self.url))
 
     def get(self, key):
-        url = "%s/%s" % (self.baseurl, key)
+        url = "{0!s}/{1!s}".format(self.baseurl, key)
 
         data = None
         value = ""

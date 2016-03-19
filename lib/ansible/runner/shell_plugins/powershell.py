@@ -39,7 +39,7 @@ def _escape(value, include_vars=False):
             ('\'', '`\''), ('`', '``'), ('\x00', '`0')]
     if include_vars:
         subs.append(('$', '`$'))
-    pattern = '|'.join('(%s)' % re.escape(p) for p, s in subs)
+    pattern = '|'.join('({0!s})'.format(re.escape(p)) for p, s in subs)
     substs = [s for p, s in subs]
     replace = lambda m: substs[m.lastindex - 1]
     return re.sub(pattern, replace, value)
@@ -56,7 +56,7 @@ def _encode_script(script, as_list=False):
 def _build_file_cmd(cmd_parts, quote_args=True):
     '''Build command line to run a file, given list of file name plus args.'''
     if quote_args:
-        cmd_parts = ['"%s"' % x for x in cmd_parts]
+        cmd_parts = ['"{0!s}"'.format(x) for x in cmd_parts]
     return ' '.join(_common_args + ['-ExecutionPolicy', 'Unrestricted', '-File'] + cmd_parts)
 
 class ShellModule(object):
@@ -77,14 +77,14 @@ class ShellModule(object):
     def remove(self, path, recurse=False):
         path = _escape(path)
         if recurse:
-            return _encode_script('''Remove-Item "%s" -Force -Recurse;''' % path)
+            return _encode_script('''Remove-Item "{0!s}" -Force -Recurse;'''.format(path))
         else:
-            return _encode_script('''Remove-Item "%s" -Force;''' % path)
+            return _encode_script('''Remove-Item "{0!s}" -Force;'''.format(path))
 
     def mkdtemp(self, basefile, system=False, mode=None):
         basefile = _escape(basefile)
         # FIXME: Support system temp path!
-        return _encode_script('''(New-Item -Type Directory -Path $env:temp -Name "%s").FullName | Write-Host -Separator '';''' % basefile)
+        return _encode_script('''(New-Item -Type Directory -Path $env:temp -Name "{0!s}").FullName | Write-Host -Separator '';'''.format(basefile))
 
     def expand_user(self, user_home_path):
         # PowerShell only supports "~" (not "~username").  Resolve-Path ~ does
@@ -93,39 +93,39 @@ class ShellModule(object):
         if user_home_path == '~':
             script = 'Write-Host (Get-Location).Path'
         elif user_home_path.startswith('~\\'):
-            script = 'Write-Host ((Get-Location).Path + "%s")' % _escape(user_home_path[1:])
+            script = 'Write-Host ((Get-Location).Path + "{0!s}")'.format(_escape(user_home_path[1:]))
         else:
-            script = 'Write-Host "%s"' % _escape(user_home_path)
+            script = 'Write-Host "{0!s}"'.format(_escape(user_home_path))
         return _encode_script(script)
 
     def checksum(self, path, python_interp):
         path = _escape(path)
         script = '''
-            If (Test-Path -PathType Leaf "%(path)s")
-            {
+            If (Test-Path -PathType Leaf "{path!s}")
+            {{
                 $sp = new-object -TypeName System.Security.Cryptography.SHA1CryptoServiceProvider;
-                $fp = [System.IO.File]::Open("%(path)s", [System.IO.Filemode]::Open, [System.IO.FileAccess]::Read);
+                $fp = [System.IO.File]::Open("{path!s}", [System.IO.Filemode]::Open, [System.IO.FileAccess]::Read);
                 [System.BitConverter]::ToString($sp.ComputeHash($fp)).Replace("-", "").ToLower();
                 $fp.Dispose();
-            }
-            ElseIf (Test-Path -PathType Container "%(path)s")
-            {
+            }}
+            ElseIf (Test-Path -PathType Container "{path!s}")
+            {{
                 Write-Host "3";
-            }
+            }}
             Else
-            {
+            {{
                 Write-Host "1";
-            }
-        ''' % dict(path=path)
+            }}
+        '''.format(**dict(path=path))
         return _encode_script(script)
 
     def build_module_command(self, env_string, shebang, cmd, rm_tmp=None):
         cmd = cmd.encode('utf-8')
         cmd_parts = shlex.split(cmd, posix=False)
         if not cmd_parts[0].lower().endswith('.ps1'):
-            cmd_parts[0] = '%s.ps1' % cmd_parts[0]
+            cmd_parts[0] = '{0!s}.ps1'.format(cmd_parts[0])
         script = _build_file_cmd(cmd_parts, quote_args=False)
         if rm_tmp:
             rm_tmp = _escape(rm_tmp)
-            script = '%s; Remove-Item "%s" -Force -Recurse;' % (script, rm_tmp)
+            script = '{0!s}; Remove-Item "{1!s}" -Force -Recurse;'.format(script, rm_tmp)
         return _encode_script(script)

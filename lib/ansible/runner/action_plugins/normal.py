@@ -40,7 +40,7 @@ class ActionModule(object):
 
         if self.runner.noop_on_check(inject):
             if module_name in [ 'shell', 'command' ]:
-                return ReturnData(conn=conn, comm_ok=True, result=dict(skipped=True, msg='check mode not supported for %s' % module_name))
+                return ReturnData(conn=conn, comm_ok=True, result=dict(skipped=True, msg='check mode not supported for {0!s}'.format(module_name)))
             # else let the module parsing code decide, though this will only be allowed for AnsibleModuleCommon using
             # python modules for now
             module_args += " CHECKMODE=True"
@@ -53,7 +53,7 @@ class ActionModule(object):
             module_name = 'command'
             module_args += " #USE_SHELL"
 
-        vv("REMOTE_MODULE %s %s" % (module_name, module_args), host=conn.host)
+        vv("REMOTE_MODULE {0!s} {1!s}".format(module_name, module_args), host=conn.host)
         return self.runner._execute_module(conn, tmp, module_name, module_args, inject=inject, complex_args=complex_args)
 
 

@@ -98,12 +98,12 @@ class Connection(ConnectionBase):
         return 'accelerate'
 
     def _execute_accelerate_module(self):
-        args = "password=%s port=%s minutes=%d debug=%d ipv6=%s" % (
+        args = "password={0!s} port={1!s} minutes={2:d} debug={3:d} ipv6={4!s}".format(
             base64.b64encode(self.key.__str__()), 
             str(self.accport), 
             constants.ACCELERATE_DAEMON_TIMEOUT, 
             int(utils.VERBOSITY), 
-            self.runner.accelerate_ipv6,
+            self.runner.accelerate_ipv6
         )
         if constants.ACCELERATE_MULTI_KEY:
             args += " multi_key=yes"
@@ -126,13 +126,13 @@ class Connection(ConnectionBase):
                 tries = 3
                 self.conn = socket.socket()
                 self.conn.settimeout(constants.ACCELERATE_CONNECT_TIMEOUT)
-                vvvv("attempting connection to %s via the accelerated port %d" % (self.host,self.accport))
+                vvvv("attempting connection to {0!s} via the accelerated port {1:d}".format(self.host, self.accport))
                 while tries > 0:
                     try:
                         self.conn.connect((self.host,self.accport))
                         break
                     except socket.error:
-                        vvvv("connection to %s failed, retrying..." % self.host)
+                        vvvv("connection to {0!s} failed, retrying...".format(self.host))
                         time.sleep(0.1)
                         tries -= 1
                 if tries == 0:
@@ -153,15 +153,15 @@ class Connection(ConnectionBase):
         except AnsibleError as e:
             if allow_ssh:
                 if "WRONG_USER" in e:
-                    vvv("Switching users, waiting for the daemon on %s to shutdown completely..." % self.host)
+                    vvv("Switching users, waiting for the daemon on {0!s} to shutdown completely...".format(self.host))
                     time.sleep(5)
                 vvv("Falling back to ssh to startup accelerated mode")
                 res = self._execute_accelerate_module()
                 if not res.is_successful():
-                    raise AnsibleError("Failed to launch the accelerated daemon on %s (reason: %s)" % (self.host,res.result.get('msg')))
+                    raise AnsibleError("Failed to launch the accelerated daemon on {0!s} (reason: {1!s})".format(self.host, res.result.get('msg')))
                 return self.connect(allow_ssh=False)
             else:
-                raise AnsibleError("Failed to connect to %s:%s" % (self.host,self.accport))
+                raise AnsibleError("Failed to connect to {0!s}:{1!s}".format(self.host, self.accport))
         self.is_connected = True
         return self
 
@@ -173,25 +173,25 @@ class Connection(ConnectionBase):
         header_len = 8 # size of a packed unsigned long long
         data = b""
         try:
-            vvvv("%s: in recv_data(), waiting for the header" % self.host)
+            vvvv("{0!s}: in recv_data(), waiting for the header".format(self.host))
             while len(data) < header_len:
                 d = self.conn.recv(header_len - len(data))
                 if not d:
-                    vvvv("%s: received nothing, bailing out" % self.host)
+                    vvvv("{0!s}: received nothing, bailing out".format(self.host))
                     return None
                 data += d
-            vvvv("%s: got the header, unpacking" % self.host)
+            vvvv("{0!s}: got the header, unpacking".format(self.host))
             data_len = struct.unpack('!Q',data[:header_len])[0]
             data = data[header_len:]
-            vvvv("%s: data received so far (expecting %d): %d" % (self.host,data_len,len(data)))
+            vvvv("{0!s}: data received so far (expecting {1:d}): {2:d}".format(self.host, data_len, len(data)))
             while len(data) < data_len:
                 d = self.conn.recv(data_len - len(data))
                 if not d:
-                    vvvv("%s: received nothing, bailing out" % self.host)
+                    vvvv("{0!s}: received nothing, bailing out".format(self.host))
                     return None
-                vvvv("%s: received %d bytes" % (self.host, len(d)))
+                vvvv("{0!s}: received {1:d} bytes".format(self.host, len(d)))
                 data += d
-            vvvv("%s: received all of the data, returning" % self.host)
+            vvvv("{0!s}: received all of the data, returning".format(self.host))
             return data
         except socket.timeout:
             raise AnsibleError("timed out while waiting to receive data")
@@ -203,7 +203,7 @@ class Connection(ConnectionBase):
         daemon to exit if they don't match
         '''
 
-        vvvv("%s: sending request for validate_user" % self.host)
+        vvvv("{0!s}: sending request for validate_user".format(self.host))
         data = dict(
             mode='validate_user',
             username=self.user,
@@ -211,24 +211,24 @@ class Connection(ConnectionBase):
         data = utils.jsonify(data)
         data = utils.encrypt(self.key, data)
         if self.send_data(data):
-            raise AnsibleError("Failed to send command to %s" % self.host)
+            raise AnsibleError("Failed to send command to {0!s}".format(self.host))
 
-        vvvv("%s: waiting for validate_user response" % self.host)
+        vvvv("{0!s}: waiting for validate_user response".format(self.host))
         while True:
             # we loop here while waiting for the response, because a
             # long running command may cause us to receive keepalive packets
             # ({"pong":"true"}) rather than the response we want.
             response = self.recv_data()
             if not response:
-                raise AnsibleError("Failed to get a response from %s" % self.host)
+                raise AnsibleError("Failed to get a response from {0!s}".format(self.host))
             response = utils.decrypt(self.key, response)
             response = utils.parse_json(response)
             if "pong" in response:
                 # it's a keepalive, go back to waiting
-                vvvv("%s: received a keepalive packet" % self.host)
+                vvvv("{0!s}: received a keepalive packet".format(self.host))
                 continue
             else:
-                vvvv("%s: received the validate_user response: %s" % (self.host, response))
+                vvvv("{0!s}: received the validate_user response: {1!s}".format(self.host, response))
                 break
 
         if response.get('failed'):
@@ -240,7 +240,7 @@ class Connection(ConnectionBase):
         ''' run a command on the remote host '''
 
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -251,7 +251,7 @@ class Connection(ConnectionBase):
         if self.runner.become and sudoable:
             cmd, prompt, success_key = utils.make_become_cmd(cmd, become_user, executable, self.runner.become_method, '', self.runner.become_exe)
 
-        vvv("EXEC COMMAND %s" % cmd)
+        vvv("EXEC COMMAND {0!s}".format(cmd))
 
         data = dict(
             mode='command',
@@ -262,7 +262,7 @@ class Connection(ConnectionBase):
         data = utils.jsonify(data)
         data = utils.encrypt(self.key, data)
         if self.send_data(data):
-            raise AnsibleError("Failed to send command to %s" % self.host)
+            raise AnsibleError("Failed to send command to {0!s}".format(self.host))
         
         while True:
             # we loop here while waiting for the response, because a 
@@ -270,15 +270,15 @@ class Connection(ConnectionBase):
             # ({"pong":"true"}) rather than the response we want. 
             response = self.recv_data()
             if not response:
-                raise AnsibleError("Failed to get a response from %s" % self.host)
+                raise AnsibleError("Failed to get a response from {0!s}".format(self.host))
             response = utils.decrypt(self.key, response)
             response = utils.parse_json(response)
             if "pong" in response:
                 # it's a keepalive, go back to waiting
-                vvvv("%s: received a keepalive packet" % self.host)
+                vvvv("{0!s}: received a keepalive packet".format(self.host))
                 continue
             else:
-                vvvv("%s: received the response" % self.host)
+                vvvv("{0!s}: received the response".format(self.host))
                 break
 
         return (response.get('rc',None), '', response.get('stdout',''), response.get('stderr',''))
@@ -286,15 +286,15 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
 
         ''' transfer a file from local to remote '''
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         if not os.path.exists(in_path):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
 
         fd = file(in_path, 'rb')
         fstat = os.stat(in_path)
         try:
-            vvv("PUT file is %d bytes" % fstat.st_size)
+            vvv("PUT file is {0:d} bytes".format(fstat.st_size))
             last = False
             while fd.tell() <= fstat.st_size and not last:
                 vvvv("file position currently %ld, file size is %ld" % (fd.tell(), fstat.st_size))
@@ -308,11 +308,11 @@ class Connection(ConnectionBase):
                 data = utils.encrypt(self.key, data)
 
                 if self.send_data(data):
-                    raise AnsibleError("failed to send the file to %s" % self.host)
+                    raise AnsibleError("failed to send the file to {0!s}".format(self.host))
 
                 response = self.recv_data()
                 if not response:
-                    raise AnsibleError("Failed to get a response from %s" % self.host)
+                    raise AnsibleError("Failed to get a response from {0!s}".format(self.host))
                 response = utils.decrypt(self.key, response)
                 response = utils.parse_json(response)
 
@@ -323,7 +323,7 @@ class Connection(ConnectionBase):
             vvvv("waiting for final response after PUT")
             response = self.recv_data()
             if not response:
-                raise AnsibleError("Failed to get a response from %s" % self.host)
+                raise AnsibleError("Failed to get a response from {0!s}".format(self.host))
             response = utils.decrypt(self.key, response)
             response = utils.parse_json(response)
 
@@ -332,13 +332,13 @@ class Connection(ConnectionBase):
 
     def fetch_file(self, in_path, out_path):
         ''' save a remote file to the specified path '''
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         data = dict(mode='fetch', in_path=in_path)
         data = utils.jsonify(data)
         data = utils.encrypt(self.key, data)
         if self.send_data(data):
-            raise AnsibleError("failed to initiate the file fetch with %s" % self.host)
+            raise AnsibleError("failed to initiate the file fetch with {0!s}".format(self.host))
 
         fh = open(out_path, "w")
         try:
@@ -346,7 +346,7 @@ class Connection(ConnectionBase):
             while True:
                 response = self.recv_data()
                 if not response:
-                    raise AnsibleError("Failed to get a response from %s" % self.host)
+                    raise AnsibleError("Failed to get a response from {0!s}".format(self.host))
                 response = utils.decrypt(self.key, response)
                 response = utils.parse_json(response)
                 if response.get('failed', False):
@@ -368,7 +368,7 @@ class Connection(ConnectionBase):
             # point in the future or we may just have the put/fetch
             # operations not send back a final response at all
             response = self.recv_data()
-            vvv("FETCH wrote %d bytes to %s" % (bytes, out_path))
+            vvv("FETCH wrote {0:d} bytes to {1!s}".format(bytes, out_path))
             fh.close()
 
     def close(self):

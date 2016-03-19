@@ -34,5 +34,5 @@ class LookupModule(object):
             if p.returncode == 0:
                 ret.extend(stdout.splitlines())
             else:
-                raise errors.AnsibleError("lookup_plugin.lines(%s) returned %d" % (term, p.returncode))
+                raise errors.AnsibleError("lookup_plugin.lines({0!s}) returned {1:d}".format(term, p.returncode))
         return ret

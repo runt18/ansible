@@ -107,12 +107,12 @@ class StrategyBase:
     def _queue_task(self, host, task, task_vars, connection_info):
         ''' handles queueing the task up to be sent to a worker '''
 
-        debug("entering _queue_task() for %s/%s" % (host, task))
+        debug("entering _queue_task() for {0!s}/{1!s}".format(host, task))
 
         # and then queue the new task
-        debug("%s - putting task (%s) in queue" % (host, task))
+        debug("{0!s} - putting task ({1!s}) in queue".format(host, task))
         try:
-            debug("worker is %d (out of %d available)" % (self._cur_worker+1, len(self._workers)))
+            debug("worker is {0:d} (out of {1:d} available)".format(self._cur_worker+1, len(self._workers)))
 
             (worker_prc, main_q, rslt_q) = self._workers[self._cur_worker]
             self._cur_worker += 1
@@ -128,9 +128,9 @@ class StrategyBase:
             main_q.put((host, task, self._loader.get_basedir(), task_vars, connection_info, shared_loader_obj), block=False)
         except (EOFError, IOError, AssertionError) as e:
             # most likely an abort
-            debug("got an error while queuing: %s" % e)
+            debug("got an error while queuing: {0!s}".format(e))
             return
-        debug("exiting _queue_task() for %s/%s" % (host, task))
+        debug("exiting _queue_task() for {0!s}/{1!s}".format(host, task))
 
     def _process_pending_results(self, iterator):
         '''
@@ -143,7 +143,7 @@ class StrategyBase:
         while not self._final_q.empty() and not self._tqm._terminated:
             try:
                 result = self._final_q.get(block=False)
-                debug("got result from result worker: %s" % (result,))
+                debug("got result from result worker: {0!s}".format(result))
 
                 # all host status messages contain 2 entries: (msg, task_result)
                 if result[0] in ('host_task_ok', 'host_task_failed', 'host_task_skipped', 'host_unreachable'):
@@ -152,7 +152,7 @@ class StrategyBase:
                     task = task_result._task
                     if result[0] == 'host_task_failed':
                         if not task.ignore_errors:
-                            debug("marking %s as failed" % host.name)
+                            debug("marking {0!s} as failed".format(host.name))
                             iterator.mark_host_failed(host)
                             self._tqm._failed_hosts[host.name] = True
                         self._tqm._stats.increment('failures', host.name)
@@ -221,7 +221,7 @@ class StrategyBase:
                     self._variable_manager.set_host_facts(host, facts)
 
                 else:
-                    raise AnsibleError("unknown result message received: %s" % result[0])
+                    raise AnsibleError("unknown result message received: {0!s}".format(result[0]))
             except Queue.Empty:
                 pass
 
@@ -236,7 +236,7 @@ class StrategyBase:
         ret_results = []
 
         while self._pending_results > 0 and not self._tqm._terminated:
-            debug("waiting for pending results (%d left)" % self._pending_results)
+            debug("waiting for pending results ({0:d} left)".format(self._pending_results))
             results = self._process_pending_results(iterator)
             ret_results.extend(results)
             if self._tqm._terminated:
@@ -428,5 +428,5 @@ class StrategyBase:
                     self._wait_on_pending_results(iterator)
                     # wipe the notification list
                     self._notified_handlers[handler_name] = []
-            debug("done running handlers, result is: %s" % result)
+            debug("done running handlers, result is: {0!s}".format(result))
         return result

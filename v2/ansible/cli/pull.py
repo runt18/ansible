@@ -65,7 +65,7 @@ class PullCLI(CLI):
         self.parser.add_option('--accept-host-key', default=False, dest='accept_host_key', action='store_true',
             help='adds the hostkey for the repo url if not already added')
         self.parser.add_option('-m', '--module-name', dest='module_name', default=self.DEFAULT_REPO_TYPE,
-            help='Repository module name, which ansible will use to check out the repo. Default is %s.' % self.DEFAULT_REPO_TYPE)
+            help='Repository module name, which ansible will use to check out the repo. Default is {0!s}.'.format(self.DEFAULT_REPO_TYPE))
 
 
         self.options, self.args = self.parser.parse_args()
@@ -75,7 +75,7 @@ class PullCLI(CLI):
                 secs = random.randint(0,int(self.options.sleep))
                 self.options.sleep = secs
             except ValueError:
-                raise AnsibleOptionsError("%s is not a number." % self.options.sleep)
+                raise AnsibleOptionsError("{0!s} is not a number.".format(self.options.sleep))
 
         if not self.options.url:
             raise AnsibleOptionsError("URL for repository not specified, use -h for help")
@@ -84,7 +84,7 @@ class PullCLI(CLI):
             raise AnsibleOptionsError("Missing target hosts")
 
         if self.options.module_name not in self.SUPPORTED_REPO_MODULES:
-            raise AnsibleOptionsError("Unsuported repo module %s, choices are %s" % (self.options.module_name, ','.join(self.SUPPORTED_REPO_MODULES)))
+            raise AnsibleOptionsError("Unsuported repo module {0!s}, choices are {1!s}".format(self.options.module_name, ','.join(self.SUPPORTED_REPO_MODULES)))
 
         self.display.verbosity = self.options.verbosity
         self.validate_conflicts()
@@ -99,10 +99,10 @@ class PullCLI(CLI):
 
         # Build Checkout command
         # Now construct the ansible command
-        limit_opts = 'localhost:%s:127.0.0.1' % socket.getfqdn()
-        base_opts = '-c local --limit "%s"' % limit_opts
+        limit_opts = 'localhost:{0!s}:127.0.0.1'.format(socket.getfqdn())
+        base_opts = '-c local --limit "{0!s}"'.format(limit_opts)
         if self.options.verbosity > 0:
-            base_opts += ' -%s' % ''.join([ "v" for x in range(0, self.options.verbosity) ])
+            base_opts += ' -{0!s}'.format(''.join([ "v" for x in range(0, self.options.verbosity) ]))
 
         # Attempt to use the inventory passed in as an argument
         # It might not yet have been downloaded so use localhost if note
@@ -113,31 +113,31 @@ class PullCLI(CLI):
 
         #TODO: enable more repo modules hg/svn?
         if self.options.module_name == 'git':
-            repo_opts = "name=%s dest=%s" % (self.options.url, self.options.dest)
+            repo_opts = "name={0!s} dest={1!s}".format(self.options.url, self.options.dest)
             if self.options.checkout:
-                repo_opts += ' version=%s' % self.options.checkout
+                repo_opts += ' version={0!s}'.format(self.options.checkout)
 
             if self.options.accept_host_key:
                 repo_opts += ' accept_hostkey=yes'
 
             if self.options.key_file:
-                repo_opts += ' key_file=%s' % options.key_file
+                repo_opts += ' key_file={0!s}'.format(options.key_file)
 
         path = utils.plugins.module_finder.find_plugin(options.module_name)
         if path is None:
-            raise AnsibleOptionsError(("module '%s' not found.\n" % options.module_name))
+            raise AnsibleOptionsError(("module '{0!s}' not found.\n".format(options.module_name)))
 
         bin_path = os.path.dirname(os.path.abspath(__file__))
-        cmd = '%s/ansible localhost -i "%s" %s -m %s -a "%s"' % (
+        cmd = '{0!s}/ansible localhost -i "{1!s}" {2!s} -m {3!s} -a "{4!s}"'.format(
             bin_path, inv_opts, base_opts, self.options.module_name, repo_opts
         )
 
         for ev in self.options.extra_vars:
-            cmd += ' -e "%s"' % ev
+            cmd += ' -e "{0!s}"'.format(ev)
 
         # Nap?
         if self.options.sleep:
-            self.display.display("Sleeping for %d seconds..." % self.options.sleep)
+            self.display.display("Sleeping for {0:d} seconds...".format(self.options.sleep))
             time.sleep(self.options.sleep);
 
         # RUN the Checkout command
@@ -158,17 +158,17 @@ class PullCLI(CLI):
             raise AnsibleOptionsError("Could not find a playbook to run.")
 
         # Build playbook command
-        cmd = '%s/ansible-playbook %s %s' % (bin_path, base_opts, playbook)
+        cmd = '{0!s}/ansible-playbook {1!s} {2!s}'.format(bin_path, base_opts, playbook)
         if self.options.vault_password_file:
-            cmd += " --vault-password-file=%s" % self.options.vault_password_file
+            cmd += " --vault-password-file={0!s}".format(self.options.vault_password_file)
         if self.options.inventory:
-            cmd += ' -i "%s"' % self.options.inventory
+            cmd += ' -i "{0!s}"'.format(self.options.inventory)
         for ev in self.options.extra_vars:
-            cmd += ' -e "%s"' % ev
+            cmd += ' -e "{0!s}"'.format(ev)
         if self.options.ask_sudo_pass:
             cmd += ' -K'
         if self.options.tags:
-            cmd += ' -t "%s"' % self.options.tags
+            cmd += ' -t "{0!s}"'.format(self.options.tags)
 
         os.chdir(self.options.dest)
 
@@ -180,7 +180,7 @@ class PullCLI(CLI):
             try:
                 shutil.rmtree(options.dest)
             except Exception, e:
-                print >>sys.stderr, "Failed to remove %s: %s" % (options.dest, str(e))
+                print >>sys.stderr, "Failed to remove {0!s}: {1!s}".format(options.dest, str(e))
 
         return rc
 
@@ -198,7 +198,7 @@ class PullCLI(CLI):
             playbook = os.path.join(path, self.args[0])
             rc = self.try_playbook(playbook)
             if rc != 0:
-                self.display.warning("%s: %s" % (playbook, self.PLAYBOOK_ERRORS[rc]))
+                self.display.warning("{0!s}: {1!s}".format(playbook, self.PLAYBOOK_ERRORS[rc]))
                 return None
             return playbook
         else:
@@ -213,7 +213,7 @@ class PullCLI(CLI):
                     playbook = pb
                     break
                 else:
-                    errors.append("%s: %s" % (pb, self.PLAYBOOK_ERRORS[rc]))
+                    errors.append("{0!s}: {1!s}".format(pb, self.PLAYBOOK_ERRORS[rc]))
             if playbook is None:
                 self.display.warning("\n".join(errors))
             return playbook

@@ -41,8 +41,8 @@ class VaultCLI(CLI):
 
         self.parser = CLI.base_parser(
             vault_opts=True,
-            usage = "usage: %%prog [%s] [--help] [options] vaultfile.yml" % "|".join(self.VALID_ACTIONS),
-            epilog = "\nSee '%s <command> --help' for more information on a specific command.\n\n" % os.path.basename(sys.argv[0])
+            usage = "usage: %prog [{0!s}] [--help] [options] vaultfile.yml".format("|".join(self.VALID_ACTIONS)),
+            epilog = "\nSee '{0!s} <command> --help' for more information on a specific command.\n\n".format(os.path.basename(sys.argv[0]))
         )
 
         self.set_action()

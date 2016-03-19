@@ -60,7 +60,7 @@ class TestPlayIterator(unittest.TestCase):
         hosts = []
         for i in range(0, 10):
             host  = MagicMock()
-            host.get_name.return_value = 'host%02d' % i
+            host.get_name.return_value = 'host{0:02d}'.format(i)
             hosts.append(host)
 
         inventory = MagicMock()

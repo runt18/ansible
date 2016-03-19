@@ -287,14 +287,14 @@ class SSLValidationHandler(urllib2.BaseHandler):
                 if proxy_parts.get('scheme') == 'http':
                     s.sendall(self.CONNECT_COMMAND % (self.hostname, self.port))
                     if proxy_parts.get('username'):
-                        credentials = "%s:%s" % (proxy_parts.get('username',''), proxy_parts.get('password',''))
-                        s.sendall('Proxy-Authorization: Basic %s\r\n' % credentials.encode('base64').strip())
+                        credentials = "{0!s}:{1!s}".format(proxy_parts.get('username',''), proxy_parts.get('password',''))
+                        s.sendall('Proxy-Authorization: Basic {0!s}\r\n'.format(credentials.encode('base64').strip()))
                     s.sendall('\r\n')
                     connect_result = s.recv(4096)
                     self.validate_proxy_response(connect_result)
                     ssl_s = ssl.wrap_socket(s, ca_certs=tmp_ca_cert_path, cert_reqs=ssl.CERT_REQUIRED)
                 else:
-                    self.module.fail_json(msg='Unsupported proxy scheme: %s. Currently ansible only supports HTTP proxies.' % proxy_parts.get('scheme'))
+                    self.module.fail_json(msg='Unsupported proxy scheme: {0!s}. Currently ansible only supports HTTP proxies.'.format(proxy_parts.get('scheme')))
             else:
                 s.connect((self.hostname, self.port))
                 ssl_s = ssl.wrap_socket(s, ca_certs=tmp_ca_cert_path, cert_reqs=ssl.CERT_REQUIRED)
@@ -304,12 +304,12 @@ class SSLValidationHandler(urllib2.BaseHandler):
         except (ssl.SSLError, socket.error), e:
             # fail if we tried all of the certs but none worked
             if 'connection refused' in str(e).lower():
-                self.module.fail_json(msg='Failed to connect to %s:%s.' % (self.hostname, self.port))
+                self.module.fail_json(msg='Failed to connect to {0!s}:{1!s}.'.format(self.hostname, self.port))
             else:
                 self.module.fail_json(
-                    msg='Failed to validate the SSL certificate for %s:%s. ' % (self.hostname, self.port) + \
+                    msg='Failed to validate the SSL certificate for {0!s}:{1!s}. '.format(self.hostname, self.port) + \
                     'Use validate_certs=no or make sure your managed systems have a valid CA certificate installed. ' + \
-                    'Paths checked for this platform: %s' % ", ".join(paths_checked)
+                    'Paths checked for this platform: {0!s}'.format(", ".join(paths_checked))
                 )
         try:
             # cleanup the temp file created, don't worry
@@ -433,7 +433,7 @@ def fetch_url(module, url, data=None, headers=None, method=None,
 
     if method:
         if method.upper() not in ('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT'):
-            module.fail_json(msg='invalid HTTP request method; %s' % method.upper())
+            module.fail_json(msg='invalid HTTP request method; {0!s}'.format(method.upper()))
         request = RequestWithMethod(url, method.upper(), data)
     else:
         request = urllib2.Request(url, data)
@@ -466,16 +466,16 @@ def fetch_url(module, url, data=None, headers=None, method=None,
             r = urllib2.urlopen(request, None, timeout)
         info.update(r.info())
         info['url'] = r.geturl()  # The URL goes in too, because of redirects.
-        info.update(dict(msg="OK (%s bytes)" % r.headers.get('Content-Length', 'unknown'), status=200))
+        info.update(dict(msg="OK ({0!s} bytes)".format(r.headers.get('Content-Length', 'unknown')), status=200))
     except urllib2.HTTPError, e:
         info.update(dict(msg=str(e), status=e.code))
     except urllib2.URLError, e:
         code = int(getattr(e, 'code', -1))
-        info.update(dict(msg="Request failed: %s" % str(e), status=code))
+        info.update(dict(msg="Request failed: {0!s}".format(str(e)), status=code))
     except socket.error, e:
-        info.update(dict(msg="Connection failure: %s" % str(e), status=-1))
+        info.update(dict(msg="Connection failure: {0!s}".format(str(e)), status=-1))
     except Exception, e:
-        info.update(dict(msg="An unknown error occurred: %s" % str(e), status=-1))
+        info.update(dict(msg="An unknown error occurred: {0!s}".format(str(e)), status=-1))
 
     return r, info
 

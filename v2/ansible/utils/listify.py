@@ -44,7 +44,7 @@ def listify_lookup_plugin_terms(terms, variables, loader):
             # if not already a list, get ready to evaluate with Jinja2
             # not sure why the "/" is in above code :)
             try:
-                new_terms = templar.template("{{ %s }}" % terms)
+                new_terms = templar.template("{{{{ {0!s} }}}}".format(terms))
                 if isinstance(new_terms, basestring) and "{{" in new_terms:
                     pass
                 else:

@@ -100,7 +100,7 @@ class VaultLib(object):
             cipher = globals()['Vault' + self.cipher_name]
             this_cipher = cipher()
         else:
-            raise errors.AnsibleError("%s cipher could not be found" % self.cipher_name)
+            raise errors.AnsibleError("{0!s} cipher could not be found".format(self.cipher_name))
 
         """
         # combine sha + data
@@ -130,7 +130,7 @@ class VaultLib(object):
             cipher = globals()['Vault' + self.cipher_name]
             this_cipher = cipher()
         else:
-            raise errors.AnsibleError("%s cipher could not be found" % self.cipher_name)
+            raise errors.AnsibleError("{0!s} cipher could not be found".format(self.cipher_name))
 
         # try to unencrypt data
         data = this_cipher.decrypt(data, self.password)
@@ -206,7 +206,7 @@ class VaultEditor(object):
         try:
             call(self._editor_shell_command(tmp_path))
         except OSError, e:
-           raise Exception("Failed to open editor (%s): %s" % (self._editor_shell_command(tmp_path)[0],str(e)))
+           raise Exception("Failed to open editor ({0!s}): {1!s}".format(self._editor_shell_command(tmp_path)[0], str(e)))
         tmpdata = self.read_data(tmp_path)
 
         # create new vault
@@ -231,7 +231,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s exists, please use 'edit' instead" % self.filename)
+            raise errors.AnsibleError("{0!s} exists, please use 'edit' instead".format(self.filename))
 
         # Let the user specify contents and save file
         self._edit_file_helper(cipher=self.cipher_name)
@@ -242,7 +242,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if not os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s does not exist" % self.filename)
+            raise errors.AnsibleError("{0!s} does not exist".format(self.filename))
 
         tmpdata = self.read_data(self.filename)
         this_vault = VaultLib(self.password)
@@ -253,7 +253,7 @@ class VaultEditor(object):
             else:
                 self.write_data(dec_data, self.filename)
         else:
-            raise errors.AnsibleError("%s is not encrypted" % self.filename)
+            raise errors.AnsibleError("{0!s} is not encrypted".format(self.filename))
 
     def edit_file(self):
 
@@ -296,7 +296,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if not os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s does not exist" % self.filename)
+            raise errors.AnsibleError("{0!s} does not exist".format(self.filename))
 
         tmpdata = self.read_data(self.filename)
         this_vault = VaultLib(self.password)
@@ -305,7 +305,7 @@ class VaultEditor(object):
             enc_data = this_vault.encrypt(tmpdata)
             self.write_data(enc_data, self.filename)
         else:
-            raise errors.AnsibleError("%s is already encrypted" % self.filename)
+            raise errors.AnsibleError("{0!s} is already encrypted".format(self.filename))
 
     def rekey_file(self, new_password):
 
@@ -539,7 +539,7 @@ class VaultAES256(object):
 
         # COMBINE SALT, DIGEST AND DATA
         hmac = HMAC.new(key2, cryptedData, SHA256)
-        message = "%s\n%s\n%s" % ( hexlify(salt), hmac.hexdigest(), hexlify(cryptedData) )
+        message = "{0!s}\n{1!s}\n{2!s}".format(hexlify(salt), hmac.hexdigest(), hexlify(cryptedData) )
         message = hexlify(message)
         return message
 

@@ -145,7 +145,7 @@ class InventoryParser(object):
                             try:
                                 (k,v) = t.split("=", 1)
                             except ValueError, e:
-                                raise AnsibleError("Invalid ini entry in %s: %s - %s" % (self.filename, t, str(e)))
+                                raise AnsibleError("Invalid ini entry in {0!s}: {1!s} - {2!s}".format(self.filename, t, str(e)))
                             if k == 'ansible_ssh_host':
                                 host.ipv4_address = self._parse_value(v)
                             else:
@@ -175,7 +175,7 @@ class InventoryParser(object):
             elif group:
                 kid_group = self.groups.get(line, None)
                 if kid_group is None:
-                    raise AnsibleError("child group is not defined: (%s)" % line)
+                    raise AnsibleError("child group is not defined: ({0!s})".format(line))
                 else:
                     group.add_child_group(kid_group)
 
@@ -192,7 +192,7 @@ class InventoryParser(object):
                 line = line.replace("[","").replace(":vars]","")
                 group = self.groups.get(line, None)
                 if group is None:
-                    raise AnsibleError("can't add vars to undefined group: %s" % line)
+                    raise AnsibleError("can't add vars to undefined group: {0!s}".format(line))
             elif line.startswith("#") or line.startswith(";"):
                 pass
             elif line.startswith("["):

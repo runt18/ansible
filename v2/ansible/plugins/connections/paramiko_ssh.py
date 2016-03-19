@@ -126,7 +126,7 @@ class Connection(ConnectionBase):
         return 'paramiko'
 
     def _cache_key(self):
-        return "%s__%s__" % (self._connection_info.remote_addr, self._connection_info.remote_user)
+        return "{0!s}__{1!s}__".format(self._connection_info.remote_addr, self._connection_info.remote_user)
 
     def _connect(self):
         cache_key = self._cache_key()
@@ -143,7 +143,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("paramiko is not installed")
 
         port = self._connection_info.port or 22
-        self._display.vvv("ESTABLISH CONNECTION FOR USER: %s on PORT %s TO %s" % (self._connection_info.remote_user, port, self._connection_info.remote_addr), host=self._connection_info.remote_addr)
+        self._display.vvv("ESTABLISH CONNECTION FOR USER: {0!s} on PORT {1!s} TO {2!s}".format(self._connection_info.remote_user, port, self._connection_info.remote_addr), host=self._connection_info.remote_addr)
 
         ssh = paramiko.SSHClient()
 
@@ -179,7 +179,7 @@ class Connection(ConnectionBase):
             if "PID check failed" in msg:
                 raise AnsibleError("paramiko version issue, please upgrade paramiko on the machine running ansible")
             elif "Private key file is encrypted" in msg:
-                msg = 'ssh %s@%s:%s : %s\nTo connect as a different user, use -u <username>.' % (
+                msg = 'ssh {0!s}@{1!s}:{2!s} : {3!s}\nTo connect as a different user, use -u <username>.'.format(
                     self._connection_info.remote_user, self._connection_info.remote_addr, port, msg)
                 raise AnsibleConnectionFailure(msg)
             else:
@@ -201,7 +201,7 @@ class Connection(ConnectionBase):
         except Exception as e:
             msg = "Failed to open session"
             if len(str(e)) > 0:
-                msg += ": %s" % str(e)
+                msg += ": {0!s}".format(str(e))
             raise AnsibleConnectionFailure(msg)
 
         # sudo usually requires a PTY (cf. requiretty option), therefore
@@ -210,7 +210,7 @@ class Connection(ConnectionBase):
         if C.PARAMIKO_PTY:
             chan.get_pty(term=os.getenv('TERM', 'vt100'), width=int(os.getenv('COLUMNS', 0)), height=int(os.getenv('LINES', 0)))
 
-        self._display.vvv("EXEC %s" % cmd, host=self._connection_info.remote_addr)
+        self._display.vvv("EXEC {0!s}".format(cmd), host=self._connection_info.remote_addr)
 
         no_prompt_out = ''
         no_prompt_err = ''
@@ -228,7 +228,7 @@ class Connection(ConnectionBase):
                     if not chunk:
                         if 'unknown user' in become_output:
                             raise AnsibleError(
-                                'user %s does not exist' % become_user)
+                                'user {0!s} does not exist'.format(become_user))
                         else:
                             raise AnsibleError('ssh connection ' +
                                 'closed waiting for password prompt')
@@ -250,24 +250,24 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to remote '''
 
-        self._display.vvv("PUT %s TO %s" % (in_path, out_path), host=self._connection_info.remote_addr)
+        self._display.vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self._connection_info.remote_addr)
 
         if not os.path.exists(in_path):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
 
         try:
             self.sftp = self.ssh.open_sftp()
         except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % e)
+            raise AnsibleError("failed to open a SFTP connection ({0!s})".format(e))
 
         try:
             self.sftp.put(in_path, out_path)
         except IOError:
-            raise AnsibleError("failed to transfer file to %s" % out_path)
+            raise AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def _connect_sftp(self):
 
-        cache_key = "%s__%s__" % (self._connection_info.remote_addr, self._connection_info.remote_user)
+        cache_key = "{0!s}__{1!s}__".format(self._connection_info.remote_addr, self._connection_info.remote_user)
         if cache_key in SFTP_CONNECTION_CACHE:
             return SFTP_CONNECTION_CACHE[cache_key]
         else:
@@ -277,7 +277,7 @@ class Connection(ConnectionBase):
     def fetch_file(self, in_path, out_path):
         ''' save a remote file to the specified path '''
 
-        self._display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self._connection_info.remote_addr)
+        self._display.vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self._connection_info.remote_addr)
 
         try:
             self.sftp = self._connect_sftp()
@@ -287,7 +287,7 @@ class Connection(ConnectionBase):
         try:
             self.sftp.get(in_path, out_path)
         except IOError:
-            raise AnsibleError("failed to transfer file from %s" % in_path)
+            raise AnsibleError("failed to transfer file from {0!s}".format(in_path))
 
     def _any_keys_added(self):
 
@@ -321,14 +321,14 @@ class Connection(ConnectionBase):
                 # was f.write
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                 if not added_this_time:
-                    f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                    f.write("{0!s} {1!s} {2!s}\n".format(hostname, keytype, key.get_base64()))
 
         for hostname, keys in self.ssh._host_keys.iteritems():
 
             for keytype, key in keys.iteritems():
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                 if added_this_time:
-                    f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                    f.write("{0!s} {1!s} {2!s}\n".format(hostname, keytype, key.get_base64()))
 
         f.close()
 

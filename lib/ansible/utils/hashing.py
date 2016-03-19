@@ -63,7 +63,7 @@ def secure_hash(filename, hash_func=sha1):
             block = infile.read(blocksize)
         infile.close()
     except IOError, e:
-        raise errors.AnsibleError("error while accessing the file %s, error was: %s" % (filename, e))
+        raise errors.AnsibleError("error while accessing the file {0!s}, error was: {1!s}".format(filename, e))
     return digest.hexdigest()
 
 # The checksum algorithm must match with the algorithm in ShellModule.checksum() method

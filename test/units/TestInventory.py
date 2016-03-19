@@ -200,7 +200,7 @@ class TestInventory(unittest.TestCase):
     def test_large_range(self):
         inventory = self.large_range_inventory()
         hosts = inventory.list_hosts()
-        self.assertEqual(sorted(hosts),  sorted('bob%03i' %i  for i in range(0, 143)))
+        self.assertEqual(sorted(hosts),  sorted('bob{0:03d}'.format(i)  for i in range(0, 143)))
 
     def test_subset(self):
         inventory = self.simple_inventory()
@@ -262,24 +262,24 @@ class TestInventory(unittest.TestCase):
         inventory = self.complex_inventory()
         hosts = inventory.list_hosts("nc:florida:!triangle:!orlando")
         expected_hosts = ['miami', 'rtp_a', 'rtp_b', 'rtp_c']
-        print "HOSTS=%s" % sorted(hosts)
-        print "EXPECTED=%s" % sorted(expected_hosts)
+        print "HOSTS={0!s}".format(sorted(hosts))
+        print "EXPECTED={0!s}".format(sorted(expected_hosts))
         assert sorted(hosts) == sorted(expected_hosts)
 
     def test_regex_exclude(self):
         inventory = self.complex_inventory()
         hosts = inventory.list_hosts("~rtp_[ac]")
         expected_hosts = ['rtp_a', 'rtp_c']
-        print "HOSTS=%s" % sorted(hosts)
-        print "EXPECTED=%s" % sorted(expected_hosts)
+        print "HOSTS={0!s}".format(sorted(hosts))
+        print "EXPECTED={0!s}".format(sorted(expected_hosts))
         assert sorted(hosts) == sorted(expected_hosts)
 
     def test_regex_grouping(self):
         inventory = self.simple_inventory()
         hosts = inventory.list_hosts("~(cer[a-z]|berc)(erus00[13])")
         expected_hosts = ['cerberus001', 'cerberus003']
-        print "HOSTS=%s" % sorted(hosts)
-        print "EXPECTED=%s" % sorted(expected_hosts)
+        print "HOSTS={0!s}".format(sorted(hosts))
+        print "EXPECTED={0!s}".format(sorted(expected_hosts))
         assert sorted(hosts) == sorted(expected_hosts)
 
     def test_complex_enumeration(self):
@@ -351,8 +351,8 @@ class TestInventory(unittest.TestCase):
 
         expected_hosts=['jupiter', 'saturn', 'zeus', 'hera', 'poseidon', 'thor', 'odin', 'loki']
 
-        print "Expected: %s"%(expected_hosts)
-        print "Got     : %s"%(hosts)
+        print "Expected: {0!s}".format((expected_hosts))
+        print "Got     : {0!s}".format((hosts))
         assert sorted(hosts) == sorted(expected_hosts)
 
     def test_script_all(self):
@@ -396,7 +396,7 @@ class TestInventory(unittest.TestCase):
         inventory = self.script_inventory()
         vars = inventory.get_variables('thor')
 
-        print "VARS=%s" % vars
+        print "VARS={0!s}".format(vars)
 
         assert vars == {'hammer':True,
                         'group_names': ['norse'],
@@ -415,7 +415,7 @@ class TestInventory(unittest.TestCase):
         inventory = self.script_inventory()
         vars = inventory.get_variables('zeus')
 
-        print "VARS=%s" % vars
+        print "VARS={0!s}".format(vars)
 
         assert vars == {'inventory_hostname': 'zeus',
                         'inventory_hostname_short': 'zeus',
@@ -436,8 +436,8 @@ class TestInventory(unittest.TestCase):
                          'group_names': ['greek', 'major-god'],
                          'var_a': '3#4'}
 
-        print "HOST     VARS=%s" % host_vars
-        print "EXPECTED VARS=%s" % expected_vars
+        print "HOST     VARS={0!s}".format(host_vars)
+        print "EXPECTED VARS={0!s}".format(expected_vars)
 
         assert host_vars == expected_vars
 
@@ -445,7 +445,7 @@ class TestInventory(unittest.TestCase):
         inventory = self.dir_inventory()
         group_greek = inventory.get_hosts('greek')
         actual_host_names = [host.name for host in group_greek]
-        print "greek : %s " % actual_host_names
+        print "greek : {0!s} ".format(actual_host_names)
         assert actual_host_names == ['zeus', 'morpheus']
 
     def test_dir_inventory_skip_extension(self):
@@ -464,8 +464,8 @@ class TestInventory(unittest.TestCase):
         actual_groups = {}
         for group in inventory.get_groups():
             actual_groups[group.name] = sorted([h.name for h in group.get_hosts()])
-            print "INVENTORY groups[%s].hosts=%s" % (group.name, actual_groups[group.name])
-            print "EXPECTED  groups[%s].hosts=%s" % (group.name, expected_groups[group.name])
+            print "INVENTORY groups[{0!s}].hosts={1!s}".format(group.name, actual_groups[group.name])
+            print "EXPECTED  groups[{0!s}].hosts={1!s}".format(group.name, expected_groups[group.name])
 
         assert actual_groups == expected_groups
 
@@ -480,8 +480,8 @@ class TestInventory(unittest.TestCase):
             groups = inventory.groups_for_host(host)
             names = sorted([g.name for g in groups])
             actual_groups_for_host[host] = names
-            print "INVENTORY groups_for_host(%s)=%s" % (host, names)
-            print "EXPECTED  groups_for_host(%s)=%s" % (host, expected)
+            print "INVENTORY groups_for_host({0!s})={1!s}".format(host, names)
+            print "EXPECTED  groups_for_host({0!s})={1!s}".format(host, expected)
 
         assert actual_groups_for_host == expected_groups_for_host
 
@@ -498,8 +498,8 @@ class TestInventory(unittest.TestCase):
 
         for (name, expected_hosts) in expected_groups.iteritems():
             inventory_groups[name] = sorted(inventory_groups.get(name, []))
-            print "INVENTORY groups_list['%s']=%s" % (name, inventory_groups[name])
-            print "EXPECTED  groups_list['%s']=%s" % (name, expected_hosts)
+            print "INVENTORY groups_list['{0!s}']={1!s}".format(name, inventory_groups[name])
+            print "EXPECTED  groups_list['{0!s}']={1!s}".format(name, expected_hosts)
 
         assert inventory_groups == expected_groups
 

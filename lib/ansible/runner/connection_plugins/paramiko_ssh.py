@@ -129,7 +129,7 @@ class Connection(object):
         self.become_methods_supported=['sudo', 'su', 'pbrun']
 
     def _cache_key(self):
-        return "%s__%s__" % (self.host, self.user)
+        return "{0!s}__{1!s}__".format(self.host, self.user)
 
     def connect(self):
         cache_key = self._cache_key()
@@ -145,7 +145,7 @@ class Connection(object):
         if not HAVE_PARAMIKO:
             raise errors.AnsibleError("paramiko is not installed")
 
-        vvv("ESTABLISH CONNECTION FOR USER: %s on PORT %s TO %s" % (self.user, self.port, self.host), host=self.host)
+        vvv("ESTABLISH CONNECTION FOR USER: {0!s} on PORT {1!s} TO {2!s}".format(self.user, self.port, self.host), host=self.host)
 
         ssh = paramiko.SSHClient()
 
@@ -179,7 +179,7 @@ class Connection(object):
             if "PID check failed" in msg:
                 raise errors.AnsibleError("paramiko version issue, please upgrade paramiko on the machine running ansible")
             elif "Private key file is encrypted" in msg:
-                msg = 'ssh %s@%s:%s : %s\nTo connect as a different user, use -u <username>.' % (
+                msg = 'ssh {0!s}@{1!s}:{2!s} : {3!s}\nTo connect as a different user, use -u <username>.'.format(
                     self.user, self.host, self.port, msg)
                 raise errors.AnsibleConnectionFailed(msg)
             else:
@@ -191,7 +191,7 @@ class Connection(object):
         ''' run a command on the remote host '''
 
         if self.runner.become and sudoable and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -207,7 +207,7 @@ class Connection(object):
 
             msg = "Failed to open session"
             if len(str(e)) > 0:
-                msg += ": %s" % str(e)
+                msg += ": {0!s}".format(str(e))
             raise errors.AnsibleConnectionFailed(msg)
 
         no_prompt_out = ''
@@ -218,7 +218,7 @@ class Connection(object):
                 quoted_command = executable + ' -c ' + pipes.quote(cmd)
             else:
                 quoted_command = cmd
-            vvv("EXEC %s" % quoted_command, host=self.host)
+            vvv("EXEC {0!s}".format(quoted_command), host=self.host)
             chan.exec_command(quoted_command)
 
         else:
@@ -233,7 +233,7 @@ class Connection(object):
             if self.runner.become and sudoable:
                 shcmd, prompt, success_key = utils.make_become_cmd(cmd, become_user, executable, self.runner.become_method, '', self.runner.become_exe)
 
-            vvv("EXEC %s" % shcmd, host=self.host)
+            vvv("EXEC {0!s}".format(shcmd), host=self.host)
             become_output = ''
 
             try:
@@ -253,7 +253,7 @@ class Connection(object):
                         if not chunk:
                             if 'unknown user' in become_output:
                                 raise errors.AnsibleError(
-                                    'user %s does not exist' % become_user)
+                                    'user {0!s} does not exist'.format(become_user))
                             else:
                                 raise errors.AnsibleError('ssh connection ' +
                                     'closed waiting for password prompt')
@@ -279,24 +279,24 @@ class Connection(object):
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to remote '''
 
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
 
         try:
             self.sftp = self.ssh.open_sftp()
         except Exception, e:
-            raise errors.AnsibleError("failed to open a SFTP connection (%s)" % e)
+            raise errors.AnsibleError("failed to open a SFTP connection ({0!s})".format(e))
 
         try:
             self.sftp.put(in_path, out_path)
         except IOError:
-            raise errors.AnsibleError("failed to transfer file to %s" % out_path)
+            raise errors.AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def _connect_sftp(self):
 
-        cache_key = "%s__%s__" % (self.host, self.user)
+        cache_key = "{0!s}__{1!s}__".format(self.host, self.user)
         if cache_key in SFTP_CONNECTION_CACHE:
             return SFTP_CONNECTION_CACHE[cache_key]
         else:
@@ -306,7 +306,7 @@ class Connection(object):
     def fetch_file(self, in_path, out_path):
         ''' save a remote file to the specified path '''
 
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         try:
             self.sftp = self._connect_sftp()
@@ -316,7 +316,7 @@ class Connection(object):
         try:
             self.sftp.get(in_path, out_path)
         except IOError:
-            raise errors.AnsibleError("failed to transfer file from %s" % in_path)
+            raise errors.AnsibleError("failed to transfer file from {0!s}".format(in_path))
 
     def _any_keys_added(self):
 
@@ -350,14 +350,14 @@ class Connection(object):
                 # was f.write
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                 if not added_this_time:
-                    f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                    f.write("{0!s} {1!s} {2!s}\n".format(hostname, keytype, key.get_base64()))
 
         for hostname, keys in self.ssh._host_keys.iteritems():
 
             for keytype, key in keys.iteritems():
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                 if added_this_time:
-                    f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+                    f.write("{0!s} {1!s} {2!s}\n".format(hostname, keytype, key.get_base64()))
 
         f.close()
 

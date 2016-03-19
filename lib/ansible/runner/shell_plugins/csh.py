@@ -23,4 +23,4 @@ class ShellModule(ShModule):
     _SHELL_EMBEDDED_PY_EOL = '\\\n'
 
     def env_prefix(self, **kwargs):
-        return 'env %s' % super(ShellModule, self).env_prefix(**kwargs)
+        return 'env {0!s}'.format(super(ShellModule, self).env_prefix(**kwargs))

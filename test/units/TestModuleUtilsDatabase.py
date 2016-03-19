@@ -15,12 +15,11 @@ except ImportError:
             if isinstance(regexp, basestring):
                 regexp = re.compile(regexp)
             if not regexp.search(str(e)):
-                raise Exception('"%s" does not match "%s"' %
-                                (regexp.pattern, str(e)))
+                raise Exception('"{0!s}" does not match "{1!s}"'.format(regexp.pattern, str(e)))
         else:
             if hasattr(expected,'__name__'): excName = expected.__name__
             else: excName = str(expected)
-            raise AssertionError("%s not raised" % excName)
+            raise AssertionError("{0!s} not raised".format(excName))
 
 from ansible.module_utils.database import (
     pg_quote_identifier,

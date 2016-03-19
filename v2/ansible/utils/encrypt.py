@@ -34,7 +34,7 @@ def do_encrypt(result, encrypt, salt_size=None, salt=None):
         try:
             crypt = getattr(passlib.hash, encrypt)
         except:
-            raise AnsibleError("passlib does not support '%s' algorithm" % encrypt)
+            raise AnsibleError("passlib does not support '{0!s}' algorithm".format(encrypt))
 
         if salt_size:
             result = crypt.encrypt(result, salt_size=salt_size)

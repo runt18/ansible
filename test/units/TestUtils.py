@@ -399,7 +399,7 @@ class TestUtils(unittest.TestCase):
 
     def test_version(self):
         version = ansible.utils.version('ansible')
-        self.assertTrue(version.startswith('ansible %s' % __version__))
+        self.assertTrue(version.startswith('ansible {0!s}'.format(__version__)))
         # this fails if not run from git clone
         # self.assertEqual('last updated' in version)
 

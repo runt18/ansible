@@ -50,45 +50,45 @@ class ShellModule(object):
     def remove(self, path, recurse=False):
         path = self._escape(path)
         if recurse:
-            return self._encode_script('''Remove-Item "%s" -Force -Recurse;''' % path)
+            return self._encode_script('''Remove-Item "{0!s}" -Force -Recurse;'''.format(path))
         else:
-            return self._encode_script('''Remove-Item "%s" -Force;''' % path)
+            return self._encode_script('''Remove-Item "{0!s}" -Force;'''.format(path))
 
     def mkdtemp(self, basefile, system=False, mode=None):
         basefile = self._escape(basefile)
         # FIXME: Support system temp path!
-        return self._encode_script('''(New-Item -Type Directory -Path $env:temp -Name "%s").FullName | Write-Host -Separator '';''' % basefile)
+        return self._encode_script('''(New-Item -Type Directory -Path $env:temp -Name "{0!s}").FullName | Write-Host -Separator '';'''.format(basefile))
 
     def md5(self, path):
         path = self._escape(path)
         script = '''
-            If (Test-Path -PathType Leaf "%(path)s")
-            {
+            If (Test-Path -PathType Leaf "{path!s}")
+            {{
                 $sp = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider;
-                $fp = [System.IO.File]::Open("%(path)s", [System.IO.Filemode]::Open, [System.IO.FileAccess]::Read);
+                $fp = [System.IO.File]::Open("{path!s}", [System.IO.Filemode]::Open, [System.IO.FileAccess]::Read);
                 [System.BitConverter]::ToString($sp.ComputeHash($fp)).Replace("-", "").ToLower();
                 $fp.Dispose();
-            }
-            ElseIf (Test-Path -PathType Container "%(path)s")
-            {
+            }}
+            ElseIf (Test-Path -PathType Container "{path!s}")
+            {{
                 Write-Host "3";
-            }
+            }}
             Else
-            {
+            {{
                 Write-Host "1";
-            }
-        ''' % dict(path=path)
+            }}
+        '''.format(**dict(path=path))
         return self._encode_script(script)
 
     def build_module_command(self, env_string, shebang, cmd, rm_tmp=None):
         cmd = cmd.encode('utf-8')
         cmd_parts = shlex.split(cmd, posix=False)
         if not cmd_parts[0].lower().endswith('.ps1'):
-            cmd_parts[0] = '%s.ps1' % cmd_parts[0]
+            cmd_parts[0] = '{0!s}.ps1'.format(cmd_parts[0])
         script = self._build_file_cmd(cmd_parts)
         if rm_tmp:
             rm_tmp = self._escape(rm_tmp)
-            script = '%s; Remove-Item "%s" -Force -Recurse;' % (script, rm_tmp)
+            script = '{0!s}; Remove-Item "{1!s}" -Force -Recurse;'.format(script, rm_tmp)
         return self._encode_script(script)
 
     def _escape(self, value, include_vars=False):
@@ -100,7 +100,7 @@ class ShellModule(object):
                 ('\'', '`\''), ('`', '``'), ('\x00', '`0')]
         if include_vars:
             subs.append(('$', '`$'))
-        pattern = '|'.join('(%s)' % re.escape(p) for p, s in subs)
+        pattern = '|'.join('({0!s})'.format(re.escape(p)) for p, s in subs)
         substs = [s for p, s in subs]
         replace = lambda m: substs[m.lastindex - 1]
         return re.sub(pattern, replace, value)
@@ -116,5 +116,5 @@ class ShellModule(object):
 
     def _build_file_cmd(self, cmd_parts):
         '''Build command line to run a file, given list of file name plus args.'''
-        return ' '.join(_common_args + ['-ExecutionPolicy', 'Unrestricted', '-File'] + ['"%s"' % x for x in cmd_parts])
+        return ' '.join(_common_args + ['-ExecutionPolicy', 'Unrestricted', '-File'] + ['"{0!s}"'.format(x) for x in cmd_parts])
 

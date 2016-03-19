@@ -184,7 +184,7 @@ p = load_config_file()
 
 
 def rax_slugify(value):
-    return 'rax_%s' % (re.sub('[^\w-]', '_', value).lower().lstrip('_'))
+    return 'rax_{0!s}'.format((re.sub('[^\w-]', '_', value).lower().lstrip('_')))
 
 
 def to_dict(obj):
@@ -265,10 +265,10 @@ def _list(regions):
             hostvars[server.name]['rax_region'] = region
 
             for key, value in server.metadata.iteritems():
-                groups['%s_%s_%s' % (prefix, key, value)].append(server.name)
+                groups['{0!s}_{1!s}_{2!s}'.format(prefix, key, value)].append(server.name)
 
-            groups['instance-%s' % server.id].append(server.name)
-            groups['flavor-%s' % server.flavor['id']].append(server.name)
+            groups['instance-{0!s}'.format(server.id)].append(server.name)
+            groups['flavor-{0!s}'.format(server.flavor['id'])].append(server.name)
 
             # Handle boot from volume
             if not server.image:
@@ -293,18 +293,18 @@ def _list(regions):
                 hostvars[server.name]['rax_boot_source'] = 'local'
 
             try:
-                imagegroup = 'image-%s' % images[server.image['id']]
+                imagegroup = 'image-{0!s}'.format(images[server.image['id']])
                 groups[imagegroup].append(server.name)
-                groups['image-%s' % server.image['id']].append(server.name)
+                groups['image-{0!s}'.format(server.image['id'])].append(server.name)
             except KeyError:
                 try:
                     image = cs.images.get(server.image['id'])
                 except cs.exceptions.NotFound:
-                    groups['image-%s' % server.image['id']].append(server.name)
+                    groups['image-{0!s}'.format(server.image['id'])].append(server.name)
                 else:
                     images[image.id] = image.human_id
-                    groups['image-%s' % image.human_id].append(server.name)
-                    groups['image-%s' % server.image['id']].append(server.name)
+                    groups['image-{0!s}'.format(image.human_id)].append(server.name)
+                    groups['image-{0!s}'.format(server.image['id'])].append(server.name)
 
             # And finally, add an IP address
             ansible_ssh_host = None
@@ -383,7 +383,7 @@ def setup():
         else:
             pyrax.set_credential_file(creds_file, region=region)
     except Exception, e:
-        sys.stderr.write("%s: %s\n" % (e, e.message))
+        sys.stderr.write("{0!s}: {1!s}\n".format(e, e.message))
         sys.exit(1)
 
     regions = []
@@ -398,7 +398,7 @@ def setup():
                 regions = pyrax.regions
                 break
             elif region not in pyrax.regions:
-                sys.stderr.write('Unsupported region %s' % region)
+                sys.stderr.write('Unsupported region {0!s}'.format(region))
                 sys.exit(1)
             elif region not in regions:
                 regions.append(region)

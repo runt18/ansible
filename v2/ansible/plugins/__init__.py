@@ -119,10 +119,10 @@ class PluginLoader:
         for basedir in _basedirs:
             fullpath = os.path.realpath(os.path.join(basedir, self.subdir))
             if os.path.isdir(fullpath):
-                files = glob.glob("%s/*" % fullpath)
+                files = glob.glob("{0!s}/*".format(fullpath))
 
                 # allow directories to be two levels deep
-                files2 = glob.glob("%s/*/*" % fullpath)
+                files2 = glob.glob("{0!s}/*/*".format(fullpath))
 
                 if files2 is not None:
                     files.extend(files2)
@@ -138,7 +138,7 @@ class PluginLoader:
             configured_paths = self.config.split(os.pathsep)
             for path in configured_paths:
                 path = os.path.realpath(os.path.expanduser(path))
-                contents = glob.glob("%s/*" % path) + glob.glob("%s/*/*" % path)
+                contents = glob.glob("{0!s}/*".format(path)) + glob.glob("{0!s}/*/*".format(path))
                 for c in contents:
                     if os.path.isdir(c) and c not in ret:
                         ret.append(c)
@@ -175,7 +175,7 @@ class PluginLoader:
             else:
                 suffixes = ['.py', '']
 
-        potential_names = frozenset('%s%s' % (name, s) for s in suffixes)
+        potential_names = frozenset('{0!s}{1!s}'.format(name, s) for s in suffixes)
         for full_name in potential_names:
             if full_name in self._plugin_path_cache:
                 return self._plugin_path_cache[full_name]
@@ -187,7 +187,7 @@ class PluginLoader:
                     full_paths = (os.path.join(path, f) for f in os.listdir(path))
                 except OSError as e:
                     d = Display()
-                    d.warning("Error accessing plugin paths: %s" % str(e))
+                    d.warning("Error accessing plugin paths: {0!s}".format(str(e)))
                 for full_path in (f for f in full_paths if os.path.isfile(f)):
                     for suffix in suffixes:
                         if full_path.endswith(suffix):
@@ -206,7 +206,7 @@ class PluginLoader:
 
         # if nothing is found, try finding alias/deprecated
         if not name.startswith('_'):
-            for alias_name in ('_%s' % n for n in potential_names):
+            for alias_name in ('_{0!s}'.format(n) for n in potential_names):
                 # We've already cached all the paths at this point
                 if alias_name in self._plugin_path_cache:
                     return self._plugin_path_cache[alias_name]

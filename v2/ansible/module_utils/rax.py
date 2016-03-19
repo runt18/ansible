@@ -48,7 +48,7 @@ SERVICE_NET_ID = "11111111-1111-1111-1111-111111111111"
 
 def rax_slugify(value):
     """Prepend a key with rax_ and normalize the key name"""
-    return 'rax_%s' % (re.sub('[^\w-]', '_', value).lower().lstrip('_'))
+    return 'rax_{0!s}'.format((re.sub('[^\w-]', '_', value).lower().lstrip('_')))
 
 
 def rax_clb_node_to_dict(obj):
@@ -141,8 +141,8 @@ def rax_find_image(module, rax_module, image, exit=True):
             except (cs.exceptions.NotFound,
                     cs.exceptions.NoUniqueMatch):
                 if exit:
-                    module.fail_json(msg='No matching image found (%s)' %
-                                         image)
+                    module.fail_json(msg='No matching image found ({0!s})'.format(
+                                         image))
                 else:
                     return False
 
@@ -161,7 +161,7 @@ def rax_find_volume(module, rax_module, name):
         except rax_module.exc.NotFound:
             volume = None
         except Exception, e:
-            module.fail_json(msg='%s' % e)
+            module.fail_json(msg='{0!s}'.format(e))
     return volume
 
 
@@ -180,8 +180,8 @@ def rax_find_network(module, rax_module, network):
                 network_obj = cnw.find_network_by_label(network)
             except (rax_module.exceptions.NetworkNotFound,
                     rax_module.exceptions.NetworkLabelNotUnique):
-                module.fail_json(msg='No matching network found (%s)' %
-                                     network)
+                module.fail_json(msg='No matching network found ({0!s})'.format(
+                                     network))
             else:
                 return cnw.get_server_networks(network_obj)
     else:
@@ -195,7 +195,7 @@ def rax_find_server(module, rax_module, server):
         UUID(server)
         server = cs.servers.get(server)
     except ValueError:
-        servers = cs.servers.list(search_opts=dict(name='^%s$' % server))
+        servers = cs.servers.list(search_opts=dict(name='^{0!s}$'.format(server)))
         if not servers:
             module.fail_json(msg='No Server was matched by name, '
                                  'try using the Server ID instead')
@@ -260,7 +260,7 @@ def rax_required_together():
 
 def setup_rax_module(module, rax_module, region_required=True):
     """Set up pyrax in a standard way for all modules"""
-    rax_module.USER_AGENT = 'ansible/%s %s' % (ANSIBLE_VERSION,
+    rax_module.USER_AGENT = 'ansible/{0!s} {1!s}'.format(ANSIBLE_VERSION,
                                                rax_module.USER_AGENT)
 
     api_key = module.params.get('api_key')
@@ -300,7 +300,7 @@ def setup_rax_module(module, rax_module, region_required=True):
         region = (region or os.environ.get('RAX_REGION') or
                   rax_module.get_setting('region'))
     except KeyError, e:
-        module.fail_json(msg='Unable to load %s' % e.message)
+        module.fail_json(msg='Unable to load {0!s}'.format(e.message))
 
     try:
         if api_key and username:
@@ -322,7 +322,6 @@ def setup_rax_module(module, rax_module, region_required=True):
         module.fail_json(msg=msg)
 
     if region_required and region not in rax_module.regions:
-        module.fail_json(msg='%s is not a valid region, must be one of: %s' %
-                         (region, ','.join(rax_module.regions)))
+        module.fail_json(msg='{0!s} is not a valid region, must be one of: {1!s}'.format(region, ','.join(rax_module.regions)))
 
     return rax_module

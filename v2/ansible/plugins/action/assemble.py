@@ -45,7 +45,7 @@ class ActionModule(ActionBase):
         for f in sorted(os.listdir(src_path)):
             if compiled_regexp and not compiled_regexp.search(f):
                 continue
-            fragment = "%s/%s" % (src_path, f)
+            fragment = "{0!s}/{1!s}".format(src_path, f)
             if not os.path.isfile(fragment):
                 continue
             fragment_content = file(fragment).read()

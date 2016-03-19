@@ -42,7 +42,7 @@ class HostState:
         self.child_state      = None
 
     def __repr__(self):
-        return "HOST STATE: block=%d, task=%d, rescue=%d, always=%d, role=%s, run_state=%d, fail_state=%d, pending_setup=%s, child state? %s" % (
+        return "HOST STATE: block={0:d}, task={1:d}, rescue={2:d}, always={3:d}, role={4!s}, run_state={5:d}, fail_state={6:d}, pending_setup={7!s}, child state? {8!s}".format(
             self.cur_block,
             self.cur_regular_task,
             self.cur_rescue_task,
@@ -51,7 +51,7 @@ class HostState:
             self.run_state,
             self.fail_state,
             self.pending_setup,
-            self.child_state,
+            self.child_state
         )
 
     def get_current_block(self):
@@ -104,7 +104,7 @@ class PlayIterator:
         try:
             return self._host_states[host.name].copy()
         except KeyError:
-            raise AnsibleError("invalid host (%s) specified for playbook iteration" % host)
+            raise AnsibleError("invalid host ({0!s}) specified for playbook iteration".format(host))
 
     def get_next_task_for_host(self, host, peek=False):
 

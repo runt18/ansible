@@ -36,7 +36,7 @@ class LookupModule(LookupBase):
                 if row[0] == key:
                     return row[int(col)]
         except Exception as e:
-            raise AnsibleError("csvfile: %s" % str(e))
+            raise AnsibleError("csvfile: {0!s}".format(str(e)))
 
         return dflt
 

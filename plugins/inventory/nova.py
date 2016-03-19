@@ -141,7 +141,7 @@ def get_metadata(server):
 
 config = nova_load_config_file()
 if not config:
-    sys.exit('Unable to find configfile in %s' % ', '.join(NOVA_CONFIG_FILES))
+    sys.exit('Unable to find configfile in {0!s}'.format(', '.join(NOVA_CONFIG_FILES)))
 
 # Load up connections info based on config and then environment
 # variables

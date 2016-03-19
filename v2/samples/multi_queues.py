@@ -35,9 +35,9 @@ def results(final_q, workers):
 
          try:
             if not res_q.empty():
-               debug("worker %d has data to read" % cur_worker)
+               debug("worker {0:d} has data to read".format(cur_worker))
                result = res_q.get()
-               debug("got a result from worker %d: %s" % (cur_worker, result))
+               debug("got a result from worker {0:d}: {1!s}".format(cur_worker, result))
                break
          except:
             pass
@@ -56,10 +56,10 @@ def results(final_q, workers):
             continue
          final_q.put(result, block=False)
       except (IOError, EOFError, KeyboardInterrupt) as e:
-         debug("got a breaking error: %s" % e)
+         debug("got a breaking error: {0!s}".format(e))
          break
       except Exception as e:
-         debug("EXCEPTION DURING RESULTS PROCESSING: %s" % e)
+         debug("EXCEPTION DURING RESULTS PROCESSING: {0!s}".format(e))
          traceback.print_exc()
          break
 
@@ -70,7 +70,7 @@ def worker(main_q, res_q, loader):
          if not main_q.empty():
             (host, task, task_vars, conn_info) = main_q.get(block=False)
             executor_result = TaskExecutor(host, task, task_vars, conn_info, loader).run()
-            debug("executor result: %s" % executor_result)
+            debug("executor result: {0!s}".format(executor_result))
             task_result = TaskResult(host, task, executor_result)
             res_q.put(task_result)
          else:
@@ -78,10 +78,10 @@ def worker(main_q, res_q, loader):
       except Queue.Empty:
          pass
       except (IOError, EOFError, KeyboardInterrupt) as e:
-         debug("got a breaking error: %s" % e)
+         debug("got a breaking error: {0!s}".format(e))
          break
       except Exception as e:
-         debug("EXCEPTION DURING WORKER PROCESSING: %s" % e)
+         debug("EXCEPTION DURING WORKER PROCESSING: {0!s}".format(e))
          traceback.print_exc()
          break
 
@@ -119,7 +119,7 @@ def _process_pending_results():
    while not res_q.empty():
       try:
          result = res_q.get(block=False)
-         debug("got final result: %s" % (result,))
+         debug("got final result: {0!s}".format(result))
          pending_results -= 1
       except Queue.Empty:
          pass
@@ -127,7 +127,7 @@ def _process_pending_results():
 def _wait_on_pending_results():
    global pending_results
    while pending_results > 0:
-      debug("waiting for pending results (%d left)" % pending_results)
+      debug("waiting for pending results ({0:d} left)".format(pending_results))
       _process_pending_results()
       time.sleep(0.01)
 
@@ -150,16 +150,16 @@ ci.connection = 'local'
 for i in range(NUM_TASKS):
    #for j in range(NUM_HOSTS):
    for h in hosts:
-      debug("queuing %s %d" % (h, i))
+      debug("queuing {0!s} {1:d}".format(h, i))
       #h = Host(name="host%06d" % j)
-      t = Task().load(dict(name="task %d" % (i,), debug="msg='hello from %s, %d'" % (h,i)))
+      t = Task().load(dict(name="task {0:d}".format(i), debug="msg='hello from {0!s}, {1:d}'".format(h, i)))
       #t = Task().load(dict(name="task %d" % (i,), ping=""))
       #task_vars = var_manager.get_vars(loader=loader, host=h, task=t)
       task_vars = dict()
       new_t = t.copy()
       new_t.post_validate(task_vars)
       send_data((h, t, task_vars, ci))
-      debug("done queuing %s %d" % (h, i))
+      debug("done queuing {0!s} {1:d}".format(h, i))
       _process_pending_results()
    debug("waiting for the results to drain...")
    _wait_on_pending_results()

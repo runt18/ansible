@@ -41,7 +41,7 @@ def add_credentials_options(parser):
 def check_required(opts, parser):
     for required in ['service_account_email', 'pem_file', 'project_id']:
         if getattr(opts, required) is None:
-            parser.error("Missing required parameter: --%s" % required)
+            parser.error("Missing required parameter: --{0!s}".format(required))
 
 
 def get_gce_driver(opts):

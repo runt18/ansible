@@ -43,7 +43,7 @@ class ActionModule(ActionBase):
             if data is None:
                 data = {}
             if not isinstance(data, dict):
-                raise AnsibleError("%s must be stored as a dictionary/hash" % source)
+                raise AnsibleError("{0!s} must be stored as a dictionary/hash".format(source))
             return dict(ansible_facts=data)
         else:
             return dict(failed=True, msg="Source file not found.", file=source)

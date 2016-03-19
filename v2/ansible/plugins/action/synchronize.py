@@ -40,9 +40,9 @@ class ActionModule(ActionBase):
 
         if not host in ['127.0.0.1', 'localhost']:
             if user:
-                return '%s@%s:%s' % (user, host, path)
+                return '{0!s}@{1!s}:{2!s}'.format(user, host, path)
             else:
-                return '%s:%s' % (host, path)
+                return '{0!s}:{1!s}'.format(host, path)
         else:
             if not ':' in path:
                 if not path.startswith('/'):
@@ -54,9 +54,9 @@ class ActionModule(ActionBase):
         return_data = None
         if not host in ['127.0.0.1', 'localhost'] or transport != "local":
             if user:
-                return_data = '%s@%s:%s' % (user, host, path)
+                return_data = '{0!s}@{1!s}:{2!s}'.format(user, host, path)
             else:
-                return_data = '%s:%s' % (host, path)
+                return_data = '{0!s}:{1!s}'.format(host, path)
         else:
             return_data = path
 
@@ -160,7 +160,7 @@ class ActionModule(ActionBase):
 
         # make sure rsync path is quoted.
         if rsync_path:
-            self._task.args['rsync_path'] = '"%s"' % rsync_path
+            self._task.args['rsync_path'] = '"{0!s}"'.format(rsync_path)
 
         # run the module and store the result
         result = self._execute_module('synchronize')

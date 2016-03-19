@@ -96,15 +96,13 @@ class LookupModule(object):
                 setattr(self, arg, arg_cooked)
             except ValueError:
                 raise AnsibleError(
-                    "can't parse arg %s=%r as integer"
-                        % (arg, arg_raw)
+                    "can't parse arg {0!s}={1!r} as integer".format(arg, arg_raw)
                 )
             if 'format' in args:
                 self.format = args.pop("format")
         if args:
             raise AnsibleError(
-                "unrecognized arguments to with_sequence: %r"
-                % args.keys()
+                "unrecognized arguments to with_sequence: {0!r}".format(args.keys())
             )
 
     def parse_simple_args(self, term):
@@ -119,17 +117,17 @@ class LookupModule(object):
             try:
                 start = int(start, 0)
             except ValueError:
-                raise AnsibleError("can't parse start=%s as integer" % start)
+                raise AnsibleError("can't parse start={0!s} as integer".format(start))
         if end is not None:
             try:
                 end = int(end, 0)
             except ValueError:
-                raise AnsibleError("can't parse end=%s as integer" % end)
+                raise AnsibleError("can't parse end={0!s} as integer".format(end))
         if stride is not None:
             try:
                 stride = int(stride, 0)
             except ValueError:
-                raise AnsibleError("can't parse stride=%s as integer" % stride)
+                raise AnsibleError("can't parse stride={0!s} as integer".format(stride))
 
         if start is not None:
             self.start = start
@@ -156,7 +154,7 @@ class LookupModule(object):
         if self.end < self.start:
             raise AnsibleError("can't count backwards")
         if self.format.count('%') != 1:
-            raise AnsibleError("bad formatting string: %s" % self.format)
+            raise AnsibleError("bad formatting string: {0!s}".format(self.format))
 
     def generate_sequence(self):
         numbers = xrange(self.start, self.end + 1, self.stride)
@@ -167,7 +165,7 @@ class LookupModule(object):
                 yield formatted
             except (ValueError, TypeError):
                 raise AnsibleError(
-                    "problem formatting %r with %r" % self.format
+                    "problem formatting {0!r} with {1!r}".format(*self.format)
                 )
 
     def run(self, terms, inject=None, **kwargs):
@@ -187,8 +185,7 @@ class LookupModule(object):
                         self.parse_kv_args(utils.parse_kv(term))
                 except Exception:
                     raise AnsibleError(
-                        "unknown error parsing with_sequence arguments: %r"
-                        % term
+                        "unknown error parsing with_sequence arguments: {0!r}".format(term)
                     )
 
                 self.sanity_check()

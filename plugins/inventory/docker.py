@@ -176,7 +176,7 @@ class HostDict(UserDict):
 
 
 def write_stderr(string):
-    sys.stderr.write('%s\n' % string)
+    sys.stderr.write('{0!s}\n'.format(string))
 
 
 def setup():

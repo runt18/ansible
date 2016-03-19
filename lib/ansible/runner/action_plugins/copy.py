@@ -90,7 +90,7 @@ class ActionModule(object):
                     content_tempfile = self._create_content_tempfile(content)
                 source = content_tempfile
             except Exception, err:
-                result = dict(failed=True, msg="could not write content temp file: %s" % err)
+                result = dict(failed=True, msg="could not write content temp file: {0!s}".format(err))
                 return ReturnData(conn=conn, result=result)
         # if we have first_available_file in our vars
         # look up the files and use the first one we find as src
@@ -166,7 +166,7 @@ class ActionModule(object):
 
             # If local_checksum is not defined we can't find the file so we should fail out.
             if local_checksum is None:
-                result = dict(failed=True, msg="could not find src=%s" % source_full)
+                result = dict(failed=True, msg="could not find src={0!s}".format(source_full))
                 return ReturnData(conn=conn, result=result)
 
             # This is kind of optimization - if user told us destination is
@@ -331,7 +331,7 @@ class ActionModule(object):
         return content_tempfile
 
     def _get_diff_data(self, conn, tmp, inject, destination, source):
-        peek_result = self.runner._execute_module(conn, tmp, 'file', "path=%s diff_peek=1" % destination, inject=inject, persist_files=True)
+        peek_result = self.runner._execute_module(conn, tmp, 'file', "path={0!s} diff_peek=1".format(destination), inject=inject, persist_files=True)
 
         if not peek_result.is_successful():
             return {}
@@ -344,13 +344,13 @@ class ActionModule(object):
         elif peek_result.result['size'] > utils.MAX_FILE_SIZE_FOR_DIFF:
             diff['dst_larger'] = utils.MAX_FILE_SIZE_FOR_DIFF
         else:
-            dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path=%s" % destination, inject=inject, persist_files=True)
+            dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path={0!s}".format(destination), inject=inject, persist_files=True)
             if 'content' in dest_result.result:
                 dest_contents = dest_result.result['content']
                 if dest_result.result['encoding'] == 'base64':
                     dest_contents = base64.b64decode(dest_contents)
                 else:
-                    raise Exception("unknown encoding, failed: %s" % dest_result.result)
+                    raise Exception("unknown encoding, failed: {0!s}".format(dest_result.result))
                 diff['before_header'] = destination
                 diff['before'] = dest_contents
 

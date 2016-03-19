@@ -71,7 +71,7 @@ class ActionModule(ActionBase):
                     content_tempfile = self._create_content_tempfile(content)
                 source = content_tempfile
             except Exception as err:
-                return dict(failed=True, msg="could not write content temp file: %s" % err)
+                return dict(failed=True, msg="could not write content temp file: {0!s}".format(err))
 
         ###############################################################################################
         # FIXME: first_available_file needs to be reworked?
@@ -151,7 +151,7 @@ class ActionModule(ActionBase):
 
             # If local_checksum is not defined we can't find the file so we should fail out.
             if local_checksum is None:
-                return dict(failed=True, msg="could not find src=%s" % source_full)
+                return dict(failed=True, msg="could not find src={0!s}".format(source_full))
 
             # This is kind of optimization - if user told us destination is
             # dir, do path manipulation right away, otherwise we still check
@@ -324,7 +324,7 @@ class ActionModule(ActionBase):
                 if dest_result['encoding'] == 'base64':
                     dest_contents = base64.b64decode(dest_contents)
                 else:
-                    raise Exception("unknown encoding, failed: %s" % dest_result)
+                    raise Exception("unknown encoding, failed: {0!s}".format(dest_result))
                 diff['before_header'] = destination
                 diff['before'] = dest_contents
 

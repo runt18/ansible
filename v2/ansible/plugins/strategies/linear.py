@@ -175,7 +175,7 @@ class StrategyModule(StrategyBase):
                         # If there is no metadata, the default behavior is to not allow duplicates,
                         # if there is metadata, check to see if the allow_duplicates flag was set to true
                         if task._role._metadata is None or task._role._metadata and not task._role._metadata.allow_duplicates:
-                            debug("'%s' skipped because role has already run" % task)
+                            debug("'{0!s}' skipped because role has already run".format(task))
                             continue
 
                     if task.action == 'meta':
@@ -188,7 +188,7 @@ class StrategyModule(StrategyBase):
                         elif meta_action == 'flush_handlers':
                             self.run_handlers(iterator, connection_info)
                         else:
-                            raise AnsibleError("invalid meta action requested: %s" % meta_action, obj=task._ds)
+                            raise AnsibleError("invalid meta action requested: {0!s}".format(meta_action), obj=task._ds)
                     else:
                         if not callback_sent:
                             self._tqm.send_callback('v2_playbook_on_task_start', task, is_conditional=False)
@@ -221,7 +221,7 @@ class StrategyModule(StrategyBase):
                     def __eq__(self, other):
                         return other._filename == self._filename and other._args == self._args
                     def __repr__(self):
-                        return "%s (%s): %s" % (self._filename, self._args, self._hosts)
+                        return "{0!s} ({1!s}): {2!s}".format(self._filename, self._args, self._hosts)
 
                 # FIXME: this should also be moved to the base class in a method
                 included_files = []
@@ -296,7 +296,7 @@ class StrategyModule(StrategyBase):
 
                 debug("results queue empty")
             except (IOError, EOFError), e:
-                debug("got IOError/EOFError in task loop: %s" % e)
+                debug("got IOError/EOFError in task loop: {0!s}".format(e))
                 # most likely an abort, return failed
                 return 1
 

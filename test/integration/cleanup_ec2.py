@@ -18,7 +18,7 @@ def delete_aws_resources(get_func, attr, opts):
     for item in get_func():
         val = getattr(item, attr)
         if re.search(opts.match_re, val):
-            prompt_and_delete(item, "Delete matching %s? [y/n]: " % (item,), opts.assumeyes)
+            prompt_and_delete(item, "Delete matching {0!s}? [y/n]: ".format(item), opts.assumeyes)
 
 def delete_autoscaling_group(get_func, attr, opts):
     assumeyes = opts.assumeyes
@@ -27,7 +27,7 @@ def delete_autoscaling_group(get_func, attr, opts):
         group_name = getattr(item, attr)
         if re.search(opts.match_re, group_name):
             if not opts.assumeyes:
-                assumeyes = raw_input("Delete matching %s? [y/n]: " % (item).lower()) == 'y'
+                assumeyes = raw_input("Delete matching {0!s}? [y/n]: ".format((item).lower())) == 'y'
             break
     if assumeyes and group_name:
         groups = asg.get_all_groups(names=[group_name])
@@ -49,7 +49,7 @@ def delete_autoscaling_group(get_func, attr, opts):
             group.delete()
             while len(asg.get_all_groups(names=[group_name])):
                 time.sleep(5)
-            print ("Terminated ASG: %s" % group_name)
+            print ("Terminated ASG: {0!s}".format(group_name))
 
 def delete_aws_eips(get_func, attr, opts):
 
@@ -63,24 +63,24 @@ def delete_aws_eips(get_func, attr, opts):
     for item in get_func():
         val = getattr(item, attr)
         if val in eip_log:
-          prompt_and_delete(item, "Delete matching %s? [y/n]: " % (item,), opts.assumeyes)
+          prompt_and_delete(item, "Delete matching {0!s}? [y/n]: ".format(item), opts.assumeyes)
 
 def delete_aws_instances(reservation, opts):
     for list in reservation:
         for item in list.instances:
-            prompt_and_delete(item, "Delete matching %s? [y/n]: " % (item,), opts.assumeyes)
+            prompt_and_delete(item, "Delete matching {0!s}? [y/n]: ".format(item), opts.assumeyes)
 
 def prompt_and_delete(item, prompt, assumeyes):
     if not assumeyes:
         assumeyes = raw_input(prompt).lower() == 'y'
-    assert hasattr(item, 'delete') or hasattr(item, 'terminate') , "Class <%s> has no delete or terminate attribute" % item.__class__
+    assert hasattr(item, 'delete') or hasattr(item, 'terminate') , "Class <{0!s}> has no delete or terminate attribute".format(item.__class__)
     if assumeyes:
         if  hasattr(item, 'delete'):
             item.delete()
-            print ("Deleted %s" % item)
+            print ("Deleted {0!s}".format(item))
         if  hasattr(item, 'terminate'):
             item.terminate()
-            print ("Terminated %s" % item)
+            print ("Terminated {0!s}".format(item))
 
 def parse_args():
     # Load details from credentials.yml
@@ -94,7 +94,7 @@ def parse_args():
         if default_aws_secret_key is None:
             default_aws_secret_key = credentials['ec2_secret_key']
 
-    parser = optparse.OptionParser(usage="%s [options]" % (sys.argv[0],),
+    parser = optparse.OptionParser(usage="{0!s} [options]".format(sys.argv[0]),
                 description=__doc__)
     parser.add_option("--access",
         action="store", dest="ec2_access_key",
@@ -128,7 +128,7 @@ def parse_args():
     (opts, args) = parser.parse_args()
     for required in ['ec2_access_key', 'ec2_secret_key']:
         if getattr(opts, required) is None:
-            parser.error("Missing required parameter: --%s" % required)
+            parser.error("Missing required parameter: --{0!s}".format(required))
 
 
     return (opts, args)

@@ -75,7 +75,7 @@ class CallbackModule(object):
         params['color'] = color
         params['notify'] = int(self.allow_notify and notify)
 
-        url = ('%s?auth_token=%s' % (self.msg_uri, self.token))
+        url = ('{0!s}?auth_token={1!s}'.format(self.msg_uri, self.token))
         try:
             response = urllib2.urlopen(url, urllib.urlencode(params))
             return response.read()
@@ -152,22 +152,19 @@ class CallbackModule(object):
                 os.path.basename(self.play.playbook.filename))
             host_list = self.play.playbook.inventory.host_list
             inventory = os.path.basename(os.path.realpath(host_list))
-            self.send_msg("%s: Playbook initiated by %s against %s" %
-                          (self.playbook_name,
+            self.send_msg("{0!s}: Playbook initiated by {1!s} against {2!s}".format(self.playbook_name,
                            self.play.playbook.remote_user,
                            inventory), notify=True)
             self.printed_playbook = True
             subset = self.play.playbook.inventory._subset
             skip_tags = self.play.playbook.skip_tags
-            self.send_msg("%s:\nTags: %s\nSkip Tags: %s\nLimit: %s" %
-                          (self.playbook_name,
+            self.send_msg("{0!s}:\nTags: {1!s}\nSkip Tags: {2!s}\nLimit: {3!s}".format(self.playbook_name,
                            ', '.join(self.play.playbook.only_tags),
                            ', '.join(skip_tags) if skip_tags else None,
                            ', '.join(subset) if subset else subset))
 
         # This is where we actually say we are starting a play
-        self.send_msg("%s: Starting play: %s" %
-                      (self.playbook_name, name))
+        self.send_msg("{0!s}: Starting play: {1!s}".format(self.playbook_name, name))
 
     def playbook_on_stats(self, stats):
         """Display info about playbook statistics"""
@@ -190,14 +187,14 @@ class CallbackModule(object):
             t.add_row([h] + [s[k] for k in ['ok', 'changed', 'unreachable',
                                             'failures']])
 
-        self.send_msg("%s: Playbook complete" % self.playbook_name,
+        self.send_msg("{0!s}: Playbook complete".format(self.playbook_name),
                       notify=True)
 
         if failures or unreachable:
             color = 'red'
-            self.send_msg("%s: Failures detected" % self.playbook_name,
+            self.send_msg("{0!s}: Failures detected".format(self.playbook_name),
                           color=color, notify=True)
         else:
             color = 'green'
 
-        self.send_msg("/code %s:\n%s" % (self.playbook_name, t), color=color)
+        self.send_msg("/code {0!s}:\n{1!s}".format(self.playbook_name, t), color=color)

@@ -101,7 +101,7 @@ class LookupModule(object):
                         values.append(results[1]['Value'])
         except Exception, e:
             raise errors.AnsibleError(
-                "Error locating '%s' in kv store. Error was %s" % (term, e))
+                "Error locating '{0!s}' in kv store. Error was {1!s}".format(term, e))
 
         return values
 

@@ -231,7 +231,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s exists, please use 'edit' instead" % self.filename)
+            raise errors.AnsibleError("{0!s} exists, please use 'edit' instead".format(self.filename))
 
         # Let the user specify contents and save file
         self._edit_file_helper(cipher=self.cipher_name)
@@ -242,7 +242,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if not os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s does not exist" % self.filename)
+            raise errors.AnsibleError("{0!s} does not exist".format(self.filename))
 
         tmpdata = self.read_data(self.filename)
         this_vault = VaultLib(self.password)
@@ -253,7 +253,7 @@ class VaultEditor(object):
             else:
                 self.write_data(dec_data, self.filename)
         else:
-            raise errors.AnsibleError("%s is not encrypted" % self.filename)
+            raise errors.AnsibleError("{0!s} is not encrypted".format(self.filename))
 
     def edit_file(self):
 
@@ -294,7 +294,7 @@ class VaultEditor(object):
             raise errors.AnsibleError(CRYPTO_UPGRADE)
 
         if not os.path.isfile(self.filename):
-            raise errors.AnsibleError("%s does not exist" % self.filename)
+            raise errors.AnsibleError("{0!s} does not exist".format(self.filename))
 
         tmpdata = self.read_data(self.filename)
         this_vault = VaultLib(self.password)
@@ -303,7 +303,7 @@ class VaultEditor(object):
             enc_data = this_vault.encrypt(tmpdata)
             self.write_data(enc_data, self.filename)
         else:
-            raise errors.AnsibleError("%s is already encrypted" % self.filename)
+            raise errors.AnsibleError("{0!s} is already encrypted".format(self.filename))
 
     def rekey_file(self, new_password):
 

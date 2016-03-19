@@ -98,13 +98,13 @@ class ActionModule(object):
 
             if self.runner.diff:
                 # using persist_files to keep the temp directory around to avoid needing to grab another
-                dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path=%s" % dest, inject=inject, persist_files=True)
+                dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path={0!s}".format(dest), inject=inject, persist_files=True)
                 if 'content' in dest_result.result:
                     dest_contents = dest_result.result['content']
                     if dest_result.result['encoding'] == 'base64':
                         dest_contents = base64.b64decode(dest_contents)
                     else:
-                        raise Exception("unknown encoding, failed: %s" % dest_result.result)
+                        raise Exception("unknown encoding, failed: {0!s}".format(dest_result.result))
 
             xfered = self.runner._transfer_str(conn, tmp, 'source', resultant)
 

@@ -45,14 +45,14 @@ class LookupModule(LookupBase):
         ret = []
         for item0 in elementlist:
             if not isinstance(item0, dict):
-                raise AnsibleError("subelements lookup expects a dictionary, got '%s'" %item0)
+                raise AnsibleError("subelements lookup expects a dictionary, got '{0!s}'".format(item0))
             if item0.get('skipped', False) != False:
                 # this particular item is to be skipped
                 continue 
             if not subelement in item0:
-                raise AnsibleError("could not find '%s' key in iterated item '%s'" % (subelement, item0))
+                raise AnsibleError("could not find '{0!s}' key in iterated item '{1!s}'".format(subelement, item0))
             if not isinstance(item0[subelement], list):
-                raise AnsibleError("the key %s should point to a list, got '%s'" % (subelement, item0[subelement]))
+                raise AnsibleError("the key {0!s} should point to a list, got '{1!s}'".format(subelement, item0[subelement]))
             sublist = item0.pop(subelement, [])
             for item1 in sublist:
                 ret.append((item0, item1))

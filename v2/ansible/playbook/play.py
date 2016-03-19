@@ -90,7 +90,7 @@ class Play(Base, Taggable, Become):
 
     def get_name(self):
        ''' return the name of the Play '''
-       return "PLAY: %s" % self._attributes.get('name')
+       return "PLAY: {0!s}".format(self._attributes.get('name'))
 
     @staticmethod
     def load(data, variable_manager=None, loader=None):
@@ -111,7 +111,7 @@ class Play(Base, Taggable, Become):
             # this should never happen, but error out with a helpful message
             # to the user if it does...
             if 'remote_user' in ds:
-                raise AnsibleParserError("both 'user' and 'remote_user' are set for %s. The use of 'user' is deprecated, and should be removed" % self.get_name(), obj=ds)
+                raise AnsibleParserError("both 'user' and 'remote_user' are set for {0!s}. The use of 'user' is deprecated, and should be removed".format(self.get_name()), obj=ds)
 
             ds['remote_user'] = ds['user']
             del ds['user']

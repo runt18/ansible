@@ -29,4 +29,4 @@ class TestModules(unittest.TestCase):
                 ast.parse(''.join(open(m)))
             except Exception, e:
                 ERRORS.append((m, e))
-        assert len(ERRORS) == 0, "get_docstring errors: %s" % ERRORS
+        assert len(ERRORS) == 0, "get_docstring errors: {0!s}".format(ERRORS)

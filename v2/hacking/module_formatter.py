@@ -126,7 +126,7 @@ def list_modules(module_dir, depth=0):
     categories = dict(all=dict(),_aliases=dict())
     if depth <= 3: # limit # of subdirs
 
-        files = glob.glob("%s/*" % module_dir)
+        files = glob.glob("{0!s}/*".format(module_dir))
         for d in files:
 
             category = os.path.splitext(os.path.basename(d))[0]
@@ -209,7 +209,7 @@ def jinja2_environment(template_dir, typ):
         template = env.get_template('rst.j2')
         outputname = "%s_module.rst"
     else:
-        raise Exception("unknown module format type: %s" % typ)
+        raise Exception("unknown module format type: {0!s}".format(typ))
 
     return env, template, outputname
 
@@ -233,7 +233,7 @@ def process_module(module, options, env, template, outputname, module_map, alias
         deprecated = True
         module = module.replace("_","",1)
 
-    print "rendering: %s" % module
+    print "rendering: {0!s}".format(module)
 
     # use ansible core library to parse out doc metadata YAML and plaintext examples
     doc, examples, returndocs = ansible.utils.module_docs.get_docstring(fname, verbose=options.verbose)
@@ -243,11 +243,11 @@ def process_module(module, options, env, template, outputname, module_map, alias
         if module in ansible.utils.module_docs.BLACKLIST_MODULES:
             return "SKIPPED"
         else:
-            sys.stderr.write("*** ERROR: MODULE MISSING DOCUMENTATION: %s, %s ***\n" % (fname, module))
+            sys.stderr.write("*** ERROR: MODULE MISSING DOCUMENTATION: {0!s}, {1!s} ***\n".format(fname, module))
             sys.exit(1)
 
     if deprecated and 'deprecated' not in doc:
-        sys.stderr.write("*** ERROR: DEPRECATED MODULE MISSING 'deprecated' DOCUMENTATION: %s, %s ***\n" % (fname, module))
+        sys.stderr.write("*** ERROR: DEPRECATED MODULE MISSING 'deprecated' DOCUMENTATION: {0!s}, {1!s} ***\n".format(fname, module))
         sys.exit(1)
 
     if "/core/" in fname:
@@ -261,7 +261,7 @@ def process_module(module, options, env, template, outputname, module_map, alias
     all_keys = []
 
     if not 'version_added' in doc:
-        sys.stderr.write("*** ERROR: missing version_added in: %s ***\n" % module)
+        sys.stderr.write("*** ERROR: missing version_added in: {0!s} ***\n".format(module))
         sys.exit(1)
 
     added = 0
@@ -310,7 +310,7 @@ def print_modules(module, category_file, deprecated, core, options, env, templat
     result = process_module(modname, options, env, template, outputname, module_map, aliases)
 
     if result != "SKIPPED":
-        category_file.write("  %s - %s <%s_module>\n" % (modstring, result, module))
+        category_file.write("  {0!s} - {1!s} <{2!s}_module>\n".format(modstring, result, module))
 
 def process_category(category, categories, options, env, template, outputname):
 
@@ -320,9 +320,9 @@ def process_category(category, categories, options, env, template, outputname):
     if '_aliases' in categories:
         aliases = categories['_aliases']
 
-    category_file_path = os.path.join(options.output_dir, "list_of_%s_modules.rst" % category)
+    category_file_path = os.path.join(options.output_dir, "list_of_{0!s}_modules.rst".format(category))
     category_file = open(category_file_path, "w")
-    print "*** recording category %s in %s ***" % (category, category_file_path)
+    print "*** recording category {0!s} in {1!s} ***".format(category, category_file_path)
 
     # TODO: start a new category file
 
@@ -352,16 +352,16 @@ def process_category(category, categories, options, env, template, outputname):
 
     modules.sort()
 
-    category_header = "%s Modules" % (category.title())
+    category_header = "{0!s} Modules".format((category.title()))
     underscores = "`" * len(category_header)
 
     category_file.write("""\
-%s
-%s
+{0!s}
+{1!s}
 
 .. toctree:: :maxdepth: 1
 
-""" % (category_header, underscores))
+""".format(category_header, underscores))
     sections = []
     for module in modules:
         if module in module_map and isinstance(module_map[module], dict):
@@ -372,7 +372,7 @@ def process_category(category, categories, options, env, template, outputname):
 
     sections.sort()
     for section in sections:
-        category_file.write("\n%s\n%s\n\n" % (section.replace("_"," ").title(),'-' * len(section)))
+        category_file.write("\n{0!s}\n{1!s}\n\n".format(section.replace("_"," ").title(), '-' * len(section)))
         category_file.write(".. toctree:: :maxdepth: 1\n\n")
 
         section_modules = module_map[section].keys()
@@ -383,10 +383,10 @@ def process_category(category, categories, options, env, template, outputname):
 
     category_file.write("""\n\n
 .. note::
-    - %s: This marks a module as deprecated, which means a module is kept for backwards compatibility but usage is discouraged.  The module documentation details page may explain more about this rationale.
-    - %s: This marks a module as 'extras', which means it ships with ansible but may be a newer module and possibly (but not necessarily) less activity maintained than 'core' modules.
+    - {0!s}: This marks a module as deprecated, which means a module is kept for backwards compatibility but usage is discouraged.  The module documentation details page may explain more about this rationale.
+    - {1!s}: This marks a module as 'extras', which means it ships with ansible but may be a newer module and possibly (but not necessarily) less activity maintained than 'core' modules.
     - Tickets filed on modules are filed to different repos than those on the main open source project. Core module tickets should be filed at `ansible/ansible-modules-core on GitHub <http://github.com/ansible/ansible-modules-core>`_, extras tickets to `ansible/ansible-modules-extras on GitHub <http://github.com/ansible/ansible-modules-extras>`_
-""" % (DEPRECATED, NOTCORE))
+""".format(DEPRECATED, NOTCORE))
     category_file.close()
 
     # TODO: end a new category file
@@ -400,7 +400,7 @@ def validate_options(options):
         print >>sys.stderr, "--module-dir is required"
         sys.exit(1)
     if not os.path.exists(options.module_dir):
-        print >>sys.stderr, "--module-dir does not exist: %s" % options.module_dir
+        print >>sys.stderr, "--module-dir does not exist: {0!s}".format(options.module_dir)
         sys.exit(1)
     if not options.template_dir:
         print "--template-dir must be specified"
@@ -433,7 +433,7 @@ def main():
     for category in category_names:
         if category.startswith("_"):
             continue
-        category_list_file.write("   list_of_%s_modules\n" % category)
+        category_list_file.write("   list_of_{0!s}_modules\n".format(category))
         process_category(category, categories, options, env, template, outputname)
 
     category_list_file.close()

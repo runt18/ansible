@@ -111,7 +111,7 @@ class TestModuleUtilsBasic(unittest.TestCase):
     def test_run_command_string_unsafe_with_redirect_out(self):
         tmp_fd, tmp_path = tempfile.mkstemp()
         try:
-            (rc, out, err) = self.module.run_command('echo "foo bar" > %s' % tmp_path, use_unsafe_shell=True)
+            (rc, out, err) = self.module.run_command('echo "foo bar" > {0!s}'.format(tmp_path), use_unsafe_shell=True)
             self.assertEqual(rc, 0)
             self.assertTrue(os.path.exists(tmp_path))
             checksum = utils_checksum(tmp_path)
@@ -125,7 +125,7 @@ class TestModuleUtilsBasic(unittest.TestCase):
     def test_run_command_string_unsafe_with_double_redirect_out(self):
         tmp_fd, tmp_path = tempfile.mkstemp()
         try:
-            (rc, out, err) = self.module.run_command('echo "foo bar" >> %s' % tmp_path, use_unsafe_shell=True)
+            (rc, out, err) = self.module.run_command('echo "foo bar" >> {0!s}'.format(tmp_path), use_unsafe_shell=True)
             self.assertEqual(rc, 0)
             self.assertTrue(os.path.exists(tmp_path))
             checksum = utils_checksum(tmp_path)
@@ -195,7 +195,7 @@ class TestModuleUtilsBasicHelpers(unittest.TestCase):
     def _gen_data(self, records, per_rec, top_level, secret_text):
         hostvars = {'hostvars': {}}
         for i in range(1, records, 1):
-            host_facts = {'host%s' % i:
+            host_facts = {'host{0!s}'.format(i):
                             {'pstack':
                                 {'running': '875.1',
                                  'symlinked': '880.0',
@@ -204,7 +204,7 @@ class TestModuleUtilsBasicHelpers(unittest.TestCase):
                          }}
 
             if per_rec:
-                host_facts['host%s' % i]['secret'] = secret_text
+                host_facts['host{0!s}'.format(i)]['secret'] = secret_text
             hostvars['hostvars'].update(host_facts)
         if top_level:
             hostvars['secret'] = secret_text
@@ -304,11 +304,11 @@ class TestModuleUtilsBasicHelpers(unittest.TestCase):
             self.assertNotIn('pas', ssh_output)
         except AttributeError:
             # python2.6 or less's unittest
-            self.assertFalse('pas:word' in url_output, '%s is present in %s' % ('"pas:word"', url_output))
-            self.assertFalse('pas:word' in ssh_output, '%s is present in %s' % ('"pas:word"', ssh_output))
+            self.assertFalse('pas:word' in url_output, '{0!s} is present in {1!s}'.format('"pas:word"', url_output))
+            self.assertFalse('pas:word' in ssh_output, '{0!s} is present in {1!s}'.format('"pas:word"', ssh_output))
 
-            self.assertFalse('pas' in url_output, '%s is present in %s' % ('"pas"', url_output))
-            self.assertFalse('pas' in ssh_output, '%s is present in %s' % ('"pas"', ssh_output))
+            self.assertFalse('pas' in url_output, '{0!s} is present in {1!s}'.format('"pas"', url_output))
+            self.assertFalse('pas' in ssh_output, '{0!s} is present in {1!s}'.format('"pas"', ssh_output))
 
         # In this implementation we replace the password with 8 "*" which is
         # also the length of our password.  The url fields should be able to
@@ -326,7 +326,7 @@ class TestModuleUtilsBasicHelpers(unittest.TestCase):
             self.assertIn(":********@foo.com/data'", ssh_output)
         except AttributeError:
             # python2.6 or less's unittest
-            self.assertTrue(":********@foo.com/data'" in ssh_output, '%s is not present in %s' % (":********@foo.com/data'", ssh_output))
+            self.assertTrue(":********@foo.com/data'" in ssh_output, '{0!s} is not present in {1!s}'.format(":********@foo.com/data'", ssh_output))
 
         # The overzealous-ness here may lead to us changing the algorithm in
         # the future.  We could make it consume less of the data (with the

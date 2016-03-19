@@ -15,7 +15,7 @@ import gce_credentials
 
 def parse_args():
     parser = optparse.OptionParser(
-        usage="%s [options] <prefix>" % (sys.argv[0],), description=__doc__)
+        usage="{0!s} [options] <prefix>".format(sys.argv[0]), description=__doc__)
     gce_credentials.add_credentials_options(parser)
     parser.add_option("--prefix",
         action="store", dest="prefix",

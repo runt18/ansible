@@ -204,7 +204,7 @@ class Facts(object):
                 out = get_file_content(fn, default='')
 
             # load raw json
-            fact = 'loading %s' % fact_base
+            fact = 'loading {0!s}'.format(fact_base)
             try:
                 fact = json.loads(out)
             except ValueError, e:
@@ -700,7 +700,7 @@ class LinuxHardware(Hardware):
             key = data[0]
             if key in self.ORIGINAL_MEMORY_FACTS:
                 val = data[1].strip().split(' ')[0]
-                self.facts["%s_mb" % key.lower()] = long(val) / 1024
+                self.facts["{0!s}_mb".format(key.lower())] = long(val) / 1024
 
             if key in self.MEMORY_FACTS:
                  val = data[1].strip().split(' ')[0]
@@ -852,7 +852,7 @@ class LinuxHardware(Hardware):
                         try:
                             self.facts['form_factor'] = FORM_FACTOR[int(data)]
                         except IndexError, e:
-                            self.facts['form_factor'] = 'unknown (%s)' % data
+                            self.facts['form_factor'] = 'unknown ({0!s})'.format(data)
                     else:
                         self.facts[key] = data
                 else:
@@ -873,7 +873,7 @@ class LinuxHardware(Hardware):
                     }
             for (k, v) in DMI_DICT.items():
                 if dmi_bin is not None:
-                    (rc, out, err) = module.run_command('%s -s %s' % (dmi_bin, v))
+                    (rc, out, err) = module.run_command('{0!s} -s {1!s}'.format(dmi_bin, v))
                     if rc == 0:
                         # Strip out commented lines (specific dmidecode output)
                         thisvalue = ''.join([ line for line in out.split('\n') if not line.startswith('#') ])
@@ -908,7 +908,7 @@ class LinuxHardware(Hardware):
                     uuid = 'NA'
                     lsblkPath = module.get_bin_path("lsblk")
                     if lsblkPath:
-                        rc, out, err = module.run_command("%s -ln --output UUID %s" % (lsblkPath, fields[0]), use_unsafe_shell=True)
+                        rc, out, err = module.run_command("{0!s} -ln --output UUID {1!s}".format(lsblkPath, fields[0]), use_unsafe_shell=True)
 
                         if rc == 0:
                             uuid = out.strip()
@@ -1193,7 +1193,7 @@ class OpenBSDHardware(Hardware):
             rc, dmesg_boot, err = module.run_command("/sbin/dmesg")
         i = 0
         for line in dmesg_boot.splitlines():
-            if line.split(' ', 1)[0] == 'cpu%i:' % i:
+            if line.split(' ', 1)[0] == 'cpu{0:d}:'.format(i):
                 processor.append(line.split(' ', 1)[1])
                 i = i + 1
         processor_count = i
@@ -1321,7 +1321,7 @@ class FreeBSDHardware(Hardware):
         )
         for (k, v) in DMI_DICT.items():
             if dmi_bin is not None:
-                (rc, out, err) = module.run_command('%s -s %s' % (dmi_bin, v))
+                (rc, out, err) = module.run_command('{0!s} -s {1!s}'.format(dmi_bin, v))
                 if rc == 0:
                     # Strip out commented lines (specific dmidecode output)
                     self.facts[k] = ''.join([ line for line in out.split('\n') if not line.startswith('#') ])
@@ -1401,7 +1401,7 @@ class NetBSDHardware(Hardware):
             key = data[0]
             if key in NetBSDHardware.MEMORY_FACTS:
                 val = data[1].strip().split(' ')[0]
-                self.facts["%s_mb" % key.lower()] = long(val) / 1024
+                self.facts["{0!s}_mb".format(key.lower())] = long(val) / 1024
 
     @timeout(10)
     def get_mount_facts(self):
@@ -1661,7 +1661,7 @@ class Darwin(Hardware):
             self.facts['processor_cores'] = self.sysctl['machdep.cpu.core_count']
         else: # PowerPC
             system_profile = self.get_system_profile()
-            self.facts['processor'] = '%s @ %s' % (system_profile['Processor Name'], system_profile['Processor Speed'])
+            self.facts['processor'] = '{0!s} @ {1!s}'.format(system_profile['Processor Name'], system_profile['Processor Speed'])
             self.facts['processor_cores'] = self.sysctl['hw.physicalcpu']
 
     def get_memory_facts(self):
@@ -2698,7 +2698,7 @@ def get_all_facts(module):
     facts = ansible_facts(module)
 
     for (k, v) in facts.items():
-        setup_options["ansible_%s" % k.replace('-', '_')] = v
+        setup_options["ansible_{0!s}".format(k.replace('-', '_'))] = v
 
     # Look for the path to the facter and ohai binary and set
     # the variable to that path.
@@ -2718,7 +2718,7 @@ def get_all_facts(module):
             facter = False
         if facter:
             for (k,v) in facter_ds.items():
-                setup_options["facter_%s" % k] = v
+                setup_options["facter_{0!s}".format(k)] = v
 
     # ditto for ohai
 
@@ -2731,7 +2731,7 @@ def get_all_facts(module):
             ohai = False
         if ohai:
             for (k,v) in ohai_ds.items():
-                k2 = "ohai_%s" % k.replace('-', '_')
+                k2 = "ohai_{0!s}".format(k.replace('-', '_'))
                 setup_options[k2] = v
 
     setup_result = { 'ansible_facts': {} }

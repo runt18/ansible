@@ -123,7 +123,7 @@ class CloudStackInventory(object):
             for p in projects['project']:
                 if p['name'] == project or p['id'] == project:
                     return p['id']
-        print >> sys.stderr, "Error: Project %s not found." % project
+        print >> sys.stderr, "Error: Project {0!s} not found.".format(project)
         sys.exit(1)
 
 

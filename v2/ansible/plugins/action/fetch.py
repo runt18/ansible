@@ -98,7 +98,7 @@ class ActionModule(ActionBase):
                 target_name = task_vars['inventory_hostname']
             else:
                 target_name = self._connection_info.remote_addr
-            dest = "%s/%s/%s" % (self._loader.path_dwim(dest), target_name, source_local)
+            dest = "{0!s}/{1!s}/{2!s}".format(self._loader.path_dwim(dest), target_name, source_local)
 
         dest = dest.replace("//","/")
 

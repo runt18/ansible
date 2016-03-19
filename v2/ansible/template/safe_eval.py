@@ -82,12 +82,12 @@ def safe_eval(expr, locals={}, include_exceptions=False):
     class CleansingNodeVisitor(ast.NodeVisitor):
         def generic_visit(self, node, inside_call=False):
             if type(node) not in SAFE_NODES:
-                raise Exception("invalid expression (%s)" % expr)
+                raise Exception("invalid expression ({0!s})".format(expr))
             elif isinstance(node, ast.Call):
                 inside_call = True
             elif isinstance(node, ast.Name) and inside_call:
                 if hasattr(builtins, node.id) and node.id not in CALL_WHITELIST:
-                    raise Exception("invalid function: %s" % node.id)
+                    raise Exception("invalid function: {0!s}".format(node.id))
             # iterate over all child nodes
             for child_node in ast.iter_child_nodes(node):
                 self.generic_visit(child_node, inside_call)

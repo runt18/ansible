@@ -83,7 +83,7 @@ class AnsibleCloudStack:
                 if project in [ p['name'], p['displaytext'], p['id'] ]:
                     self.project_id = p['id']
                     return self.project_id
-        self.module.fail_json(msg="project '%s' not found" % project)
+        self.module.fail_json(msg="project '{0!s}' not found".format(project))
 
 
     def get_ip_address_id(self):
@@ -100,7 +100,7 @@ class AnsibleCloudStack:
         ip_addresses = self.cs.listPublicIpAddresses(**args)
 
         if not ip_addresses:
-            self.module.fail_json(msg="IP address '%s' not found" % args['ipaddress'])
+            self.module.fail_json(msg="IP address '{0!s}' not found".format(args['ipaddress']))
 
         self.ip_address_id = ip_addresses['publicipaddress'][0]['id']
         return self.ip_address_id
@@ -122,7 +122,7 @@ class AnsibleCloudStack:
                 if vm in [ v['displayname'], v['name'], v['id'] ]:
                     self.vm_id = v['id']
                     return self.vm_id
-        self.module.fail_json(msg="Virtual machine '%s' not found" % vm)
+        self.module.fail_json(msg="Virtual machine '{0!s}' not found".format(vm))
 
 
     def get_zone_id(self):
@@ -142,7 +142,7 @@ class AnsibleCloudStack:
                 if zone in [ z['name'], z['id'] ]:
                     self.zone_id = z['id']
                     return self.zone_id
-        self.module.fail_json(msg="zone '%s' not found" % zone)
+        self.module.fail_json(msg="zone '{0!s}' not found".format(zone))
 
 
     def get_os_type_id(self):
@@ -159,7 +159,7 @@ class AnsibleCloudStack:
                 if os_type in [ o['description'], o['id'] ]:
                     self.os_type_id = o['id']
                     return self.os_type_id
-        self.module.fail_json(msg="OS type '%s' not found" % os_type)
+        self.module.fail_json(msg="OS type '{0!s}' not found".format(os_type))
 
 
     def get_hypervisor(self):
@@ -178,7 +178,7 @@ class AnsibleCloudStack:
             if hypervisor.lower() == h['name'].lower():
                 self.hypervisor = h['name']
                 return self.hypervisor
-        self.module.fail_json(msg="Hypervisor '%s' not found" % hypervisor)
+        self.module.fail_json(msg="Hypervisor '{0!s}' not found".format(hypervisor))
 
 
     def _poll_job(self, job=None, key=None):
@@ -187,7 +187,7 @@ class AnsibleCloudStack:
                 res = self.cs.queryAsyncJobResult(jobid=job['jobid'])
                 if res['jobstatus'] != 0 and 'jobresult' in res:
                     if 'errortext' in res['jobresult']:
-                        self.module.fail_json(msg="Failed: '%s'" % res['jobresult']['errortext'])
+                        self.module.fail_json(msg="Failed: '{0!s}'".format(res['jobresult']['errortext']))
                     if key and key in res['jobresult']:
                         job = res['jobresult'][key]
                     break

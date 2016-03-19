@@ -49,7 +49,7 @@ class VariableManager:
         self._group_vars_files = defaultdict(dict)
         self._inventory        = None
 
-        self._omit_token       = '__omit_place_holder__%s' % sha1(os.urandom(64)).hexdigest()
+        self._omit_token       = '__omit_place_holder__{0!s}'.format(sha1(os.urandom(64)).hexdigest())
 
     def _get_cache_entry(self, play=None, host=None, task=None):
         play_id = "NONE"
@@ -64,7 +64,7 @@ class VariableManager:
         if task:
             task_id = task._uuid
 
-        return "PLAY:%s;HOST:%s;TASK:%s" % (play_id, host_id, task_id)
+        return "PLAY:{0!s};HOST:{1!s};TASK:{2!s}".format(play_id, host_id, task_id)
 
     @property
     def extra_vars(self):
@@ -84,7 +84,7 @@ class VariableManager:
         Validates that both arguments are dictionaries, or an error is raised.
         '''
         if not (isinstance(a, dict) and isinstance(b, dict)):
-            raise AnsibleError("failed to combine variables, expected dicts but got a '%s' and a '%s'" % (type(a).__name__, type(b).__name__))
+            raise AnsibleError("failed to combine variables, expected dicts but got a '{0!s}' and a '{1!s}'".format(type(a).__name__, type(b).__name__))
 
     def _combine_vars(self, a, b):
         '''
@@ -250,7 +250,7 @@ class VariableManager:
             try:
                 names = loader.list_directory(path)
             except os.error as err:
-                raise AnsibleError("This folder cannot be listed: %s: %s." % (path, err.strerror))
+                raise AnsibleError("This folder cannot be listed: {0!s}: {1!s}.".format(path, err.strerror))
 
             # evaluate files in a stable order rather than whatever
             # order the filesystem lists them.

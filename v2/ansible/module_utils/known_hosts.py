@@ -48,9 +48,9 @@ def add_git_host_key(module, url, accept_hostkey=True, create_dir=True):
             if accept_hostkey:
                 rc, out, err = add_host_key(module, fqdn, create_dir=create_dir)
                 if rc != 0:
-                    module.fail_json(msg="failed to add %s hostkey: %s" % (fqdn, out + err))
+                    module.fail_json(msg="failed to add {0!s} hostkey: {1!s}".format(fqdn, out + err))
             else:
-                module.fail_json(msg="%s has an unknown hostkey. Set accept_hostkey to True or manually add the hostkey prior to running the git module" % fqdn)
+                module.fail_json(msg="{0!s} has an unknown hostkey. Set accept_hostkey to True or manually add the hostkey prior to running the git module".format(fqdn))
 
 def get_fqdn(repo_url):
 
@@ -161,13 +161,13 @@ def add_host_key(module, fqdn, key_type="rsa", create_dir=False):
             try:
                 os.makedirs(user_ssh_dir, 0700)
             except:
-                module.fail_json(msg="failed to create host key directory: %s" % user_ssh_dir)
+                module.fail_json(msg="failed to create host key directory: {0!s}".format(user_ssh_dir))
         else:
-            module.fail_json(msg="%s does not exist" % user_ssh_dir)
+            module.fail_json(msg="{0!s} does not exist".format(user_ssh_dir))
     elif not os.path.isdir(user_ssh_dir):
-        module.fail_json(msg="%s is not a directory" % user_ssh_dir)
+        module.fail_json(msg="{0!s} is not a directory".format(user_ssh_dir))
 
-    this_cmd = "%s -t %s %s" % (keyscan_cmd, key_type, fqdn)
+    this_cmd = "{0!s} -t {1!s} {2!s}".format(keyscan_cmd, key_type, fqdn)
 
     rc, out, err = module.run_command(this_cmd)
     module.append_to_file(user_host_file, out)

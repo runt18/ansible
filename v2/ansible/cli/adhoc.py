@@ -51,7 +51,7 @@ class AdHocCLI(CLI):
         self.parser.add_option('-a', '--args', dest='module_args',
             help="module arguments", default=C.DEFAULT_MODULE_ARGS)
         self.parser.add_option('-m', '--module-name', dest='module_name',
-            help="module name to execute (default=%s)" % C.DEFAULT_MODULE_NAME,
+            help="module name to execute (default={0!s})".format(C.DEFAULT_MODULE_NAME),
             default=C.DEFAULT_MODULE_NAME)
 
         self.options, self.args = self.parser.parse_args()
@@ -100,11 +100,11 @@ class AdHocCLI(CLI):
 
         if self.options.listhosts:
             for host in hosts:
-                self.display.display('    %s' % host)
+                self.display.display('    {0!s}'.format(host))
             return 0
 
         if self.options.module_name in C.MODULE_REQUIRE_ARGS and not self.options.module_args:
-            raise AnsibleError("No argument passed to %s module" % self.options.module_name)
+            raise AnsibleError("No argument passed to {0!s} module".format(self.options.module_name))
 
         #TODO: implement async support
         #if self.options.seconds:

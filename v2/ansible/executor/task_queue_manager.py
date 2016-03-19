@@ -130,7 +130,7 @@ class TaskQueueManager:
             stdout_callback = C.DEFAULT_STDOUT_CALLBACK
 
         if stdout_callback not in callback_loader:
-            raise AnsibleError("Invalid callback for stdout specified: %s" % stdout_callback)
+            raise AnsibleError("Invalid callback for stdout specified: {0!s}".format(stdout_callback))
 
         for callback_plugin in callback_loader.all(class_only=True):
             if hasattr(callback_plugin, 'CALLBACK_VERSION') and callback_plugin.CALLBACK_VERSION >= 2.0:
@@ -178,7 +178,7 @@ class TaskQueueManager:
         # load the specified strategy (or the default linear one)
         strategy = strategy_loader.get(new_play.strategy, self)
         if strategy is None:
-            raise AnsibleError("Invalid play strategy specified: %s" % new_play.strategy, obj=play._ds)
+            raise AnsibleError("Invalid play strategy specified: {0!s}".format(new_play.strategy), obj=play._ds)
 
         # build the iterator
         iterator = PlayIterator(inventory=self._inventory, play=new_play, connection_info=connection_info, all_vars=all_vars)

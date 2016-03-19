@@ -35,12 +35,12 @@ def deprecated(msg, version, removed=False):
 
     if not removed:
         if version:
-            new_msg = "\n[DEPRECATION WARNING]: %s. This feature will be removed in version %s." % (msg, version)
+            new_msg = "\n[DEPRECATION WARNING]: {0!s}. This feature will be removed in version {1!s}.".format(msg, version)
         else:
-            new_msg = "\n[DEPRECATION WARNING]: %s. This feature will be removed in a future release." % (msg)
+            new_msg = "\n[DEPRECATION WARNING]: {0!s}. This feature will be removed in a future release.".format((msg))
         new_msg = new_msg + " Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.\n\n"
     else:
-        raise errors.AnsibleError("[DEPRECATED]: %s.  Please update your playbooks." % msg)
+        raise errors.AnsibleError("[DEPRECATED]: {0!s}.  Please update your playbooks.".format(msg))
 
     wrapped = textwrap.wrap(new_msg, 79)
     new_msg = "\n".join(wrapped) + "\n"
@@ -50,7 +50,7 @@ def deprecated(msg, version, removed=False):
         deprecations[new_msg] = 1
 
 def warning(msg):
-    new_msg = "\n[WARNING]: %s" % msg
+    new_msg = "\n[WARNING]: {0!s}".format(msg)
     wrapped = textwrap.wrap(new_msg, 79)
     new_msg = "\n".join(wrapped) + "\n"
     if new_msg not in warns:

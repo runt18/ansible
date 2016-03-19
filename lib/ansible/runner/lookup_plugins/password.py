@@ -83,14 +83,14 @@ class LookupModule(object):
                     try:
                         os.makedirs(pathdir, mode=0700)
                     except OSError, e:
-                        raise errors.AnsibleError("cannot create the path for the password lookup: %s (error was %s)" % (pathdir, str(e)))
+                        raise errors.AnsibleError("cannot create the path for the password lookup: {0!s} (error was {1!s})".format(pathdir, str(e)))
 
                 chars = "".join([getattr(string,c,c) for c in use_chars]).replace('"','').replace("'",'')
                 password = ''.join(random.choice(chars) for _ in range(length))
 
                 if encrypt is not None:
                     salt = self.random_salt()
-                    content = '%s salt=%s' % (password, salt)
+                    content = '{0!s} salt={1!s}'.format(password, salt)
                 else:
                     content = password
                 with open(path, 'w') as f:
@@ -110,7 +110,7 @@ class LookupModule(object):
                 # crypt requested, add salt if missing
                 if (encrypt is not None and not salt):
                     salt = self.random_salt()
-                    content = '%s salt=%s' % (password, salt)
+                    content = '{0!s} salt={1!s}'.format(password, salt)
                     with open(path, 'w') as f:
                         os.chmod(path, 0600)
                         f.write(content + '\n')

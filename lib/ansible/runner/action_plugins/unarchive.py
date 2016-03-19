@@ -70,7 +70,7 @@ class ActionModule(object):
                     comm_ok=True,
                     result=dict(
                         changed=False,
-                        msg=("skipped, since %s exists" % creates)
+                        msg=("skipped, since {0!s} exists".format(creates))
                     )
                 )
 
@@ -87,7 +87,7 @@ class ActionModule(object):
             result = dict(failed=True, msg="python isn't present on the system.  Unable to compute checksum")
             return ReturnData(conn=conn, result=result)
         if remote_checksum != '3':
-            result = dict(failed=True, msg="dest '%s' must be an existing dir" % dest)
+            result = dict(failed=True, msg="dest '{0!s}' must be an existing dir".format(dest))
             return ReturnData(conn=conn, result=result)
 
         if copy:
@@ -114,7 +114,7 @@ class ActionModule(object):
 
             module_args = utils.merge_module_args(module_args, new_module_args)
         else:
-            module_args = "%s original_basename=%s" % (module_args, pipes.quote(os.path.basename(source)))
+            module_args = "{0!s} original_basename={1!s}".format(module_args, pipes.quote(os.path.basename(source)))
             # make sure checkmod is passed on correctly
             if self.runner.noop_on_check(inject):
                 module_args += " CHECKMODE=True"

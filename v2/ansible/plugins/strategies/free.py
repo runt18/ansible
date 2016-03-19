@@ -62,14 +62,14 @@ class StrategyModule(StrategyBase):
             host_results = []
             while True:
                 host = hosts_left[last_host]
-                debug("next free host: %s" % host)
+                debug("next free host: {0!s}".format(host))
                 host_name = host.get_name()
 
                 # peek at the next task for the host, to see if there's
                 # anything to do do for this host
                 (state, task) = iterator.get_next_task_for_host(host, peek=True)
-                debug("free host state: %s" % state)
-                debug("free host task: %s" % task)
+                debug("free host state: {0!s}".format(state))
+                debug("free host task: {0!s}".format(task))
                 if host_name not in self._tqm._failed_hosts and host_name not in self._tqm._unreachable_hosts and task:
 
                     # set the flag so the outer loop knows we've still found
@@ -94,11 +94,11 @@ class StrategyModule(StrategyBase):
                             # If there is no metadata, the default behavior is to not allow duplicates,
                             # if there is metadata, check to see if the allow_duplicates flag was set to true
                             if task._role._metadata is None or task._role._metadata and not task._role._metadata.allow_duplicates:
-                                debug("'%s' skipped because role has already run" % task)
+                                debug("'{0!s}' skipped because role has already run".format(task))
                                 continue
 
                         if not task.evaluate_tags(connection_info.only_tags, connection_info.skip_tags, task_vars) and task.action != 'setup':
-                            debug("'%s' failed tag evaluation" % task)
+                            debug("'{0!s}' failed tag evaluation".format(task))
                             continue
 
                         if task.action == 'meta':
@@ -113,7 +113,7 @@ class StrategyModule(StrategyBase):
                                 #        only those handlers notified for the host doing the flush
                                 self.run_handlers(iterator, connection_info)
                             else:
-                                raise AnsibleError("invalid meta action requested: %s" % meta_action, obj=task._ds)
+                                raise AnsibleError("invalid meta action requested: {0!s}".format(meta_action), obj=task._ds)
 
                             self._blocked_hosts[host_name] = False
                         else:
@@ -142,7 +142,7 @@ class StrategyModule(StrategyBase):
         except Exception as e:
             # FIXME: ctrl+c can cause some failures here, so catch them
             #        with the appropriate error type
-            print("wtf: %s" % e)
+            print("wtf: {0!s}".format(e))
             pass
 
         # run the base class run() method, which executes the cleanup function

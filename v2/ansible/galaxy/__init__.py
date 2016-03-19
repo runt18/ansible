@@ -66,5 +66,5 @@ class Galaxy(object):
         try:
             return open(myfile).read()
         except Exception as e:
-            raise AnsibleError("Could not open %s: %s" % (filename, str(e)))
+            raise AnsibleError("Could not open {0!s}: {1!s}".format(filename, str(e)))
 

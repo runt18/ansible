@@ -79,7 +79,7 @@ class ActionModule(object):
         # use slurp if sudo and permissions are lacking
         remote_data = None
         if remote_checksum in ('1', '2') or self.runner.become:
-            slurpres = self.runner._execute_module(conn, tmp, 'slurp', 'src=%s' % source, inject=inject)
+            slurpres = self.runner._execute_module(conn, tmp, 'slurp', 'src={0!s}'.format(source), inject=inject)
             if slurpres.is_successful():
                 if slurpres.result['encoding'] == 'base64':
                     remote_data = base64.b64decode(slurpres.result['content'])
@@ -110,7 +110,7 @@ class ActionModule(object):
                 dest = utils.path_dwim(self.runner.basedir, dest)
         else:
             # files are saved in dest dir, with a subdir for each host, then the filename
-            dest = "%s/%s/%s" % (utils.path_dwim(self.runner.basedir, dest), inject['inventory_hostname'], source_local)
+            dest = "{0!s}/{1!s}/{2!s}".format(utils.path_dwim(self.runner.basedir, dest), inject['inventory_hostname'], source_local)
 
         dest = dest.replace("//","/")
 

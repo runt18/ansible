@@ -105,7 +105,7 @@ class AnsibleCloudStack:
         if key:
             if key in my_dict:
                 return my_dict[key]
-            self.module.fail_json(msg="Something went wrong: %s not found" % key)
+            self.module.fail_json(msg="Something went wrong: {0!s} not found".format(key))
         return my_dict
 
 
@@ -131,7 +131,7 @@ class AnsibleCloudStack:
                 if project in [ p['name'], p['displaytext'], p['id'] ]:
                     self.project = p
                     return self._get_by_key(key, self.project)
-        self.module.fail_json(msg="project '%s' not found" % project)
+        self.module.fail_json(msg="project '{0!s}' not found".format(project))
 
 
     # TODO: for backward compatibility only, remove if not used anymore
@@ -155,7 +155,7 @@ class AnsibleCloudStack:
         ip_addresses = self.cs.listPublicIpAddresses(**args)
 
         if not ip_addresses:
-            self.module.fail_json(msg="IP address '%s' not found" % args['ipaddress'])
+            self.module.fail_json(msg="IP address '{0!s}' not found".format(args['ipaddress']))
 
         self.ip_address = ip_addresses['publicipaddress'][0]
         return self._get_by_key(key, self.ip_address)
@@ -185,7 +185,7 @@ class AnsibleCloudStack:
                 if vm in [ v['name'], v['displayname'], v['id'] ]:
                     self.vm = v
                     return self._get_by_key(key, self.vm)
-        self.module.fail_json(msg="Virtual machine '%s' not found" % vm)
+        self.module.fail_json(msg="Virtual machine '{0!s}' not found".format(vm))
 
 
     # TODO: for backward compatibility only, remove if not used anymore
@@ -210,7 +210,7 @@ class AnsibleCloudStack:
                 if zone in [ z['name'], z['id'] ]:
                     self.zone = z
                     return self._get_by_key(key, self.zone)
-        self.module.fail_json(msg="zone '%s' not found" % zone)
+        self.module.fail_json(msg="zone '{0!s}' not found".format(zone))
 
 
     # TODO: for backward compatibility only, remove if not used anymore
@@ -232,7 +232,7 @@ class AnsibleCloudStack:
                 if os_type in [ o['description'], o['id'] ]:
                     self.os_type = o
                     return self._get_by_key(key, self.os_type)
-        self.module.fail_json(msg="OS type '%s' not found" % os_type)
+        self.module.fail_json(msg="OS type '{0!s}' not found".format(os_type))
 
 
     def get_hypervisor(self):
@@ -251,7 +251,7 @@ class AnsibleCloudStack:
             if hypervisor.lower() == h['name'].lower():
                 self.hypervisor = h['name']
                 return self.hypervisor
-        self.module.fail_json(msg="Hypervisor '%s' not found" % hypervisor)
+        self.module.fail_json(msg="Hypervisor '{0!s}' not found".format(hypervisor))
 
 
     def get_account(self, key=None):
@@ -274,7 +274,7 @@ class AnsibleCloudStack:
         if accounts:
             self.account = accounts['account'][0]
             return self._get_by_key(key, self.account)
-        self.module.fail_json(msg="Account '%s' not found" % account)
+        self.module.fail_json(msg="Account '{0!s}' not found".format(account))
 
 
     def get_domain(self, key=None):
@@ -292,7 +292,7 @@ class AnsibleCloudStack:
         if domains:
             self.domain = domains['domain'][0]
             return self._get_by_key(key, self.domain)
-        self.module.fail_json(msg="Domain '%s' not found" % domain)
+        self.module.fail_json(msg="Domain '{0!s}' not found".format(domain))
 
 
     def get_tags(self, resource=None):
@@ -366,7 +366,7 @@ class AnsibleCloudStack:
                 res = self.cs.queryAsyncJobResult(jobid=job['jobid'])
                 if res['jobstatus'] != 0 and 'jobresult' in res:
                     if 'errortext' in res['jobresult']:
-                        self.module.fail_json(msg="Failed: '%s'" % res['jobresult']['errortext'])
+                        self.module.fail_json(msg="Failed: '{0!s}'".format(res['jobresult']['errortext']))
                     if key and key in res['jobresult']:
                         job = res['jobresult'][key]
                     break

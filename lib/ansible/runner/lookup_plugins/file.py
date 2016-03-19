@@ -54,6 +54,6 @@ class LookupModule(object):
                     ret.append(codecs.open(path, encoding="utf8").read().rstrip())
                     break
             else:
-                raise errors.AnsibleError("could not locate file in lookup: %s" % term)
+                raise errors.AnsibleError("could not locate file in lookup: {0!s}".format(term))
 
         return ret

@@ -55,7 +55,7 @@ class ActionModule(ActionBase):
         if self._task.args is None or len(self._task.args.keys()) == 0:
             pause_type = 'prompt'
             #prompt = "[%s]\nPress enter to continue:\n" % hosts
-            prompt = "[%s]\nPress enter to continue:\n" % self._task.get_name().strip()
+            prompt = "[{0!s}]\nPress enter to continue:\n".format(self._task.get_name().strip())
 
         # Are 'minutes' or 'seconds' keys that exist in 'args'?
         elif 'minutes' in self._task.args or 'seconds' in self._task.args:
@@ -71,17 +71,17 @@ class ActionModule(ActionBase):
                     duration_unit = 'seconds'
 
             except ValueError as e:
-                return dict(failed=True, msg="non-integer value given for prompt duration:\n%s" % str(e))
+                return dict(failed=True, msg="non-integer value given for prompt duration:\n{0!s}".format(str(e)))
 
         # Is 'prompt' a key in 'args'?
         elif 'prompt' in self._task.args:
             pause_type = 'prompt'
             #prompt = "[%s]\n%s:\n" % (hosts, self._task.args['prompt'])
-            prompt = "[%s]\n%s:\n" % (self._task.get_name().strip(), self._task.args['prompt'])
+            prompt = "[{0!s}]\n{1!s}:\n".format(self._task.get_name().strip(), self._task.args['prompt'])
 
         # I have no idea what you're trying to do. But it's so wrong.
         else:
-            return dict(failed=True, msg="invalid pause type given. must be one of: %s" % ", ".join(self.PAUSE_TYPES))
+            return dict(failed=True, msg="invalid pause type given. must be one of: {0!s}".format(", ".join(self.PAUSE_TYPES)))
 
         #vv("created 'pause' ActionModule: pause_type=%s, duration_unit=%s, calculated_seconds=%s, prompt=%s" % \
         #        (self.pause_type, self.duration_unit, self.seconds, self.prompt))
@@ -103,7 +103,7 @@ class ActionModule(ActionBase):
             if not pause_type == 'prompt':
                 print("(^C-c = continue early, ^C-a = abort)")
                 #print("[%s]\nPausing for %s seconds" % (hosts, seconds))
-                print("[%s]\nPausing for %s seconds" % (self._task.get_name().strip(), seconds))
+                print("[{0!s}]\nPausing for {1!s} seconds".format(self._task.get_name().strip(), seconds))
                 time.sleep(seconds)
             else:
                 # Clear out any unflushed buffered input which would
@@ -130,7 +130,7 @@ class ActionModule(ActionBase):
             else:
                 duration = round(duration, 2)
 
-            result['stdout'] = "Paused for %s %s" % (duration, duration_unit)
+            result['stdout'] = "Paused for {0!s} {1!s}".format(duration, duration_unit)
 
         return result
 

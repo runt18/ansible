@@ -58,7 +58,7 @@ def axapi_call(module, url, post=None):
     '''
     rsp, info = fetch_url(module, url, data=post)
     if not rsp or info['status'] >= 400:
-        module.fail_json(msg="failed to connect (status code %s), error was %s" % (info['status'], info.get('msg', 'no error given')))
+        module.fail_json(msg="failed to connect (status code {0!s}), error was {1!s}".format(info['status'], info.get('msg', 'no error given')))
     try:
         raw_data = rsp.read()
         data = json.loads(raw_data)
@@ -77,7 +77,7 @@ def axapi_call(module, url, post=None):
     return data
 
 def axapi_authenticate(module, base_url, username, password):
-    url = '%s&method=authenticate&username=%s&password=%s' % (base_url, username, password)
+    url = '{0!s}&method=authenticate&username={1!s}&password={2!s}'.format(base_url, username, password)
     result = axapi_call(module, url)
     if axapi_failure(result):
         return module.fail_json(msg=result['response']['err']['msg'])

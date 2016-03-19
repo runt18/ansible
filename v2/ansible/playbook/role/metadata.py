@@ -54,7 +54,7 @@ class RoleMetadata(Base):
         '''
 
         if not isinstance(data, dict):
-            raise AnsibleParserError("the 'meta/main.yml' for role %s is not a dictionary" % owner.get_name())
+            raise AnsibleParserError("the 'meta/main.yml' for role {0!s} is not a dictionary".format(owner.get_name()))
 
         m = RoleMetadata(owner=owner).load_data(data, variable_manager=variable_manager, loader=loader)
         return m

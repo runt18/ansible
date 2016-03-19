@@ -40,16 +40,16 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if 'exception' in result._result and self._display.verbosity < 3:
             del result._result['exception']
-        self._display.display("%s | FAILED! => %s" % (result._host.get_name(), result._result), color='red')
+        self._display.display("{0!s} | FAILED! => {1!s}".format(result._host.get_name(), result._result), color='red')
 
     def v2_runner_on_ok(self, result):
-        self._display.display("%s | SUCCESS => %s" % (result._host.get_name(), json.dumps(result._result, indent=4)), color='green')
+        self._display.display("{0!s} | SUCCESS => {1!s}".format(result._host.get_name(), json.dumps(result._result, indent=4)), color='green')
 
     def v2_runner_on_skipped(self, result):
         pass
 
     def v2_runner_on_unreachable(self, result):
-        self._display.display("%s | UNREACHABLE!" % result._host.get_name(), color='yellow')
+        self._display.display("{0!s} | UNREACHABLE!".format(result._host.get_name()), color='yellow')
 
     def v2_runner_on_no_hosts(self, task):
         pass

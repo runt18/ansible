@@ -46,11 +46,11 @@ class ActionModule(ActionBase):
             # do not run the command if the line contains creates=filename
             # and the filename already exists. This allows idempotence
             # of command executions.
-            module_args_tmp = "path=%s" % creates
+            module_args_tmp = "path={0!s}".format(creates)
             result = self._execute_module(module_name='stat', module_args=dict(path=creates))
             stat = result.get('stat', None)
             if stat and stat.get('exists', False):
-                return dict(skipped=True, msg=("skipped, since %s exists" % creates))
+                return dict(skipped=True, msg=("skipped, since {0!s} exists".format(creates)))
 
         dest = self._remote_expand_user(dest, tmp) # CCTODO: Fix path for Windows hosts.
         source = os.path.expanduser(source)
@@ -64,7 +64,7 @@ class ActionModule(ActionBase):
 
         remote_checksum = self._remote_checksum(tmp, dest)
         if remote_checksum != '3':
-            return dict(failed=True, msg="dest '%s' must be an existing dir" % dest)
+            return dict(failed=True, msg="dest '{0!s}' must be an existing dir".format(dest))
         elif remote_checksum == '4':
             return dict(failed=True, msg="python isn't present on the system.  Unable to compute checksum")
 

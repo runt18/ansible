@@ -13,6 +13,6 @@ global_debug_lock = Lock()
 def debug(msg):
     if C.DEFAULT_DEBUG:
         global_debug_lock.acquire()
-        print("%6d %0.5f: %s" % (os.getpid(), time.time(), msg))
+        print("{0:6d} {1:0.5f}: {2!s}".format(os.getpid(), time.time(), msg))
         sys.stdout.flush()
         global_debug_lock.release()

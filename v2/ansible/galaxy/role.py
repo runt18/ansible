@@ -58,44 +58,44 @@ class GalaxyRole(object):
 
         # this can be configured to prevent unwanted SCMS but cannot add new ones unless the code is also updated
         if scm not in self.scms:
-            self.display.display("The %s scm is not currently supported" % scm)
+            self.display.display("The {0!s} scm is not currently supported".format(scm))
             return False
 
         tempdir = tempfile.mkdtemp()
         clone_cmd = [scm, 'clone', role_url, self.name]
         with open('/dev/null', 'w') as devnull:
             try:
-                self.display.display("- executing: %s" % " ".join(clone_cmd))
+                self.display.display("- executing: {0!s}".format(" ".join(clone_cmd)))
                 popen = subprocess.Popen(clone_cmd, cwd=tempdir, stdout=devnull, stderr=devnull)
             except:
-                raise AnsibleError("error executing: %s" % " ".join(clone_cmd))
+                raise AnsibleError("error executing: {0!s}".format(" ".join(clone_cmd)))
             rc = popen.wait()
         if rc != 0:
-            self.display.display("- command %s failed" % ' '.join(clone_cmd))
-            self.display.display("  in directory %s" % tempdir)
+            self.display.display("- command {0!s} failed".format(' '.join(clone_cmd)))
+            self.display.display("  in directory {0!s}".format(tempdir))
             return False
 
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.tar')
         if scm == 'hg':
-            archive_cmd = ['hg', 'archive', '--prefix', "%s/" % self.name]
+            archive_cmd = ['hg', 'archive', '--prefix', "{0!s}/".format(self.name)]
             if role_version:
                 archive_cmd.extend(['-r', role_version])
             archive_cmd.append(temp_file.name)
         if scm == 'git':
-            archive_cmd = ['git', 'archive', '--prefix=%s/' % self.name, '--output=%s' % temp_file.name]
+            archive_cmd = ['git', 'archive', '--prefix={0!s}/'.format(self.name), '--output={0!s}'.format(temp_file.name)]
             if role_version:
                 archive_cmd.append(role_version)
             else:
                 archive_cmd.append('HEAD')
 
         with open('/dev/null', 'w') as devnull:
-            self.display.display("- executing: %s" % " ".join(archive_cmd))
+            self.display.display("- executing: {0!s}".format(" ".join(archive_cmd)))
             popen = subprocess.Popen(archive_cmd, cwd=os.path.join(tempdir, self.name),
                                      stderr=devnull, stdout=devnull)
             rc = popen.wait()
         if rc != 0:
-            self.display.display("- command %s failed" % ' '.join(archive_cmd))
-            self.display.display("  in directory %s" % tempdir)
+            self.display.display("- command {0!s} failed".format(' '.join(archive_cmd)))
+            self.display.display("  in directory {0!s}".format(tempdir))
             return False
 
         rmtree(tempdir, ignore_errors=True)
@@ -114,7 +114,7 @@ class GalaxyRole(object):
                     f = open(meta_path, 'r')
                     self._metadata = yaml.safe_load(f)
                 except:
-                    self.display.vvvvv("Unable to load metadata for %s" % self.name)
+                    self.display.vvvvv("Unable to load metadata for {0!s}".format(self.name))
                     return False
                 finally:
                     f.close()
@@ -135,7 +135,7 @@ class GalaxyRole(object):
                     f = open(info_path, 'r')
                     self._install_info = yaml.safe_load(f)
                 except:
-                    self.display.vvvvv("Unable to load Galaxy install info for %s" % self.name)
+                    self.display.vvvvv("Unable to load Galaxy install info for {0!s}".format(self.name))
                     return False
                 finally:
                     f.close()
@@ -188,8 +188,8 @@ class GalaxyRole(object):
         if self.src:
             archive_url = self.src
         else:
-            archive_url = 'https://github.com/%s/%s/archive/%s.tar.gz' % (role_data["github_user"], role_data["github_repo"], target)
-        self.display.display("- downloading role from %s" % archive_url)
+            archive_url = 'https://github.com/{0!s}/{1!s}/archive/{2!s}.tar.gz'.format(role_data["github_user"], role_data["github_repo"], target)
+        self.display.display("- downloading role from {0!s}".format(archive_url))
 
         try:
             url_file = urlopen(archive_url)
@@ -239,19 +239,19 @@ class GalaxyRole(object):
             # we strip off the top-level directory for all of the files contained within
             # the tar file here, since the default is 'github_repo-target', and change it
             # to the specified role's name
-            self.display.display("- extracting %s to %s" % (self.name, self.path))
+            self.display.display("- extracting {0!s} to {1!s}".format(self.name, self.path))
             try:
                 if os.path.exists(self.path):
                     if not os.path.isdir(self.path):
                         self.display.error("the specified roles path exists and is not a directory.")
                         return False
                     elif not getattr(self.options, "force", False):
-                        self.display.error("the specified role %s appears to already exist. Use --force to replace it." % self.name)
+                        self.display.error("the specified role {0!s} appears to already exist. Use --force to replace it.".format(self.name))
                         return False
                     else:
                         # using --force, remove the old path
                         if not self.remove():
-                            self.display.error("%s doesn't appear to contain a role." % self.path)
+                            self.display.error("{0!s} doesn't appear to contain a role.".format(self.path))
                             self.display.error("  please remove this directory manually if you really want to put the role here.")
                             return False
                 else:
@@ -274,11 +274,11 @@ class GalaxyRole(object):
                 # write out the install info file for later use
                 self._write_galaxy_install_info()
             except OSError as e:
-                self.display.error("Could not update files in %s: %s" % (self.path, str(e)))
+                self.display.error("Could not update files in {0!s}: {1!s}".format(self.path, str(e)))
                 return False
 
             # return the parsed yaml metadata
-            self.display.display("- %s was installed successfully" % self.name)
+            self.display.display("- {0!s} was installed successfully".format(self.name))
             return True
 
     @property

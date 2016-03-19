@@ -177,7 +177,7 @@ or environment variables (DO_CLIENT_ID and DO_API_KEY)'''
 
         # env command, show DigitalOcean credentials
         if self.args.env:
-            print "DO_CLIENT_ID=%s DO_API_KEY=%s" % (self.client_id, self.api_key)
+            print "DO_CLIENT_ID={0!s} DO_API_KEY={1!s}".format(self.client_id, self.api_key)
             sys.exit(0)
 
         # Manage cache

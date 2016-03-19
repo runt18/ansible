@@ -199,7 +199,7 @@ class Templar:
         if isinstance(variable, basestring):
             first_part = variable.split(".")[0].split("[")[0]
             if first_part in self._available_variables and '{{' not in variable and '$' not in variable:
-                return "{{%s}}" % variable
+                return "{{{{{0!s}}}}}".format(variable)
 
         # the variable didn't meet the conditions to be converted,
         # so just return it as-is
@@ -228,7 +228,7 @@ class Templar:
                 ran = ",".join(ran)
             return ran
         else:
-            raise AnsibleError("lookup plugin (%s) not found" % name)
+            raise AnsibleError("lookup plugin ({0!s}) not found".format(name))
 
     def _do_template(self, data, preserve_trailing_newlines=False):
 
@@ -249,10 +249,10 @@ class Templar:
             try:
                 t = environment.from_string(data)
             except TemplateSyntaxError, e:
-                raise AnsibleError("template error while templating string: %s" % str(e))
+                raise AnsibleError("template error while templating string: {0!s}".format(str(e)))
             except Exception, e:
                 if 'recursion' in str(e):
-                    raise AnsibleError("recursive loop detected in template string: %s" % data)
+                    raise AnsibleError("recursive loop detected in template string: {0!s}".format(data))
                 else:
                     return data
 
@@ -273,8 +273,8 @@ class Templar:
                         "Make sure your variable name does not contain invalid characters like '-'."
                     )
                 else:
-                    debug("failing because of a type error, template data is: %s" % data)
-                    raise AnsibleError("an unexpected type error occurred. Error was %s" % te)
+                    debug("failing because of a type error, template data is: {0!s}".format(data))
+                    raise AnsibleError("an unexpected type error occurred. Error was {0!s}".format(te))
 
             if preserve_trailing_newlines:
                 # The low level calls above do not preserve the newline

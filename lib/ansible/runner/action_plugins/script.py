@@ -57,7 +57,7 @@ class ActionModule(object):
             # do not run the command if the line contains creates=filename
             # and the filename already exists. This allows idempotence
             # of command executions.
-            module_args_tmp = "path=%s" % creates
+            module_args_tmp = "path={0!s}".format(creates)
             module_return = self.runner._execute_module(conn, tmp, 'stat', module_args_tmp, inject=inject,
                                                         complex_args=complex_args, persist_files=True)
             stat = module_return.result.get('stat', None)
@@ -67,14 +67,14 @@ class ActionModule(object):
                     comm_ok=True,
                     result=dict(
                         changed=False,
-                        msg=("skipped, since %s exists" % creates)
+                        msg=("skipped, since {0!s} exists".format(creates))
                     )
                 )
         if removes:
             # do not run the command if the line contains removes=filename
             # and the filename does not exist. This allows idempotence
             # of command executions.
-            module_args_tmp = "path=%s" % removes
+            module_args_tmp = "path={0!s}".format(removes)
             module_return = self.runner._execute_module(conn, tmp, 'stat', module_args_tmp, inject=inject,
                                                         complex_args=complex_args, persist_files=True)
             stat = module_return.result.get('stat', None)
@@ -84,7 +84,7 @@ class ActionModule(object):
                     comm_ok=True,
                     result=dict(
                         changed=False,
-                        msg=("skipped, since %s does not exist" % removes)
+                        msg=("skipped, since {0!s} does not exist".format(removes))
                     )
                 )
 

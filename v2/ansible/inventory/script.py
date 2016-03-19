@@ -45,11 +45,11 @@ class InventoryScript:
         try:
             sp = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except OSError, e:
-            raise AnsibleError("problem running %s (%s)" % (' '.join(cmd), e))
+            raise AnsibleError("problem running {0!s} ({1!s})".format(' '.join(cmd), e))
         (stdout, stderr) = sp.communicate()
 
         if sp.returncode != 0:
-            raise AnsibleError("Inventory script (%s) had an execution error: %s " % (filename,stderr))
+            raise AnsibleError("Inventory script ({0!s}) had an execution error: {1!s} ".format(filename, stderr))
 
         self.data = stdout
         # see comment about _meta below
@@ -72,7 +72,7 @@ class InventoryScript:
 
         if 'failed' in self.raw:
             sys.stderr.write(err + "\n")
-            raise AnsibleError("failed to parse executable inventory script results: %s" % self.raw)
+            raise AnsibleError("failed to parse executable inventory script results: {0!s}".format(self.raw))
 
         for (group_name, data) in self.raw.items():
 
@@ -147,12 +147,12 @@ class InventoryScript:
         try:
             sp = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except OSError, e:
-            raise AnsibleError("problem running %s (%s)" % (' '.join(cmd), e))
+            raise AnsibleError("problem running {0!s} ({1!s})".format(' '.join(cmd), e))
         (out, err) = sp.communicate()
         if out.strip() == '':
             return dict()
         try:
             return json_dict_bytes_to_unicode(self._loader.load(out))
         except ValueError:
-            raise AnsibleError("could not parse post variable response: %s, %s" % (cmd, out))
+            raise AnsibleError("could not parse post variable response: {0!s}, {1!s}".format(cmd, out))
 

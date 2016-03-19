@@ -40,7 +40,7 @@ class Connection(object):
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
         if p.returncode:
-            raise errors.AnsibleError("%s is not a lxc defined in libvirt" % domain)
+            raise errors.AnsibleError("{0!s} is not a lxc defined in libvirt".format(domain))
 
     def __init__(self, runner, host, port, *args, **kwargs):
         self.lxc = host
@@ -66,14 +66,14 @@ class Connection(object):
         if executable:
             local_cmd = [self.cmd, '-q', '-c', 'lxc:///', 'lxc-enter-namespace', self.lxc, '--', executable , '-c', cmd]
         else:
-            local_cmd = '%s -q -c lxc:/// lxc-enter-namespace %s -- %s' % (self.cmd, self.lxc, cmd)
+            local_cmd = '{0!s} -q -c lxc:/// lxc-enter-namespace {1!s} -- {2!s}'.format(self.cmd, self.lxc, cmd)
         return local_cmd
 
     def exec_command(self, cmd, tmp_path, become_user, sudoable=False, executable='/bin/sh', in_data=None):
         ''' run a command on the chroot '''
 
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -81,7 +81,7 @@ class Connection(object):
         # We ignore privilege escalation!
         local_cmd = self._generate_cmd(executable, cmd)
 
-        vvv("EXEC %s" % (local_cmd), host=self.lxc)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.lxc)
         p = subprocess.Popen(local_cmd, shell=isinstance(local_cmd, basestring),
                              cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,
@@ -100,10 +100,10 @@ class Connection(object):
         ''' transfer a file from local to lxc '''
 
         out_path = self._normalize_path(out_path, '/')
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.lxc)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.lxc)
         
         local_cmd = [self.cmd, '-q', '-c', 'lxc:///', 'lxc-enter-namespace', self.lxc, '--', '/bin/tee', out_path]
-        vvv("EXEC %s" % (local_cmd), host=self.lxc)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.lxc)
 
         p = subprocess.Popen(local_cmd, cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,
@@ -114,10 +114,10 @@ class Connection(object):
         ''' fetch a file from lxc to local '''
 
         in_path = self._normalize_path(in_path, '/')
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.lxc)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.lxc)
 
         local_cmd = [self.cmd, '-q', '-c', 'lxc:///', 'lxc-enter-namespace', self.lxc, '--', '/bin/cat', in_path]
-        vvv("EXEC %s" % (local_cmd), host=self.lxc)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.lxc)
 
         p = subprocess.Popen(local_cmd, cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,

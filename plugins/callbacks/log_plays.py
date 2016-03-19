@@ -41,7 +41,7 @@ def log(host, category, data):
             invocation = data.pop('invocation', None)
             data = json.dumps(data)
             if invocation is not None:
-                data = json.dumps(invocation) + " => %s " % data
+                data = json.dumps(invocation) + " => {0!s} ".format(data)
 
     path = os.path.join("/var/log/ansible/hosts", host)
     now = time.strftime(TIME_FORMAT, time.localtime())

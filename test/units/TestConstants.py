@@ -23,7 +23,7 @@ class TestConstants(unittest.TestCase):
     
     def test_configfile_and_env_both_set(self):
         r = random_string(6)
-        env_var = 'ANSIBLE_TEST_%s' % r
+        env_var = 'ANSIBLE_TEST_{0!s}'.format(r)
         os.environ[env_var] = r
 
         res = get_config(p, 'defaults', 'test_key', env_var, 'default')
@@ -34,7 +34,7 @@ class TestConstants(unittest.TestCase):
 
     def test_configfile_set_env_not_set(self):
         r = random_string(6)
-        env_var = 'ANSIBLE_TEST_%s' % r
+        env_var = 'ANSIBLE_TEST_{0!s}'.format(r)
         assert env_var not in os.environ
         
         res = get_config(p, 'defaults', 'test_key', env_var, 'default')
@@ -45,7 +45,7 @@ class TestConstants(unittest.TestCase):
 
     def test_configfile_not_set_env_set(self):
         r = random_string(6)
-        env_var = 'ANSIBLE_TEST_%s' % r
+        env_var = 'ANSIBLE_TEST_{0!s}'.format(r)
         os.environ[env_var] = r
 
         res = get_config(p, 'defaults', 'doesnt_exist', env_var, 'default')
@@ -56,7 +56,7 @@ class TestConstants(unittest.TestCase):
 
     def test_configfile_not_set_env_not_set(self):
         r = random_string(6)
-        env_var = 'ANSIBLE_TEST_%s' % r
+        env_var = 'ANSIBLE_TEST_{0!s}'.format(r)
         assert env_var not in os.environ
         
         res = get_config(p, 'defaults', 'doesnt_exist', env_var, 'default')

@@ -232,7 +232,7 @@ class ConsulInventory(object):
         metadata '''
     node = node_data['Node']
     if  self.config.has_config('kv_metadata'):
-      key = "%s/%s/%s" % (self.config.kv_metadata, self.current_dc, node['Node'])
+      key = "{0!s}/{1!s}/{2!s}".format(self.config.kv_metadata, self.current_dc, node['Node'])
       index, metadata = self.consul_api.kv.get(key)
       if metadata and metadata['Value']:
         try:
@@ -248,7 +248,7 @@ class ConsulInventory(object):
         group found '''
     node = node_data['Node']
     if  self.config.has_config('kv_groups'):
-      key = "%s/%s/%s" % (self.config.kv_groups, self.current_dc, node['Node'])
+      key = "{0!s}/{1!s}/{2!s}".format(self.config.kv_groups, self.current_dc, node['Node'])
       index, groups = self.consul_api.kv.get(key)
       if groups and groups['Value']:
         for group in groups['Value'].split(','):
@@ -277,7 +277,7 @@ class ConsulInventory(object):
     service and tag names e.g. nginx_master'''
     if self.config.has_config('tags') and service['Tags']:
       tags = service['Tags']
-      self.add_metadata(node_data, "consul_%s_tags" % service_name, tags)
+      self.add_metadata(node_data, "consul_{0!s}_tags".format(service_name), tags)
       for tag in service['Tags']:
         tagname = service_name +'_'+tag
         self.add_node_to_map(self.nodes_by_tag, tagname, node_data['Node'])
@@ -313,9 +313,9 @@ class ConsulInventory(object):
       if domain:
           node_name = node_data['Node']
           if self.current_dc:
-              return '%s.node.%s.%s' % ( node_name, self.current_dc, domain)
+              return '{0!s}.node.{1!s}.{2!s}'.format(node_name, self.current_dc, domain)
           else:
-              return '%s.node.%s' % ( node_name, domain)
+              return '{0!s}.node.{1!s}'.format(node_name, domain)
       else:
           return node_data['Address']
 

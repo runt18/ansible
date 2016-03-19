@@ -62,7 +62,7 @@ class ConnectionBase:
         if become_method in self.__class__.become_methods:
             return True
 
-        raise AnsibleError("Internal Error: this connection module does not support running commands via %s" % become_method)
+        raise AnsibleError("Internal Error: this connection module does not support running commands via {0!s}".format(become_method))
 
     @abstractproperty
     def transport(self):

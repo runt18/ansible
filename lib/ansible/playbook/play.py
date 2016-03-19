@@ -60,7 +60,7 @@ class Play(object):
 
         for x in ds.keys():
             if not x in Play.VALID_KEYS:
-                raise errors.AnsibleError("%s is not a legal parameter of an Ansible Play" % x)
+                raise errors.AnsibleError("{0!s} is not a legal parameter of an Ansible Play".format(x))
 
         # allow all playbook keys to be set by --extra-vars
         self.vars             = ds.get('vars', {})
@@ -123,7 +123,7 @@ class Play(object):
         try:
             ds = template(basedir, ds, temp_vars)
         except errors.AnsibleError, e:
-            utils.warning("non fatal error while trying to template play variables: %s" % (str(e)))
+            utils.warning("non fatal error while trying to template play variables: {0!s}".format((str(e))))
 
         ds['tasks'] = _tasks
         ds['handlers'] = _handlers
@@ -137,7 +137,7 @@ class Play(object):
             try:
                 hosts = ';'.join(hosts)
             except TypeError,e:
-                raise errors.AnsibleError('improper host declaration: %s' % str(e))
+                raise errors.AnsibleError('improper host declaration: {0!s}'.format(str(e)))
 
         self.serial           = str(ds.get('serial', 0))
         self.hosts            = hosts
@@ -215,7 +215,7 @@ class Play(object):
             # what, not a path?
             role_name = orig_path.get('role', None)
             if role_name is None:
-                raise errors.AnsibleError("expected a role name in dictionary: %s" % orig_path)
+                raise errors.AnsibleError("expected a role name in dictionary: {0!s}".format(orig_path))
             role_vars = orig_path
         else:
             role_name = utils.role_spec_parse(orig_path)["name"]
@@ -239,7 +239,7 @@ class Play(object):
                 break
 
         if role_path is None:
-            raise errors.AnsibleError("cannot find role in %s" % " or ".join(possible_paths))
+            raise errors.AnsibleError("cannot find role in {0!s}".format(" or ".join(possible_paths)))
 
         return (role_path, role_vars)
 
@@ -265,7 +265,7 @@ class Play(object):
                 vars_data = utils.parse_yaml_from_file(vars, vault_password=self.vault_password)
                 if vars_data:
                     if not isinstance(vars_data, dict):
-                        raise errors.AnsibleError("vars from '%s' are not a dict" % vars)
+                        raise errors.AnsibleError("vars from '{0!s}' are not a dict".format(vars))
                     role_vars = utils.combine_vars(vars_data, role_vars)
 
             defaults = self._resolve_main(utils.path_dwim(self.basedir, os.path.join(role_path, 'defaults')))
@@ -392,7 +392,7 @@ class Play(object):
                 new_vars = utils.parse_yaml_from_file(filename, vault_password=self.vault_password)
                 if new_vars:
                     if type(new_vars) != dict:
-                        raise errors.AnsibleError("%s must be stored as dictionary/hash: %s" % (filename, type(new_vars)))
+                        raise errors.AnsibleError("{0!s} must be stored as dictionary/hash: {1!s}".format(filename, type(new_vars)))
                     role_vars = utils.combine_vars(role_vars, new_vars)
 
         return role_vars
@@ -405,7 +405,7 @@ class Play(object):
                 new_default_vars = utils.parse_yaml_from_file(filename, vault_password=self.vault_password)
                 if new_default_vars:
                     if type(new_default_vars) != dict:
-                        raise errors.AnsibleError("%s must be stored as dictionary/hash: %s" % (filename, type(new_default_vars)))
+                        raise errors.AnsibleError("{0!s} must be stored as dictionary/hash: {1!s}".format(filename, type(new_default_vars)))
                     default_vars = utils.combine_vars(default_vars, new_default_vars)
 
         return default_vars
@@ -472,7 +472,7 @@ class Play(object):
 
             missing = lambda f: not os.path.isfile(f)
             if missing(task) and missing(handler) and missing(vars_file) and missing(defaults_file) and missing(meta_file) and not os.path.isdir(library):
-                raise errors.AnsibleError("found role at %s, but cannot find %s or %s or %s or %s or %s or %s" % (role_path, task, handler, vars_file, defaults_file, meta_file, library))
+                raise errors.AnsibleError("found role at {0!s}, but cannot find {1!s} or {2!s} or {3!s} or {4!s} or {5!s} or {6!s}".format(role_path, task, handler, vars_file, defaults_file, meta_file, library))
 
             if isinstance(role, dict):
                 role_name = role['role']
@@ -543,7 +543,7 @@ class Play(object):
                  os.path.join(basepath, 'main.json'),
                 )
         if sum([os.path.isfile(x) for x in mains]) > 1:
-            raise errors.AnsibleError("found multiple main files at %s, only one allowed" % (basepath))
+            raise errors.AnsibleError("found multiple main files at {0!s}, only one allowed".format((basepath)))
         else:
             for m in mains:
                 if os.path.isfile(m):
@@ -579,7 +579,7 @@ class Play(object):
             included_additional_conditions = list(old_conditions)
 
             if not isinstance(x, dict):
-                raise errors.AnsibleError("expecting dict; got: %s, error in %s" % (x, original_file))
+                raise errors.AnsibleError("expecting dict; got: {0!s}, error in {1!s}".format(x, original_file))
 
             # evaluate privilege escalation vars for current and child tasks
             included_become_vars = {}
@@ -608,7 +608,7 @@ class Play(object):
                 for k in x:
                     if k.startswith("with_"):
                         if original_file:
-                            offender = " (in %s)" % original_file
+                            offender = " (in {0!s})".format(original_file)
                         else:
                             offender = ""
                         utils.deprecated("include + with_items is a removed deprecated feature" + offender, "1.5", removed=True)
@@ -747,7 +747,7 @@ class Play(object):
 
         elif type(self.vars_prompt) == dict:
             for (vname, prompt) in self.vars_prompt.iteritems():
-                prompt_msg = "%s: " % prompt
+                prompt_msg = "{0!s}: ".format(prompt)
                 if vname not in self.playbook.extra_vars:
                     vars[vname] = self.playbook.callbacks.on_vars_prompt(
                                      varname=vname, private=False, prompt=prompt_msg, default=None
@@ -888,7 +888,7 @@ class Play(object):
             data = utils.parse_yaml_from_file(filename4, vault_password=self.vault_password)
             if data:
                 if type(data) != dict:
-                    raise errors.AnsibleError("%s must be stored as a dictionary/hash" % filename4)
+                    raise errors.AnsibleError("{0!s} must be stored as a dictionary/hash".format(filename4))
                 if host is not None:
                     target_filename = None
                     if utils.contains_vars(filename2):
@@ -936,7 +936,7 @@ class Play(object):
                         break
                 if not found and host is not None:
                     raise errors.AnsibleError(
-                        "%s: FATAL, no files matched for vars_files import sequence: %s" % (host, sequence)
+                        "{0!s}: FATAL, no files matched for vars_files import sequence: {1!s}".format(host, sequence)
                     )
             else:
                 # just one filename supplied, load it!

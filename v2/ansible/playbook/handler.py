@@ -32,7 +32,7 @@ class Handler(Task):
 
     def __repr__(self):
         ''' returns a human readable representation of the handler '''
-        return "HANDLER: %s" % self.get_name()
+        return "HANDLER: {0!s}".format(self.get_name())
 
     @staticmethod
     def load(data, block=None, role=None, task_include=None, variable_manager=None, loader=None):

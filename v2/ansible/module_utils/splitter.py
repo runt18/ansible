@@ -131,17 +131,17 @@ def split_args(args):
                 appended = True
             elif print_depth or block_depth or comment_depth or inside_quotes or was_inside_quotes:
                 if idx == 0 and not inside_quotes and was_inside_quotes:
-                    params[-1] = "%s%s" % (params[-1], token)
+                    params[-1] = "{0!s}{1!s}".format(params[-1], token)
                 elif len(tokens) > 1:
                     spacer = ''
                     if idx > 0:
                         spacer = ' '
-                    params[-1] = "%s%s%s" % (params[-1], spacer, token)
+                    params[-1] = "{0!s}{1!s}{2!s}".format(params[-1], spacer, token)
                 else:
                     spacer = ''
                     if not params[-1].endswith('\n') and idx == 0:
                         spacer = '\n'
-                    params[-1] = "%s%s%s" % (params[-1], spacer, token)
+                    params[-1] = "{0!s}{1!s}{2!s}".format(params[-1], spacer, token)
                 appended = True
 
             # if the number of paired block tags is not the same, the depth has changed, so we calculate that here

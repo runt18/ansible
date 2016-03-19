@@ -78,9 +78,8 @@ class Connection(ConnectionBase):
         Establish a WinRM connection over HTTP/HTTPS.
         '''
         port = self._connection_info.port or 5986
-        self._display.vvv("ESTABLISH WINRM CONNECTION FOR USER: %s on PORT %s TO %s" % \
-            (self._connection_info.remote_user, port, self._connection_info.remote_addr), host=self._connection_info.remote_addr)
-        netloc = '%s:%d' % (self._connection_info.remote_addr, port)
+        self._display.vvv("ESTABLISH WINRM CONNECTION FOR USER: {0!s} on PORT {1!s} TO {2!s}".format(self._connection_info.remote_user, port, self._connection_info.remote_addr), host=self._connection_info.remote_addr)
+        netloc = '{0!s}:{1:d}'.format(self._connection_info.remote_addr, port)
         exc = None
         for transport, scheme in self.transport_schemes['http' if port == 5985 else 'https']:
             if transport == 'kerberos' and (not HAVE_KERBEROS or not '@' in self._connection_info.remote_user):
@@ -93,7 +92,7 @@ class Connection(ConnectionBase):
 
             endpoint = parse.urlunsplit((scheme, netloc, '/wsman', '', ''))
 
-            self._display.vvvvv('WINRM CONNECT: transport=%s endpoint=%s' % (transport, endpoint), host=self._connection_info.remote_addr)
+            self._display.vvvvv('WINRM CONNECT: transport={0!s} endpoint={1!s}'.format(transport, endpoint), host=self._connection_info.remote_addr)
             protocol = Protocol(
                 endpoint,
                 transport=transport,
@@ -116,16 +115,16 @@ class Connection(ConnectionBase):
                         raise AnsibleError("the username/password specified for this server was incorrect")
                     elif code == 411:
                         return protocol
-                self._display.vvvvv('WINRM CONNECTION ERROR: %s' % err_msg, host=self._connection_info.remote_addr)
+                self._display.vvvvv('WINRM CONNECTION ERROR: {0!s}'.format(err_msg), host=self._connection_info.remote_addr)
                 continue
         if exc:
             raise AnsibleError(str(exc))
 
     def _winrm_exec(self, command, args=(), from_exec=False):
         if from_exec:
-            self._display.vvvvv("WINRM EXEC %r %r" % (command, args), host=self._connection_info.remote_addr)
+            self._display.vvvvv("WINRM EXEC {0!r} {1!r}".format(command, args), host=self._connection_info.remote_addr)
         else:
-            self._display.vvvvvv("WINRM EXEC %r %r" % (command, args), host=self._connection_info.remote_addr)
+            self._display.vvvvvv("WINRM EXEC {0!r} {1!r}".format(command, args), host=self._connection_info.remote_addr)
         if not self.protocol:
             self.protocol = self._winrm_connect()
         if not self.shell_id:
@@ -135,11 +134,11 @@ class Connection(ConnectionBase):
             command_id = self.protocol.run_command(self.shell_id, command, args)
             response = Response(self.protocol.get_command_output(self.shell_id, command_id))
             if from_exec:
-                self._display.vvvvv('WINRM RESULT %r' % response, host=self._connection_info.remote_addr)
+                self._display.vvvvv('WINRM RESULT {0!r}'.format(response), host=self._connection_info.remote_addr)
             else:
-                self._display.vvvvvv('WINRM RESULT %r' % response, host=self._connection_info.remote_addr)
-            self._display.vvvvvv('WINRM STDOUT %s' % response.std_out, host=self._connection_info.remote_addr)
-            self._display.vvvvvv('WINRM STDERR %s' % response.std_err, host=self._connection_info.remote_addr)
+                self._display.vvvvvv('WINRM RESULT {0!r}'.format(response), host=self._connection_info.remote_addr)
+            self._display.vvvvvv('WINRM STDOUT {0!s}'.format(response.std_out), host=self._connection_info.remote_addr)
+            self._display.vvvvvv('WINRM STDERR {0!s}'.format(response.std_err), host=self._connection_info.remote_addr)
             return response
         finally:
             if command_id:
@@ -157,9 +156,9 @@ class Connection(ConnectionBase):
         if '-EncodedCommand' in cmd_parts:
             encoded_cmd = cmd_parts[cmd_parts.index('-EncodedCommand') + 1]
             decoded_cmd = base64.b64decode(encoded_cmd)
-            self._display.vvv("EXEC %s" % decoded_cmd, host=self._connection_info.remote_addr)
+            self._display.vvv("EXEC {0!s}".format(decoded_cmd), host=self._connection_info.remote_addr)
         else:
-            self._display.vvv("EXEC %s" % cmd, host=self._connection_info.remote_addr)
+            self._display.vvv("EXEC {0!s}".format(cmd), host=self._connection_info.remote_addr)
         # For script/raw support.
         if cmd_parts and cmd_parts[0].lower().endswith('.ps1'):
             script = self._shell._build_file_cmd(cmd_parts, quote_args=False)
@@ -168,13 +167,13 @@ class Connection(ConnectionBase):
             result = self._winrm_exec(cmd_parts[0], cmd_parts[1:], from_exec=True)
         except Exception as e:
             traceback.print_exc()
-            raise AnsibleError("failed to exec cmd %s" % cmd)
+            raise AnsibleError("failed to exec cmd {0!s}".format(cmd))
         return (result.status_code, '', result.std_out.encode('utf-8'), result.std_err.encode('utf-8'))
 
     def put_file(self, in_path, out_path):
-        self._display.vvv("PUT %s TO %s" % (in_path, out_path), host=self._connection_info.remote_addr)
+        self._display.vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self._connection_info.remote_addr)
         if not os.path.exists(in_path):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         with open(in_path) as in_file:
             in_size = os.path.getsize(in_path)
             script_template = '''
@@ -200,18 +199,18 @@ class Connection(ConnectionBase):
                             out_path = out_path + '.ps1'
                     b64_data = base64.b64encode(out_data)
                     script = script_template % (self._shell._escape(out_path), offset, b64_data, in_size)
-                    self._display.vvvvv("WINRM PUT %s to %s (offset=%d size=%d)" % (in_path, out_path, offset, len(out_data)), host=self._connection_info.remote_addr)
+                    self._display.vvvvv("WINRM PUT {0!s} to {1!s} (offset={2:d} size={3:d})".format(in_path, out_path, offset, len(out_data)), host=self._connection_info.remote_addr)
                     cmd_parts = self._shell._encode_script(script, as_list=True)
                     result = self._winrm_exec(cmd_parts[0], cmd_parts[1:])
                     if result.status_code != 0:
                         raise IOError(result.std_err.encode('utf-8'))
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file to %s" % out_path)
+                    raise AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def fetch_file(self, in_path, out_path):
         out_path = out_path.replace('\\', '/')
-        self._display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self._connection_info.remote_addr)
+        self._display.vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self._connection_info.remote_addr)
         buffer_size = 2**19 # 0.5MB chunks
         if not os.path.exists(os.path.dirname(out_path)):
             os.makedirs(os.path.dirname(out_path))
@@ -221,27 +220,27 @@ class Connection(ConnectionBase):
             while True:
                 try:
                     script = '''
-                        If (Test-Path -PathType Leaf "%(path)s")
-                        {
-                            $stream = [System.IO.File]::OpenRead("%(path)s");
-                            $stream.Seek(%(offset)d, [System.IO.SeekOrigin]::Begin) | Out-Null;
-                            $buffer = New-Object Byte[] %(buffer_size)d;
-                            $bytesRead = $stream.Read($buffer, 0, %(buffer_size)d);
+                        If (Test-Path -PathType Leaf "{path!s}")
+                        {{
+                            $stream = [System.IO.File]::OpenRead("{path!s}");
+                            $stream.Seek({offset:d}, [System.IO.SeekOrigin]::Begin) | Out-Null;
+                            $buffer = New-Object Byte[] {buffer_size:d};
+                            $bytesRead = $stream.Read($buffer, 0, {buffer_size:d});
                             $bytes = $buffer[0..($bytesRead-1)];
                             [System.Convert]::ToBase64String($bytes);
                             $stream.Close() | Out-Null;
-                        }
-                        ElseIf (Test-Path -PathType Container "%(path)s")
-                        {
+                        }}
+                        ElseIf (Test-Path -PathType Container "{path!s}")
+                        {{
                             Write-Host "[DIR]";
-                        }
+                        }}
                         Else
-                        {
-                            Write-Error "%(path)s does not exist";
+                        {{
+                            Write-Error "{path!s} does not exist";
                             Exit 1;
-                        }
-                    ''' % dict(buffer_size=buffer_size, path=self._shell._escape(in_path), offset=offset)
-                    self._display.vvvvv("WINRM FETCH %s to %s (offset=%d)" % (in_path, out_path, offset), host=self._connection_info.remote_addr)
+                        }}
+                    '''.format(**dict(buffer_size=buffer_size, path=self._shell._escape(in_path), offset=offset))
+                    self._display.vvvvv("WINRM FETCH {0!s} to {1!s} (offset={2:d})".format(in_path, out_path, offset), host=self._connection_info.remote_addr)
                     cmd_parts = self._shell._encode_script(script, as_list=True)
                     result = self._winrm_exec(cmd_parts[0], cmd_parts[1:])
                     if result.status_code != 0:
@@ -266,7 +265,7 @@ class Connection(ConnectionBase):
                         offset += len(data)
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file to %s" % out_path)
+                    raise AnsibleError("failed to transfer file to {0!s}".format(out_path))
         finally:
             if out_file:
                 out_file.close()

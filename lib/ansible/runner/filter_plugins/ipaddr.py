@@ -450,7 +450,7 @@ def ipaddr(value, query = '', version = False, alias = 'ipaddr'):
                 return value
 
         except:
-            raise errors.AnsibleFilterError(alias + ': unknown filter type: %s' % query)
+            raise errors.AnsibleFilterError(alias + ': unknown filter type: {0!s}'.format(query))
 
     return False
 
@@ -614,7 +614,7 @@ def hwaddr(value, query = '', alias = 'hwaddr'):
         v = netaddr.EUI(value)
     except:
         if query and query != 'bool':
-            raise errors.AnsibleFilterError(alias + ': not a hardware address: %s' % value)
+            raise errors.AnsibleFilterError(alias + ': not a hardware address: {0!s}'.format(value))
 
     extras = []
     for arg in query_func_extra_args.get(query, tuple()):
@@ -622,7 +622,7 @@ def hwaddr(value, query = '', alias = 'hwaddr'):
     try:
         return query_func_map[query](v, *extras)
     except KeyError:
-        raise errors.AnsibleFilterError(alias + ': unknown filter type: %s' % query)
+        raise errors.AnsibleFilterError(alias + ': unknown filter type: {0!s}'.format(query))
 
     return False
 

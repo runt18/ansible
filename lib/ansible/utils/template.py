@@ -103,14 +103,14 @@ def lookup(name, *args, **kwargs):
         except errors.AnsibleError:
             raise
         except jinja2.exceptions.UndefinedError, e:
-            raise errors.AnsibleUndefinedVariable("One or more undefined variables: %s" % str(e))
+            raise errors.AnsibleUndefinedVariable("One or more undefined variables: {0!s}".format(str(e)))
         except Exception, e:
-            raise errors.AnsibleError('Unexpected error in during lookup: %s' % e)
+            raise errors.AnsibleError('Unexpected error in during lookup: {0!s}'.format(e))
         if ran and not wantlist:
             ran = ",".join(ran)
         return ran
     else:
-        raise errors.AnsibleError("lookup plugin (%s) not found" % name)
+        raise errors.AnsibleError("lookup plugin ({0!s}) not found".format(name))
 
 def template(basedir, varname, templatevars, lookup_fatal=True, depth=0, expand_lists=True, convert_bare=False, fail_on_undefined=False, filter_fatal=True):
     ''' templates a data structure by traversing it and substituting for other data structures '''
@@ -119,14 +119,14 @@ def template(basedir, varname, templatevars, lookup_fatal=True, depth=0, expand_
         if convert_bare and isinstance(varname, basestring):
             first_part = varname.split(".")[0].split("[")[0]
             if first_part in templatevars and '{{' not in varname and '$' not in varname:
-                varname = "{{%s}}" % varname
+                varname = "{{{{{0!s}}}}}".format(varname)
 
         if isinstance(varname, basestring):
             if '{{' in varname or '{%' in varname:
                 try:
                     varname = template_from_string(basedir, varname, templatevars, fail_on_undefined)
                 except errors.AnsibleError, e:
-                    raise errors.AnsibleError("Failed to template %s: %s" % (varname, str(e)))
+                    raise errors.AnsibleError("Failed to template {0!s}: {1!s}".format(varname, str(e)))
 
                 # template_from_string may return non strings for the case where the var is just
                 # a reference to a single variable, so we should re_check before we do further evals
@@ -191,7 +191,7 @@ class _jinja2_vars(object):
             if varname in self.globals:
                 return self.globals[varname]
             else:
-                raise KeyError("undefined variable: %s" % varname)
+                raise KeyError("undefined variable: {0!s}".format(varname))
         var = self.vars[varname]
         # HostVars is special, return it as-is, as is the special variable
         # 'vars', which contains the vars structure
@@ -245,9 +245,9 @@ def template_from_file(basedir, path, vars, vault_password=None):
     try:
         data = codecs.open(realpath, encoding="utf8").read()
     except UnicodeDecodeError:
-        raise errors.AnsibleError("unable to process as utf-8: %s" % realpath)
+        raise errors.AnsibleError("unable to process as utf-8: {0!s}".format(realpath))
     except:
-        raise errors.AnsibleError("unable to read %s" % realpath)
+        raise errors.AnsibleError("unable to read {0!s}".format(realpath))
 
     # Get jinja env overrides from template
     if data.startswith(JINJA2_OVERRIDE):
@@ -267,8 +267,8 @@ def template_from_file(basedir, path, vars, vault_password=None):
     except TemplateSyntaxError, e:
         # Throw an exception which includes a more user friendly error message
         values = {'name': realpath, 'lineno': e.lineno, 'error': str(e)}
-        msg = 'file: %(name)s, line number: %(lineno)s, error: %(error)s' % \
-               values
+        msg = 'file: {name!s}, line number: {lineno!s}, error: {error!s}'.format(** \
+               values)
         error = errors.AnsibleError(msg)
         raise error
     vars = vars.copy()
@@ -300,15 +300,15 @@ def template_from_file(basedir, path, vars, vault_password=None):
     try:
         res = jinja2.utils.concat(t.root_render_func(t.new_context(_jinja2_vars(basedir, vars, t.globals, fail_on_undefined), shared=True)))
     except jinja2.exceptions.UndefinedError, e:
-        raise errors.AnsibleUndefinedVariable("One or more undefined variables: %s" % str(e))
+        raise errors.AnsibleUndefinedVariable("One or more undefined variables: {0!s}".format(str(e)))
     except jinja2.exceptions.TemplateNotFound, e:
         # Throw an exception which includes a more user friendly error message
         # This likely will happen for included sub-template. Not that besides
         # pure "file not found" it may happen due to Jinja2's "security"
         # checks on path.
         values = {'name': realpath, 'subname': str(e)}
-        msg = 'file: %(name)s, error: Cannot find/not allowed to load (include) template %(subname)s' % \
-               values
+        msg = 'file: {name!s}, error: Cannot find/not allowed to load (include) template {subname!s}'.format(** \
+               values)
         error = errors.AnsibleError(msg)
         raise error
 
@@ -369,10 +369,10 @@ def template_from_string(basedir, data, vars, fail_on_undefined=False):
         try:
             t = environment.from_string(data)
         except TemplateSyntaxError, e:
-            raise errors.AnsibleError("template error while templating string: %s" % str(e))
+            raise errors.AnsibleError("template error while templating string: {0!s}".format(str(e)))
         except Exception, e:
             if 'recursion' in str(e):
-                raise errors.AnsibleError("recursive loop detected in template string: %s" % data)
+                raise errors.AnsibleError("recursive loop detected in template string: {0!s}".format(data))
             else:
                 return data
 
@@ -394,7 +394,7 @@ def template_from_string(basedir, data, vars, fail_on_undefined=False):
                     "Make sure your variable name does not contain invalid characters like '-'."
                 )
             else:
-                raise errors.AnsibleError("an unexpected type error occurred. Error was %s" % te)
+                raise errors.AnsibleError("an unexpected type error occurred. Error was {0!s}".format(te))
         return res
     except (jinja2.exceptions.UndefinedError, errors.AnsibleUndefinedVariable):
         if fail_on_undefined:

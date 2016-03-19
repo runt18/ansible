@@ -213,7 +213,7 @@ class Runner(object):
         self.accelerate_port  = accelerate_port
         self.accelerate_ipv6  = accelerate_ipv6
         self.callbacks.runner = self
-        self.omit_token       = '__omit_place_holder__%s' % sha1(os.urandom(64)).hexdigest()
+        self.omit_token       = '__omit_place_holder__{0!s}'.format(sha1(os.urandom(64)).hexdigest())
         self.vault_pass       = vault_pass
         self.no_log           = no_log
         self.run_once         = run_once
@@ -274,10 +274,10 @@ class Runner(object):
         if complex_args is None:
             return module_args
         if not isinstance(complex_args, dict):
-            raise errors.AnsibleError("complex arguments are not a dictionary: %s" % complex_args)
+            raise errors.AnsibleError("complex arguments are not a dictionary: {0!s}".format(complex_args))
         for (k,v) in complex_args.iteritems():
             if isinstance(v, basestring):
-                module_args = "%s=%s %s" % (k, pipes.quote(v), module_args)
+                module_args = "{0!s}={1!s} {2!s}".format(k, pipes.quote(v), module_args)
         return module_args
 
     # *****************************************************
@@ -319,7 +319,7 @@ class Runner(object):
             enviro = template.template(self.basedir, self.environment, inject, convert_bare=True)
             enviro = utils.safe_eval(enviro)
             if type(enviro) != dict:
-                raise errors.AnsibleError("environment must be a dictionary, received %s" % enviro)
+                raise errors.AnsibleError("environment must be a dictionary, received {0!s}".format(enviro))
 
         return conn.shell.env_prefix(**enviro)
 
@@ -429,7 +429,7 @@ class Runner(object):
                 vargs = split_args(args)
             except Exception, e:
                 if "unbalanced jinja2 block or quotes" in str(e):
-                    raise errors.AnsibleError("error parsing argument string '%s', try quoting the entire line." % args)
+                    raise errors.AnsibleError("error parsing argument string '{0!s}', try quoting the entire line.".format(args))
                 else:
                     raise
             for x in vargs:
@@ -440,7 +440,7 @@ class Runner(object):
                     is_shell_param = k in ('creates', 'removes', 'chdir', 'executable')
                     if k in options and not allow_dupes:
                         if not(is_shell_module and not is_shell_param):
-                            raise errors.AnsibleError("a duplicate parameter was found in the argument string (%s)" % k)
+                            raise errors.AnsibleError("a duplicate parameter was found in the argument string ({0!s})".format(k))
                     if is_shell_module and is_shell_param or not is_shell_module:
                         options[k] = v
         return len(options)
@@ -455,9 +455,9 @@ class Runner(object):
 
         # hack to support fireball mode
         if module_name == 'fireball':
-            args = "%s password=%s" % (args, base64.b64encode(str(utils.key_for_hostname(conn.host))))
+            args = "{0!s} password={1!s}".format(args, base64.b64encode(str(utils.key_for_hostname(conn.host))))
             if 'port' not in args:
-                args += " port=%s" % C.ZEROMQ_PORT
+                args += " port={0!s}".format(C.ZEROMQ_PORT)
 
         (
         module_style,
@@ -514,7 +514,7 @@ class Runner(object):
                 self._remote_chmod(conn, 'a+r', argsfile, tmp)
 
             if async_jid is None:
-                cmd = "%s %s" % (remote_module_path, argsfile)
+                cmd = "{0!s} {1!s}".format(remote_module_path, argsfile)
             else:
                 cmd = " ".join([str(x) for x in [remote_module_path, async_jid, async_limit, async_module, argsfile]])
         else:
@@ -522,7 +522,7 @@ class Runner(object):
                 if conn.has_pipelining and C.ANSIBLE_SSH_PIPELINING and not C.DEFAULT_KEEP_REMOTE_FILES and not self.become_method == 'su':
                     in_data = module_data
                 else:
-                    cmd = "%s" % (remote_module_path)
+                    cmd = "{0!s}".format((remote_module_path))
             else:
                 cmd = " ".join([str(x) for x in [remote_module_path, async_jid, async_limit, async_module]])
 
@@ -581,7 +581,7 @@ class Runner(object):
 
             exec_rc = self._executor_internal(host, new_stdin)
             if type(exec_rc) != ReturnData:
-                raise Exception("unexpected return type: %s" % type(exec_rc))
+                raise Exception("unexpected return type: {0!s}".format(type(exec_rc)))
             # redundant, right?
             if not exec_rc.comm_ok:
                 self.callbacks.on_unreachable(host, exec_rc.result)
@@ -729,7 +729,7 @@ class Runner(object):
             except errors.AnsibleError, e:
                 raise
             except Exception, e:
-                raise errors.AnsibleError("Unexpected error while executing task: %s" % str(e))
+                raise errors.AnsibleError("Unexpected error while executing task: {0!s}".format(str(e)))
 
             # strip out any jinja2 template syntax within
             # the data returned by the lookup plugin
@@ -738,7 +738,7 @@ class Runner(object):
                 items = []
             else:
                 if type(items) != list:
-                    raise errors.AnsibleError("lookup plugins have to return a list: %r" % items)
+                    raise errors.AnsibleError("lookup plugins have to return a list: {0!r}".format(items))
 
                 if len(items) and utils.is_list_of_strings(items) and self.module_name in [ 'apt', 'yum', 'pkgng', 'zypper' ]:
                     # hack for apt, yum, and pkgng so that with_items maps back into a single module call
@@ -775,7 +775,7 @@ class Runner(object):
 
             # and a final check to make sure the complex args are a dict
             if returned_args is not None and not isinstance(returned_args, dict):
-                raise errors.AnsibleError("args must be a dictionary, received %s" % returned_args)
+                raise errors.AnsibleError("args must be a dictionary, received {0!s}".format(returned_args))
 
             return returned_args
 
@@ -850,7 +850,7 @@ class Runner(object):
 
         if module_name in utils.plugins.action_loader:
             if self.background != 0:
-                raise errors.AnsibleError("async mode is not supported with the %s module" % module_name)
+                raise errors.AnsibleError("async mode is not supported with the {0!s} module".format(module_name))
             handler = utils.plugins.action_loader.get(module_name, self)
         elif self.background == 0:
             handler = utils.plugins.action_loader.get('normal', self)
@@ -953,7 +953,7 @@ class Runner(object):
             elif actual_port is not None:
                 actual_port = int(template.template(self.basedir, actual_port, inject))
         except ValueError, e:
-            result = dict(failed=True, msg="FAILED: Configured port \"%s\" is not a valid port, expected integer" % actual_port)
+            result = dict(failed=True, msg="FAILED: Configured port \"{0!s}\" is not a valid port, expected integer".format(actual_port))
             return ReturnData(host=host, comm_ok=False, result=result)
 
         try:
@@ -977,7 +977,7 @@ class Runner(object):
             conn.shell = shell_plugin
 
         except errors.AnsibleConnectionFailed, e:
-            result = dict(failed=True, msg="FAILED: %s" % str(e))
+            result = dict(failed=True, msg="FAILED: {0!s}".format(str(e)))
             return ReturnData(host=host, comm_ok=False, result=result)
 
         tmp = ''
@@ -1008,7 +1008,7 @@ class Runner(object):
                 raise errors.AnsibleError("A variable tried to add #USE_SHELL to the module arguments.")
             complex_args = template.template(self.basedir, complex_args, inject, fail_on_undefined=self.error_on_undefined_vars)
         except jinja2.exceptions.UndefinedError, e:
-            raise errors.AnsibleUndefinedVariable("One or more undefined variables: %s" % str(e))
+            raise errors.AnsibleUndefinedVariable("One or more undefined variables: {0!s}".format(str(e)))
 
         # filter omitted arguments out from complex_args
         if complex_args:
@@ -1049,7 +1049,7 @@ class Runner(object):
                         tmp = self._make_tmp_path(conn)
                     result = handler.run(conn, tmp, module_name, module_args, inject, complex_args)
                     result.result['attempts'] = x
-                    vv("Result from run %i is: %s" % (x, result.result))
+                    vv("Result from run {0:d} is: {1!s}".format(x, result.result))
                     inject[self.module_vars.get('register')] = result.result
                     cond = template.template(self.basedir, until, inject, expand_lists=False)
                     if utils.check_conditional(cond, self.basedir, inject, fail_on_undefined=self.error_on_undefined_vars):
@@ -1204,7 +1204,7 @@ class Runner(object):
         expand_path = split_path[0]
         if expand_path == '~':
             if self.become and self.become_user:
-                expand_path = '~%s' % self.become_user
+                expand_path = '~{0!s}'.format(self.become_user)
 
         cmd = conn.shell.expand_user(expand_path)
         data = self._low_level_exec_command(conn, cmd, tmp, sudoable=False, become=False)
@@ -1264,9 +1264,9 @@ class Runner(object):
                 return data2.split()[0]
         except IndexError:
             sys.stderr.write("warning: Calculating checksum failed unusually, please report this to the list so it can be fixed\n")
-            sys.stderr.write("command: %s\n" % cmd)
+            sys.stderr.write("command: {0!s}\n".format(cmd))
             sys.stderr.write("----\n")
-            sys.stderr.write("output: %s\n" % data)
+            sys.stderr.write("output: {0!s}\n".format(data))
             sys.stderr.write("----\n")
             # this will signal that it changed and allow things to keep going
             return "INVALIDCHECKSUM"
@@ -1275,7 +1275,7 @@ class Runner(object):
 
     def _make_tmp_path(self, conn):
         ''' make and return a temporary path on a remote box '''
-        basefile = 'ansible-tmp-%s-%s' % (time.time(), random.randint(0, 2**48))
+        basefile = 'ansible-tmp-{0!s}-{1!s}'.format(time.time(), random.randint(0, 2**48))
         use_system_tmp = False
         if self.become and self.become_user != 'root':
             use_system_tmp = True
@@ -1293,22 +1293,22 @@ class Runner(object):
                 output = 'Authentication failure.'
             elif result['rc'] == 255 and self.transport in ['ssh']:
                 if utils.VERBOSITY > 3:
-                    output = 'SSH encountered an unknown error. The output was:\n%s' % (result['stdout']+result['stderr'])
+                    output = 'SSH encountered an unknown error. The output was:\n{0!s}'.format((result['stdout']+result['stderr']))
                 else:
                     output = 'SSH encountered an unknown error during the connection. We recommend you re-run the command using -vvvv, which will enable SSH debugging output to help diagnose the issue'
             elif 'No space left on device' in result['stderr']:
                 output = result['stderr']
             else:
-                output = 'Authentication or permission failure.  In some cases, you may have been able to authenticate and did not have permissions on the remote directory. Consider changing the remote temp path in ansible.cfg to a path rooted in "/tmp". Failed command was: %s, exited with result %d' % (cmd, result['rc'])
+                output = 'Authentication or permission failure.  In some cases, you may have been able to authenticate and did not have permissions on the remote directory. Consider changing the remote temp path in ansible.cfg to a path rooted in "/tmp". Failed command was: {0!s}, exited with result {1:d}'.format(cmd, result['rc'])
             if 'stdout' in result and result['stdout'] != '':
-                output = output + ": %s" % result['stdout']
+                output = output + ": {0!s}".format(result['stdout'])
             raise errors.AnsibleError(output)
 
         rc = conn.shell.join_path(utils.last_non_blank_line(result['stdout']).strip(), '')
         # Catch failure conditions, files should never be
         # written to locations in /.
         if rc == '/':
-            raise errors.AnsibleError('failed to resolve remote temporary directory from %s: `%s` returned empty string' % (basetmp, cmd))
+            raise errors.AnsibleError('failed to resolve remote temporary directory from {0!s}: `{1!s}` returned empty string'.format(basetmp, cmd))
         return rc
 
     # *****************************************************
@@ -1347,9 +1347,9 @@ class Runner(object):
         if module_path is None:
             module_path2 = utils.plugins.module_finder.find_plugin('ping', module_suffixes)
             if module_path2 is not None:
-                raise errors.AnsibleFileNotFound("module %s not found in configured module paths" % (module_name))
+                raise errors.AnsibleFileNotFound("module {0!s} not found in configured module paths".format((module_name)))
             else:
-                raise errors.AnsibleFileNotFound("module %s not found in configured module paths.  Additionally, core modules are missing. If this is a checkout, run 'git submodule update --init --recursive' to correct this problem." % (module_name))
+                raise errors.AnsibleFileNotFound("module {0!s} not found in configured module paths.  Additionally, core modules are missing. If this is a checkout, run 'git submodule update --init --recursive' to correct this problem.".format((module_name)))
 
 
         # insert shared code and arguments into the module

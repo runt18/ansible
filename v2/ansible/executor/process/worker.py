@@ -95,7 +95,7 @@ class WorkerProcess(multiprocessing.Process):
                 if not self._main_q.empty():
                     debug("there's work to be done!")
                     (host, task, basedir, job_vars, connection_info, shared_loader_obj) = self._main_q.get(block=False)
-                    debug("got a task/handler to work on: %s" % task)
+                    debug("got a task/handler to work on: {0!s}".format(task))
 
                     # because the task queue manager starts workers (forks) before the
                     # playbook is loaded, set the basedir of the loader inherted by
@@ -114,9 +114,9 @@ class WorkerProcess(multiprocessing.Process):
                     new_connection_info = connection_info.set_task_override(task)
 
                     # execute the task and build a TaskResult from the result
-                    debug("running TaskExecutor() for %s/%s" % (host, task))
+                    debug("running TaskExecutor() for {0!s}/{1!s}".format(host, task))
                     executor_result = TaskExecutor(host, task, job_vars, new_connection_info, self._new_stdin, self._loader, shared_loader_obj).run()
-                    debug("done running TaskExecutor() for %s/%s" % (host, task))
+                    debug("done running TaskExecutor() for {0!s}/{1!s}".format(host, task))
                     task_result = TaskResult(host, task, executor_result)
 
                     # put the result on the result queue
@@ -140,8 +140,8 @@ class WorkerProcess(multiprocessing.Process):
                     # FIXME: most likely an abort, catch those kinds of errors specifically
                     break
             except Exception, e:
-                debug("WORKER EXCEPTION: %s" % e)
-                debug("WORKER EXCEPTION: %s" % traceback.format_exc())
+                debug("WORKER EXCEPTION: {0!s}".format(e))
+                debug("WORKER EXCEPTION: {0!s}".format(traceback.format_exc()))
                 try:
                     if task:
                         task_result = TaskResult(host, task, dict(failed=True, exception=traceback.format_exc(), stdout=''))

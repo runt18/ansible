@@ -110,13 +110,13 @@ def _identifier_parse(identifier, quote_char):
 def pg_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='"')
     if len(identifier_fragments) > _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError('PostgreSQL does not support %s with more than %i dots' % (id_type, _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]))
+        raise SQLParseError('PostgreSQL does not support {0!s} with more than {1:d} dots'.format(id_type, _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]))
     return '.'.join(identifier_fragments)
 
 def mysql_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='`')
     if len(identifier_fragments) > _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError('MySQL does not support %s with more than %i dots' % (id_type, _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]))
+        raise SQLParseError('MySQL does not support {0!s} with more than {1:d} dots'.format(id_type, _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]))
 
     special_cased_fragments = []
     for fragment in identifier_fragments:

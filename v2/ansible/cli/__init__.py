@@ -91,7 +91,7 @@ class CLI(object):
         """
         Actually runs a child defined method using the execute_<action> pattern
         """
-        fn = getattr(self, "execute_%s" % self.action)
+        fn = getattr(self, "execute_{0!s}".format(self.action))
         fn()
 
     def parse(self):
@@ -142,11 +142,11 @@ class CLI(object):
 
         if op.ask_pass:
             sshpass = getpass.getpass(prompt="SSH password: ")
-            become_prompt = "%s password[defaults to SSH password]: " % op.become_method.upper()
+            become_prompt = "{0!s} password[defaults to SSH password]: ".format(op.become_method.upper())
             if sshpass:
                 sshpass = to_bytes(sshpass, errors='strict', nonstring='simplerepr')
         else:
-            become_prompt = "%s password: " % op.become_method.upper()
+            become_prompt = "{0!s} password: ".format(op.become_method.upper())
 
         if op.become_ask_pass:
             becomepass = getpass.getpass(prompt=become_prompt)
@@ -211,14 +211,14 @@ class CLI(object):
 
         if runtask_opts:
             parser.add_option('-f','--forks', dest='forks', default=C.DEFAULT_FORKS, type='int',
-                help="specify number of parallel processes to use (default=%s)" % C.DEFAULT_FORKS)
+                help="specify number of parallel processes to use (default={0!s})".format(C.DEFAULT_FORKS))
             parser.add_option('-i', '--inventory-file', dest='inventory',
-                help="specify inventory host file (default=%s)" % C.DEFAULT_HOST_LIST,
+                help="specify inventory host file (default={0!s})".format(C.DEFAULT_HOST_LIST),
                 default=C.DEFAULT_HOST_LIST)
             parser.add_option('--list-hosts', dest='listhosts', action='store_true',
                 help='outputs a list of matching hosts; does not execute anything else')
             parser.add_option('-M', '--module-path', dest='module_path',
-                help="specify path(s) to module library (default=%s)" % C.DEFAULT_MODULE_PATH, default=None)
+                help="specify path(s) to module library (default={0!s})".format(C.DEFAULT_MODULE_PATH), default=None)
             parser.add_option('-e', '--extra-vars', dest="extra_vars", action="append",
                 help="set additional variables as key=value or YAML/JSON", default=[])
 
@@ -256,15 +256,15 @@ class CLI(object):
             parser.add_option('-S', '--su', default=C.DEFAULT_SU, action='store_true',
                 help='run operations with su (deprecated, use become)')
             parser.add_option('-R', '--su-user', default=None,
-                help='run operations with su as this user (default=%s) (deprecated, use become)' % C.DEFAULT_SU_USER)
+                help='run operations with su as this user (default={0!s}) (deprecated, use become)'.format(C.DEFAULT_SU_USER))
 
             # consolidated privilege escalation (become)
             parser.add_option("-b", "--become", default=C.DEFAULT_BECOME, action="store_true", dest='become',
                 help="run operations with become (nopasswd implied)")
             parser.add_option('--become-method', dest='become_method', default=C.DEFAULT_BECOME_METHOD, type='string',
-                help="privilege escalation method to use (default=%s), valid choices: [ %s ]" % (C.DEFAULT_BECOME_METHOD, ' | '.join(C.BECOME_METHODS)))
+                help="privilege escalation method to use (default={0!s}), valid choices: [ {1!s} ]".format(C.DEFAULT_BECOME_METHOD, ' | '.join(C.BECOME_METHODS)))
             parser.add_option('--become-user', default=None, dest='become_user', type='string',
-                help='run operations as this user (default=%s)' % C.DEFAULT_BECOME_USER)
+                help='run operations as this user (default={0!s})'.format(C.DEFAULT_BECOME_USER))
             parser.add_option('--ask-become-pass', default=False, dest='become_ask_pass', action='store_true',
                 help='ask for privilege escalation password')
 
@@ -275,17 +275,17 @@ class CLI(object):
             parser.add_option('--private-key', default=C.DEFAULT_PRIVATE_KEY_FILE, dest='private_key_file',
                 help='use this file to authenticate the connection')
             parser.add_option('-u', '--user', default=C.DEFAULT_REMOTE_USER, dest='remote_user',
-                help='connect as this user (default=%s)' % C.DEFAULT_REMOTE_USER)
+                help='connect as this user (default={0!s})'.format(C.DEFAULT_REMOTE_USER))
             parser.add_option('-c', '--connection', dest='connection', default=C.DEFAULT_TRANSPORT,
-                help="connection type to use (default=%s)" % C.DEFAULT_TRANSPORT)
+                help="connection type to use (default={0!s})".format(C.DEFAULT_TRANSPORT))
             parser.add_option('-T', '--timeout', default=C.DEFAULT_TIMEOUT, type='int', dest='timeout',
-                help="override the connection timeout in seconds (default=%s)" % C.DEFAULT_TIMEOUT)
+                help="override the connection timeout in seconds (default={0!s})".format(C.DEFAULT_TIMEOUT))
 
 
         if async_opts:
             parser.add_option('-P', '--poll', default=C.DEFAULT_POLL_INTERVAL, type='int',
                 dest='poll_interval',
-                help="set the poll interval if using -B (default=%s)" % C.DEFAULT_POLL_INTERVAL)
+                help="set the poll interval if using -B (default={0!s})".format(C.DEFAULT_POLL_INTERVAL))
             parser.add_option('-B', '--background', dest='seconds', type='int', default=0,
                 help='run asynchronously, failing after X seconds (default=N/A)')
 
@@ -315,7 +315,7 @@ class CLI(object):
         gitinfo = CLI._gitinfo()
         if gitinfo:
             result = result + " {0}".format(gitinfo)
-        result = result + "\n  configured module search path = %s" % C.DEFAULT_MODULE_PATH
+        result = result + "\n  configured module search path = {0!s}".format(C.DEFAULT_MODULE_PATH)
         return result
 
     @staticmethod

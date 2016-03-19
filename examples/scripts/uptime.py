@@ -18,14 +18,14 @@ if results is None:
 print "UP ***********"
 for (hostname, result) in results['contacted'].items():
     if not 'failed' in result:
-        print "%s >>> %s" % (hostname, result['stdout'])
+        print "{0!s} >>> {1!s}".format(hostname, result['stdout'])
 
 print "FAILED *******"
 for (hostname, result) in results['contacted'].items():
     if 'failed' in result:
-        print "%s >>> %s" % (hostname, result['msg'])
+        print "{0!s} >>> {1!s}".format(hostname, result['msg'])
 
 print "DOWN *********"
 for (hostname, result) in results['dark'].items():
-    print "%s >>> %s" % (hostname, result)
+    print "{0!s} >>> {1!s}".format(hostname, result)
 

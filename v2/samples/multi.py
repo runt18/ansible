@@ -15,19 +15,19 @@ NUM_TASKS   = 1
 
 class Foo:
    def __init__(self, i, j):
-      self._foo = "FOO_%05d_%05d" % (i, j)
+      self._foo = "FOO_{0:05d}_{1:05d}".format(i, j)
 
    def __repr__(self):
       return self._foo
 
    def __getstate__(self):
-      debug("pickling %s" % self._foo)
+      debug("pickling {0!s}".format(self._foo))
       return dict(foo=self._foo)
 
    def __setstate__(self, data):
       debug("unpickling...")
       self._foo = data.get('foo', "BAD PICKLE!")
-      debug("unpickled %s" % self._foo)
+      debug("unpickled {0!s}".format(self._foo))
 
 def results(pipe, workers):
    cur_worker = 0
@@ -41,9 +41,9 @@ def results(pipe, workers):
             cur_worker = 0
 
          if res_pipe[1].poll(0.01):
-            debug("worker %d has data to read" % cur_worker)
+            debug("worker {0:d} has data to read".format(cur_worker))
             result = res_pipe[1].recv()
-            debug("got a result from worker %d: %s" % (cur_worker, result))
+            debug("got a result from worker {0:d}: {1!s}".format(cur_worker, result))
             break
 
          if cur_worker == starting_point:
@@ -60,10 +60,10 @@ def results(pipe, workers):
             continue
          pipe.send(result)
       except (IOError, EOFError, KeyboardInterrupt) as e:
-         debug("got a breaking error: %s" % e)
+         debug("got a breaking error: {0!s}".format(e))
          break
       except Exception as e:
-         debug("EXCEPTION DURING RESULTS PROCESSING: %s" % e)
+         debug("EXCEPTION DURING RESULTS PROCESSING: {0!s}".format(e))
          traceback.print_exc()
          break
 
@@ -78,10 +78,10 @@ def worker(main_pipe, res_pipe):
          else:
             time.sleep(0.01)
       except (IOError, EOFError, KeyboardInterrupt), e:
-         debug("got a breaking error: %s" % e)
+         debug("got a breaking error: {0!s}".format(e))
          break
       except Exception, e:
-         debug("EXCEPTION DURING WORKER PROCESSING: %s" % e)
+         debug("EXCEPTION DURING WORKER PROCESSING: {0!s}".format(e))
          traceback.print_exc()
          break
 
@@ -118,7 +118,7 @@ def _process_pending_results():
       #p_lock.acquire()
       while out_p.poll(0.01):
          result = out_p.recv()
-         debug("got final result: %s" % (result,))
+         debug("got final result: {0!s}".format(result))
          pending_results -= 1
    finally:
       #p_lock.release()
@@ -127,7 +127,7 @@ def _process_pending_results():
 def _wait_on_pending_results():
    global pending_results
    while pending_results > 0:
-      debug("waiting for pending results (%d left)" % pending_results)
+      debug("waiting for pending results ({0:d} left)".format(pending_results))
       _process_pending_results()
       time.sleep(0.01)
 
@@ -139,9 +139,9 @@ pending_results = 0
 sample_play = Play()
 for i in range(NUM_TASKS):
    for j in range(NUM_HOSTS):
-      debug("queuing %d, %d" % (i, j))
-      send_data(Task().load(dict(name="task %d %d" % (i,j), ping=""), sample_play))
-      debug("done queuing %d, %d" % (i, j))
+      debug("queuing {0:d}, {1:d}".format(i, j))
+      send_data(Task().load(dict(name="task {0:d} {1:d}".format(i, j), ping=""), sample_play))
+      debug("done queuing {0:d}, {1:d}".format(i, j))
       _process_pending_results()
    debug("waiting for the results to drain...")
    _wait_on_pending_results()

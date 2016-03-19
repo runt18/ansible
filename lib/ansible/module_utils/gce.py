@@ -79,7 +79,7 @@ def gce_connect(module, provider=None):
         gce = get_driver(provider)(service_account_email, pem_file,
                 datacenter=module.params.get('zone', None),
                 project=project_id)
-        gce.connection.user_agent_append("%s/%s" % (
+        gce.connection.user_agent_append("{0!s}/{1!s}".format(
             USER_AGENT_PRODUCT, USER_AGENT_VERSION))
     except (RuntimeError, ValueError), e:
         module.fail_json(msg=str(e), changed=False)

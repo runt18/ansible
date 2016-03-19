@@ -45,7 +45,7 @@ class ActionModule(ActionBase):
             result = self._execute_module(module_name='stat', module_args=dict(path=creates), tmp=tmp, persist_files=True)
             stat = result.get('stat', None)
             if stat and stat.get('exists', False):
-                return dict(skipped=True, msg=("skipped, since %s exists" % creates))
+                return dict(skipped=True, msg=("skipped, since {0!s} exists".format(creates)))
 
         removes = self._task.args.get('removes')
         if removes:
@@ -55,7 +55,7 @@ class ActionModule(ActionBase):
             result = self._execute_module(module_name='stat', module_args=dict(path=removes), tmp=tmp, persist_files=True)
             stat = result.get('stat', None)
             if stat and not stat.get('exists', False):
-                return dict(skipped=True, msg=("skipped, since %s does not exist" % removes))
+                return dict(skipped=True, msg=("skipped, since {0!s} does not exist".format(removes)))
 
         # the script name is the first item in the raw params, so we split it
         # out now so we know the file name we need to transfer to the remote,

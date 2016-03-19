@@ -77,7 +77,7 @@ class ModuleReplacer(object):
 
     def slurp(self, path):
         if not os.path.exists(path):
-            raise errors.AnsibleError("imported module support code does not exist at %s" % path)
+            raise errors.AnsibleError("imported module support code does not exist at {0!s}".format(path))
         fd = open(path)
         data = fd.read()
         fd.close()
@@ -118,7 +118,7 @@ class ModuleReplacer(object):
                 if " import *" not in line:
                     import_error = True
                 if import_error:
-                    raise errors.AnsibleError("error importing module in %s, expecting format like 'from ansible.module_utils.basic import *'" % module_path)
+                    raise errors.AnsibleError("error importing module in {0!s}, expecting format like 'from ansible.module_utils.basic import *'".format(module_path))
                 snippet_name = tokens[2].split()[0]
                 snippet_names.append(snippet_name)
                 output.write(self.slurp(os.path.join(self.snippet_path, snippet_name + ".py")))
@@ -132,11 +132,11 @@ class ModuleReplacer(object):
         if not module_path.endswith(".ps1"):
             # Unixy modules
             if len(snippet_names) > 0 and not 'basic' in snippet_names:
-                raise errors.AnsibleError("missing required import in %s: from ansible.module_utils.basic import *" % module_path) 
+                raise errors.AnsibleError("missing required import in {0!s}: from ansible.module_utils.basic import *".format(module_path)) 
         else:
             # Windows modules
             if len(snippet_names) > 0 and not 'powershell' in snippet_names:
-                raise errors.AnsibleError("missing required import in %s: # POWERSHELL_COMMON" % module_path) 
+                raise errors.AnsibleError("missing required import in {0!s}: # POWERSHELL_COMMON".format(module_path)) 
 
         return (output.getvalue(), module_style)
 
@@ -177,7 +177,7 @@ class ModuleReplacer(object):
                 facility = C.DEFAULT_SYSLOG_FACILITY
                 if 'ansible_syslog_facility' in inject:
                     facility = inject['ansible_syslog_facility']
-                module_data = module_data.replace('syslog.LOG_USER', "syslog.%s" % facility)
+                module_data = module_data.replace('syslog.LOG_USER', "syslog.{0!s}".format(facility))
 
             lines = module_data.split("\n")
             shebang = None
@@ -185,11 +185,11 @@ class ModuleReplacer(object):
                 shebang = lines[0].strip()
                 args = shlex.split(str(shebang[2:]))
                 interpreter = args[0]
-                interpreter_config = 'ansible_%s_interpreter' % os.path.basename(interpreter)
+                interpreter_config = 'ansible_{0!s}_interpreter'.format(os.path.basename(interpreter))
 
                 if interpreter_config in inject:
                     interpreter = to_bytes(inject[interpreter_config], errors='strict')
-                    lines[0] = shebang = "#!%s %s" % (interpreter, " ".join(args[1:]))
+                    lines[0] = shebang = "#!{0!s} {1!s}".format(interpreter, " ".join(args[1:]))
                     module_data = "\n".join(lines)
 
             return (module_data, module_style, shebang)

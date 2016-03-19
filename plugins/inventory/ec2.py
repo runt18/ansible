@@ -347,7 +347,7 @@ class Ec2Inventory(object):
             conn = ec2.connect_to_region(region)
         # connect_to_region will fail "silently" by returning None if the region name is wrong or not supported
         if conn is None:
-            self.fail_with_error("region name: %s likely not supported, or AWS is down.  connection to region failed." % region)
+            self.fail_with_error("region name: {0!s} likely not supported, or AWS is down.  connection to region failed.".format(region))
         return conn
 
     def get_instances_by_region(self, region):
@@ -372,7 +372,7 @@ class Ec2Inventory(object):
                 error = self.get_auth_error_message()
             else:
                 backend = 'Eucalyptus' if self.eucalyptus else 'AWS' 
-                error = "Error connecting to %s backend.\n%s" % (backend, e.message)
+                error = "Error connecting to {0!s} backend.\n{1!s}".format(backend, e.message)
             self.fail_with_error(error)
 
     def get_rds_instances_by_region(self, region):
@@ -391,7 +391,7 @@ class Ec2Inventory(object):
             if e.error_code == 'AuthFailure':
                 error = self.get_auth_error_message()
             if not e.reason == "Forbidden":
-                error = "Looks like AWS RDS is down:\n%s" % e.message
+                error = "Looks like AWS RDS is down:\n{0!s}".format(e.message)
             self.fail_with_error(error)
 
     def get_auth_error_message(self):
@@ -405,9 +405,9 @@ class Ec2Inventory(object):
         boto_paths = ['/etc/boto.cfg', '~/.boto', '~/.aws/credentials']
         boto_config_found = list(p for p in boto_paths if os.path.isfile(os.path.expanduser(p)))
         if len(boto_config_found) > 0:
-            errors.append(" - Boto configs found at '%s', but the credentials contained may not be correct" % ', '.join(boto_config_found))
+            errors.append(" - Boto configs found at '{0!s}', but the credentials contained may not be correct".format(', '.join(boto_config_found)))
         else:
-            errors.append(" - No Boto config found at any expected location '%s'" % ', '.join(boto_paths))
+            errors.append(" - No Boto config found at any expected location '{0!s}'".format(', '.join(boto_paths)))
 
         return '\n'.join(errors)
         

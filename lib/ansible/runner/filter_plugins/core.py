@@ -209,7 +209,7 @@ def version_compare(value, version, operator='eq', strict=False):
         method = getattr(py_operator, operator)
         return method(Version(str(value)), Version(str(version)))
     except Exception, e:
-        raise errors.AnsibleFilterError('Version comparison: %s' % e)
+        raise errors.AnsibleFilterError('Version comparison: {0!s}'.format(e))
 
 @environmentfilter
 def rand(environment, end, start=None, step=None):
@@ -261,7 +261,7 @@ def get_encrypted_password(password, hashtype='sha512', salt=None):
             r = SystemRandom()
             salt = ''.join([r.choice(string.ascii_letters + string.digits) for _ in range(16)])
 
-        saltstring =  "$%s$%s" % (cryptmethod[hashtype],salt)
+        saltstring =  "${0!s}${1!s}".format(cryptmethod[hashtype], salt)
         encrypted = crypt.crypt(password,saltstring)
         return encrypted
 

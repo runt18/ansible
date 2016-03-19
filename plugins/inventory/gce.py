@@ -186,7 +186,7 @@ class GceInventory(object):
         # Retrieve and return the GCE driver.
         gce = get_driver(Provider.GCE)(*args, **kwargs)
         gce.connection.user_agent_append(
-            '%s/%s' % (USER_AGENT_PRODUCT, USER_AGENT_VERSION),
+            '{0!s}/{1!s}'.format(USER_AGENT_PRODUCT, USER_AGENT_VERSION),
         )
         return gce
 
@@ -257,12 +257,12 @@ class GceInventory(object):
 
             tags = node.extra['tags']
             for t in tags:
-                tag = 'tag_%s' % t
+                tag = 'tag_{0!s}'.format(t)
                 if groups.has_key(tag): groups[tag].append(name)
                 else: groups[tag] = [name]
 
             net = node.extra['networkInterfaces'][0]['network'].split('/')[-1]
-            net = 'network_%s' % net
+            net = 'network_{0!s}'.format(net)
             if groups.has_key(net): groups[net].append(name)
             else: groups[net] = [name]
 
@@ -275,7 +275,7 @@ class GceInventory(object):
             else: groups[image] = [name]
 
             status = node.extra['status']
-            stat = 'status_%s' % status.lower()
+            stat = 'status_{0!s}'.format(status.lower())
             if groups.has_key(stat): groups[stat].append(name)
             else: groups[stat] = [name]
 

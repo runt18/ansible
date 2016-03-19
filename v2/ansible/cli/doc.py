@@ -83,7 +83,7 @@ class DocCLI(CLI):
 
             filename = module_loader.find_plugin(module)
             if filename is None:
-                self.display.warning("module %s not found in %s\n" % (module, DocCLI.print_paths(module_loader)))
+                self.display.warning("module {0!s} not found in {1!s}\n".format(module, DocCLI.print_paths(module_loader)))
                 continue
 
             if any(filename.endswith(x) for x in self.BLACKLIST_EXTS):
@@ -93,7 +93,7 @@ class DocCLI(CLI):
                 doc, plainexamples, returndocs = module_docs.get_docstring(filename)
             except:
                 self.display.vvv(traceback.print_exc())
-                self.display.error("module %s has a documentation error formatting or is missing documentation\nTo see exact traceback use -vvv" % module)
+                self.display.error("module {0!s} has a documentation error formatting or is missing documentation\nTo see exact traceback use -vvv".format(module))
                 continue
 
             if doc is not None:
@@ -117,7 +117,7 @@ class DocCLI(CLI):
             else:
                 # this typically means we couldn't even parse the docstring, not just that the YAML is busted,
                 # probably a quoting issue.
-                self.display.warning("module %s missing documentation (or could not parse documentation)\n" % module)
+                self.display.warning("module {0!s} missing documentation (or could not parse documentation)\n".format(module))
 
         CLI.pager(text)
         return 0
@@ -180,7 +180,7 @@ class DocCLI(CLI):
                 else:
                     text.append("%-*s %-*.*s" % (displace, module, linelimit, len(desc), desc))
             except:
-                raise AnsibleError("module %s has a documentation error formatting or is missing documentation\n" % module)
+                raise AnsibleError("module {0!s} has a documentation error formatting or is missing documentation\n".format(module))
 
         if len(deprecated) > 0:
             text.append("\nDEPRECATED:")
@@ -204,8 +204,8 @@ class DocCLI(CLI):
 
         text = []
         desc = CLI.tty_ify(" ".join(doc['short_description']))
-        text.append("- name: %s" % (desc))
-        text.append("  action: %s" % (doc['module']))
+        text.append("- name: {0!s}".format((desc)))
+        text.append("  action: {0!s}".format((doc['module'])))
 
         for o in sorted(doc['options'].keys()):
             opt = doc['options'][o]
@@ -216,7 +216,7 @@ class DocCLI(CLI):
             else:
                 s = o
 
-            text.append("      %-20s   # %s" % (s, desc))
+            text.append("      {0:<20!s}   # {1!s}".format(s, desc))
         text.append('')
 
         return "\n".join(text)
@@ -226,11 +226,11 @@ class DocCLI(CLI):
 
         opt_indent="        "
         text = []
-        text.append("> %s\n" % doc['module'].upper())
+        text.append("> {0!s}\n".format(doc['module'].upper()))
 
         desc = " ".join(doc['description'])
 
-        text.append("%s\n" % textwrap.fill(CLI.tty_ify(desc), initial_indent="  ", subsequent_indent="  "))
+        text.append("{0!s}\n".format(textwrap.fill(CLI.tty_ify(desc), initial_indent="  ", subsequent_indent="  ")))
 
         if 'option_keys' in doc and len(doc['option_keys']) > 0:
             text.append("Options (= is mandatory):\n")
@@ -243,7 +243,7 @@ class DocCLI(CLI):
             else:
                 opt_leadin = "-"
 
-            text.append("%s %s" % (opt_leadin, o))
+            text.append("{0!s} {1!s}".format(opt_leadin, o))
 
             desc = " ".join(opt['description'])
 
@@ -253,24 +253,24 @@ class DocCLI(CLI):
             if 'default' in opt:
                 default = str(opt['default'])
                 desc = desc + " [Default: " + default + "]"
-            text.append("%s\n" % textwrap.fill(CLI.tty_ify(desc), initial_indent=opt_indent,
-                                 subsequent_indent=opt_indent))
+            text.append("{0!s}\n".format(textwrap.fill(CLI.tty_ify(desc), initial_indent=opt_indent,
+                                 subsequent_indent=opt_indent)))
 
         if 'notes' in doc and len(doc['notes']) > 0:
             notes = " ".join(doc['notes'])
-            text.append("Notes:%s\n" % textwrap.fill(CLI.tty_ify(notes), initial_indent="  ",
-                                subsequent_indent=opt_indent))
+            text.append("Notes:{0!s}\n".format(textwrap.fill(CLI.tty_ify(notes), initial_indent="  ",
+                                subsequent_indent=opt_indent)))
 
 
         if 'requirements' in doc and doc['requirements'] is not None and len(doc['requirements']) > 0:
             req = ", ".join(doc['requirements'])
-            text.append("Requirements:%s\n" % textwrap.fill(CLI.tty_ify(req), initial_indent="  ",
-                                subsequent_indent=opt_indent))
+            text.append("Requirements:{0!s}\n".format(textwrap.fill(CLI.tty_ify(req), initial_indent="  ",
+                                subsequent_indent=opt_indent)))
 
         if 'examples' in doc and len(doc['examples']) > 0:
-            text.append("Example%s:\n" % ('' if len(doc['examples']) < 2 else 's'))
+            text.append("Example{0!s}:\n".format(('' if len(doc['examples']) < 2 else 's')))
             for ex in doc['examples']:
-                text.append("%s\n" % (ex['code']))
+                text.append("{0!s}\n".format((ex['code'])))
 
         if 'plainexamples' in doc and doc['plainexamples'] is not None:
             text.append("EXAMPLES:")

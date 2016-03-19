@@ -84,7 +84,7 @@ def parse_kv(args, check_raw=False):
                 # only internal variables can start with an underscore, so
                 # we don't allow users to set them directy in arguments
                 if k.startswith('_'):
-                    raise AnsibleError("invalid parameter specified: '%s'" % k)
+                    raise AnsibleError("invalid parameter specified: '{0!s}'".format(k))
 
                 # FIXME: make the retrieval of this list of shell/command
                 #        options a function, so the list is centralized
@@ -212,14 +212,14 @@ def split_args(args):
                 appended = True
             elif print_depth or block_depth or comment_depth or inside_quotes or was_inside_quotes:
                 if idx == 0 and was_inside_quotes:
-                    params[-1] = "%s%s" % (params[-1], token)
+                    params[-1] = "{0!s}{1!s}".format(params[-1], token)
                 elif len(tokens) > 1:
                     spacer = ''
                     if idx > 0:
                         spacer = ' '
-                    params[-1] = "%s%s%s" % (params[-1], spacer, token)
+                    params[-1] = "{0!s}{1!s}{2!s}".format(params[-1], spacer, token)
                 else:
-                    params[-1] = "%s\n%s" % (params[-1], token)
+                    params[-1] = "{0!s}\n{1!s}".format(params[-1], token)
                 appended = True
 
             # if the number of paired block tags is not the same, the depth has changed, so we calculate that here

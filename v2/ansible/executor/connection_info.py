@@ -78,7 +78,7 @@ class ConnectionInformation:
         fields = self._get_fields()
         fields.sort()
         for field in fields:
-            value += "%20s : %s\n" % (field, getattr(self, field))
+            value += "{0:20!s} : {1!s}\n".format(field, getattr(self, field))
         return value
 
     def set_play(self, play):
@@ -198,13 +198,13 @@ class ConnectionInformation:
             become_settings = {}
 
         randbits    = ''.join(chr(random.randint(ord('a'), ord('z'))) for x in xrange(32))
-        success_key = 'BECOME-SUCCESS-%s' % randbits
+        success_key = 'BECOME-SUCCESS-{0!s}'.format(randbits)
         prompt      = None
         becomecmd   = None
 
         executable = executable or '$SHELL'
 
-        success_cmd = pipes.quote('echo %s; %s' % (success_key, cmd))
+        success_cmd = pipes.quote('echo {0!s}; {1!s}'.format(success_key, cmd))
         if self.become:
             if self.become_method == 'sudo':
                 # Rather than detect if sudo wants a password this time, -k makes sudo always ask for
@@ -212,32 +212,31 @@ class ConnectionInformation:
                 # directly doesn't work, so we shellquote it with pipes.quote() and pass the quoted
                 # string to the user's shell.  We loop reading output until we see the randomly-generated
                 # sudo prompt set with the -p option.
-                prompt = '[sudo via ansible, key=%s] password: ' % randbits
+                prompt = '[sudo via ansible, key={0!s}] password: '.format(randbits)
                 exe = become_settings.get('sudo_exe', C.DEFAULT_SUDO_EXE)
                 flags = become_settings.get('sudo_flags', C.DEFAULT_SUDO_FLAGS)
-                becomecmd = '%s -k && %s %s -S -p "%s" -u %s %s -c %s' % \
-                    (exe, exe, flags or C.DEFAULT_SUDO_FLAGS, prompt, self.become_user, executable, success_cmd)
+                becomecmd = '{0!s} -k && {1!s} {2!s} -S -p "{3!s}" -u {4!s} {5!s} -c {6!s}'.format(exe, exe, flags or C.DEFAULT_SUDO_FLAGS, prompt, self.become_user, executable, success_cmd)
 
             elif self.become_method == 'su':
                 exe = become_settings.get('su_exe', C.DEFAULT_SU_EXE)
                 flags = become_settings.get('su_flags', C.DEFAULT_SU_FLAGS)
-                becomecmd = '%s %s %s -c "%s -c %s"' % (exe, flags, self.become_user, executable, success_cmd)
+                becomecmd = '{0!s} {1!s} {2!s} -c "{3!s} -c {4!s}"'.format(exe, flags, self.become_user, executable, success_cmd)
 
             elif self.become_method == 'pbrun':
                 exe = become_settings.get('pbrun_exe', 'pbrun')
                 flags = become_settings.get('pbrun_flags', '')
-                becomecmd = '%s -b -l %s -u %s "%s"' % (exe, flags, self.become_user, success_cmd)
+                becomecmd = '{0!s} -b -l {1!s} -u {2!s} "{3!s}"'.format(exe, flags, self.become_user, success_cmd)
 
             elif self.become_method == 'pfexec':
                 exe = become_settings.get('pfexec_exe', 'pbrun')
                 flags = become_settings.get('pfexec_flags', '')
                 # No user as it uses it's own exec_attr to figure it out
-                becomecmd = '%s %s "%s"' % (exe, flags, success_cmd)
+                becomecmd = '{0!s} {1!s} "{2!s}"'.format(exe, flags, success_cmd)
 
             else:
-                raise AnsibleError("Privilege escalation method not found: %s" % self.become_method)
+                raise AnsibleError("Privilege escalation method not found: {0!s}".format(self.become_method))
 
-            return (('%s -c ' % executable) + pipes.quote(becomecmd), prompt, success_key)
+            return (('{0!s} -c '.format(executable)) + pipes.quote(becomecmd), prompt, success_key)
 
         return (cmd, "", "")
 

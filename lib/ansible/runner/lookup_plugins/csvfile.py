@@ -35,7 +35,7 @@ class LookupModule(object):
                 if row[0] == key:
                     return row[int(col)]
         except Exception, e:
-            raise errors.AnsibleError("csvfile: %s" % str(e))
+            raise errors.AnsibleError("csvfile: {0!s}".format(str(e)))
 
         return dflt
 

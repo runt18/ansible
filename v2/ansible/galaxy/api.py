@@ -38,18 +38,18 @@ class GalaxyAPI(object):
         try:
             urlparse(api_server, scheme='https')
         except:
-            raise AnsibleError("Invalid server API url passed: %s" % api_server)
+            raise AnsibleError("Invalid server API url passed: {0!s}".format(api_server))
 
-        server_version = self.get_server_api_version('%s/api/' % (api_server))
+        server_version = self.get_server_api_version('{0!s}/api/'.format((api_server)))
         if not server_version:
-            raise AnsibleError("Could not retrieve server API version: %s" % api_server)
+            raise AnsibleError("Could not retrieve server API version: {0!s}".format(api_server))
 
         if server_version in self.SUPPORTED_VERSIONS:
-            self.baseurl = '%s/api/%s' % (api_server, server_version)
+            self.baseurl = '{0!s}/api/{1!s}'.format(api_server, server_version)
             self.version = server_version # for future use
-            self.galaxy.display.vvvvv("Base API: %s" % self.baseurl)
+            self.galaxy.display.vvvvv("Base API: {0!s}".format(self.baseurl))
         else:
-            raise AnsibleError("Unsupported Galaxy server API version: %s" % server_version)
+            raise AnsibleError("Unsupported Galaxy server API version: {0!s}".format(server_version))
 
     def get_server_api_version(self, api_server):
         """
@@ -78,12 +78,12 @@ class GalaxyAPI(object):
             user_name = ".".join(parts[0:-1])
             role_name = parts[-1]
             if notify:
-                self.galaxy.display.display("- downloading role '%s', owned by %s" % (role_name, user_name))
+                self.galaxy.display.display("- downloading role '{0!s}', owned by {1!s}".format(role_name, user_name))
         except:
-            raise AnsibleError("- invalid role name (%s). Specify role as format: username.rolename" % role_name)
+            raise AnsibleError("- invalid role name ({0!s}). Specify role as format: username.rolename".format(role_name))
 
-        url = '%s/roles/?owner__username=%s&name=%s' % (self.baseurl, user_name, role_name)
-        self.galaxy.display.vvvv("- %s" % (url))
+        url = '{0!s}/roles/?owner__username={1!s}&name={2!s}'.format(self.baseurl, user_name, role_name)
+        self.galaxy.display.vvvv("- {0!s}".format((url)))
         try:
             data = json.load(urlopen(url))
             if len(data["results"]) != 0:
@@ -101,12 +101,12 @@ class GalaxyAPI(object):
         """
 
         try:
-            url = '%s/roles/%d/%s/?page_size=50' % (self.baseurl, int(role_id), related)
+            url = '{0!s}/roles/{1:d}/{2!s}/?page_size=50'.format(self.baseurl, int(role_id), related)
             data = json.load(urlopen(url))
             results = data['results']
             done = (data.get('next', None) == None)
             while not done:
-                url = '%s%s' % (self.baseurl, data['next'])
+                url = '{0!s}{1!s}'.format(self.baseurl, data['next'])
                 self.galaxy.display.display(url)
                 data = json.load(urlopen(url))
                 results += data['results']
@@ -121,7 +121,7 @@ class GalaxyAPI(object):
         """
 
         try:
-            url = '%s/%s/?page_size' % (self.baseurl, what)
+            url = '{0!s}/{1!s}/?page_size'.format(self.baseurl, what)
             data = json.load(urlopen(url))
             if "results" in data:
                 results = data['results']
@@ -131,11 +131,11 @@ class GalaxyAPI(object):
             if "next" in data:
                 done = (data.get('next', None) == None)
             while not done:
-                url = '%s%s' % (self.baseurl, data['next'])
+                url = '{0!s}{1!s}'.format(self.baseurl, data['next'])
                 self.galaxy.display.display(url)
                 data = json.load(urlopen(url))
                 results += data['results']
                 done = (data.get('next', None) == None)
             return results
         except Exception as error:
-            raise AnsibleError("Failed to download the %s list: %s" % (what, str(error)))
+            raise AnsibleError("Failed to download the {0!s} list: {1!s}".format(what, str(error)))

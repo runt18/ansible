@@ -22,4 +22,4 @@ from ansible.plugins.shell.sh import ShellModule as ShModule
 class ShellModule(ShModule):
 
     def env_prefix(self, **kwargs):
-        return 'env %s' % super(ShellModule, self).env_prefix(**kwargs)
+        return 'env {0!s}'.format(super(ShellModule, self).env_prefix(**kwargs))

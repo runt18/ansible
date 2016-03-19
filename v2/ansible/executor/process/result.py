@@ -58,7 +58,7 @@ class ResultProcess(multiprocessing.Process):
         super(ResultProcess, self).__init__()
 
     def _send_result(self, result):
-        debug("sending result: %s" % (result,))
+        debug("sending result: {0!s}".format(result))
         self._final_q.put(result, block=False)
         debug("done sending result")
 
@@ -73,9 +73,9 @@ class ResultProcess(multiprocessing.Process):
 
             try:
                 if not rslt_q.empty():
-                    debug("worker %d has data to read" % self._cur_worker)
+                    debug("worker {0:d} has data to read".format(self._cur_worker))
                     result = rslt_q.get(block=False)
-                    debug("got a result from worker %d: %s" % (self._cur_worker, result))
+                    debug("got a result from worker {0:d}: {1!s}".format(self._cur_worker, result))
                     break
             except queue.Empty:
                 pass

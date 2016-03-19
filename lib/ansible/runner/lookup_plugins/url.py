@@ -36,10 +36,10 @@ class LookupModule(object):
                 r = urllib2.Request(term)
                 response = urllib2.urlopen(r)
             except URLError, e:
-                utils.warnings("Failed lookup url for %s : %s" % (term, str(e)))
+                utils.warnings("Failed lookup url for {0!s} : {1!s}".format(term, str(e)))
                 continue
             except HTTPError, e:
-                utils.warnings("Received HTTP error for %s : %s" % (term, str(e)))
+                utils.warnings("Received HTTP error for {0!s} : {1!s}".format(term, str(e)))
                 continue
 
             for line in response.read().splitlines():

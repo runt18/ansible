@@ -22,6 +22,6 @@ class CallbackModule(object):
     def playbook_on_stats(self, stats):
         end_time = datetime.now()
         timedelta = end_time - self.start_time
-        print "Playbook run took %s days, %s hours, %s minutes, %s seconds" % (self.days_hours_minutes_seconds(timedelta))
+        print "Playbook run took {0!s} days, {1!s} hours, {2!s} minutes, {3!s} seconds".format(*(self.days_hours_minutes_seconds(timedelta)))
 
 

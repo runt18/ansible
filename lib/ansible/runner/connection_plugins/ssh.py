@@ -59,7 +59,7 @@ class Connection(object):
     def connect(self):
         ''' connect to the remote host '''
 
-        vvv("ESTABLISH CONNECTION FOR USER: %s" % self.user, host=self.host)
+        vvv("ESTABLISH CONNECTION FOR USER: {0!s}".format(self.user), host=self.host)
 
         self.common_args = []
         extra_args = C.ANSIBLE_SSH_ARGS
@@ -69,7 +69,7 @@ class Connection(object):
         else:
             self.common_args += ["-o", "ControlMaster=auto",
                                  "-o", "ControlPersist=60s",
-                                 "-o", "ControlPath=\"%s\"" % (C.ANSIBLE_SSH_CONTROL_PATH % dict(directory=self.cp_dir))]
+                                 "-o", "ControlPath=\"{0!s}\"".format((C.ANSIBLE_SSH_CONTROL_PATH % dict(directory=self.cp_dir)))]
 
         cp_in_use = False
         cp_path_set = False
@@ -80,17 +80,17 @@ class Connection(object):
                 cp_path_set = True
 
         if cp_in_use and not cp_path_set:
-            self.common_args += ["-o", "ControlPath=\"%s\"" % (C.ANSIBLE_SSH_CONTROL_PATH % dict(directory=self.cp_dir))]
+            self.common_args += ["-o", "ControlPath=\"{0!s}\"".format((C.ANSIBLE_SSH_CONTROL_PATH % dict(directory=self.cp_dir)))]
 
         if not C.HOST_KEY_CHECKING:
             self.common_args += ["-o", "StrictHostKeyChecking=no"]
 
         if self.port is not None:
-            self.common_args += ["-o", "Port=%d" % (self.port)]
+            self.common_args += ["-o", "Port={0:d}".format((self.port))]
         if self.private_key_file is not None:
-            self.common_args += ["-o", "IdentityFile=\"%s\"" % os.path.expanduser(self.private_key_file)]
+            self.common_args += ["-o", "IdentityFile=\"{0!s}\"".format(os.path.expanduser(self.private_key_file))]
         elif self.runner.private_key_file is not None:
-            self.common_args += ["-o", "IdentityFile=\"%s\"" % os.path.expanduser(self.runner.private_key_file)]
+            self.common_args += ["-o", "IdentityFile=\"{0!s}\"".format(os.path.expanduser(self.runner.private_key_file))]
         if self.password:
             self.common_args += ["-o", "GSSAPIAuthentication=no",
                                  "-o", "PubkeyAuthentication=no"]
@@ -100,7 +100,7 @@ class Connection(object):
                                  "-o", "PasswordAuthentication=no"]
         if self.user != pwd.getpwuid(os.geteuid())[0]:
             self.common_args += ["-o", "User="+self.user]
-        self.common_args += ["-o", "ConnectTimeout=%d" % self.runner.timeout]
+        self.common_args += ["-o", "ConnectTimeout={0:d}".format(self.runner.timeout)]
 
         return self
 
@@ -135,13 +135,13 @@ class Connection(object):
             except OSError:
                 raise errors.AnsibleError("to use the 'ssh' connection type with passwords, you must install the sshpass program")
             (self.rfd, self.wfd) = os.pipe()
-            return ["sshpass", "-d%d" % self.rfd]
+            return ["sshpass", "-d{0:d}".format(self.rfd)]
         return []
 
     def _send_password(self):
         if self.password:
             os.close(self.rfd)
-            os.write(self.wfd, "%s\n" % self.password)
+            os.write(self.wfd, "{0!s}\n".format(self.password))
             os.close(self.wfd)
 
     def _communicate(self, p, stdin, indata, sudoable=False, prompt=None):
@@ -167,12 +167,12 @@ class Connection(object):
 
                 if prompt:
                     if self.runner.become_pass:
-                        if stdout.endswith("%s\r\n%s" % (incorrect_password, prompt)):
+                        if stdout.endswith("{0!s}\r\n{1!s}".format(incorrect_password, prompt)):
                             raise errors.AnsibleError('Incorrect become password')
 
                     if stdout.endswith(prompt):
                         raise errors.AnsibleError('Missing become password')
-                    elif stdout.endswith("%s\r\n%s" % (incorrect_password, prompt)):
+                    elif stdout.endswith("{0!s}\r\n{1!s}".format(incorrect_password, prompt)):
                         raise errors.AnsibleError('Incorrect become password')
 
             if p.stdout in rfd:
@@ -253,14 +253,14 @@ class Connection(object):
                         return False
 
         if (hfiles_not_found == len(host_file_list)):
-            vvv("EXEC previous known host file not found for %s" % host)
+            vvv("EXEC previous known host file not found for {0!s}".format(host))
         return True
 
     def exec_command(self, cmd, tmp_path, become_user=None, sudoable=False, executable='/bin/sh', in_data=None):
         ''' run a command on the remote host '''
 
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         ssh_cmd = self._password_cmd()
         ssh_cmd += ["ssh", "-C"]
@@ -292,7 +292,7 @@ class Connection(object):
             else:
                 ssh_cmd.append(cmd)
 
-        vvv("EXEC %s" % ' '.join(ssh_cmd), host=self.host)
+        vvv("EXEC {0!s}".format(' '.join(ssh_cmd)), host=self.host)
 
         not_in_host_file = self.not_in_host_file(self.host)
 
@@ -337,7 +337,7 @@ class Connection(object):
                     become_errput += chunk
                     incorrect_password = gettext.dgettext(
                         "become", "Sorry, try again.")
-                    if become_errput.strip().endswith("%s%s" % (prompt, incorrect_password)):
+                    if become_errput.strip().endswith("{0!s}{1!s}".format(prompt, incorrect_password)):
                         raise errors.AnsibleError('Incorrect become password')
                     elif prompt and become_errput.endswith(prompt):
                         stdin.write(self.runner.become_pass + '\n')
@@ -345,13 +345,13 @@ class Connection(object):
                 if p.stdout in rfd:
                     chunk = p.stdout.read()
                     if not chunk:
-                        raise errors.AnsibleError('ssh connection closed waiting for %s password prompt' % self.runner.become_method)
+                        raise errors.AnsibleError('ssh connection closed waiting for {0!s} password prompt'.format(self.runner.become_method))
                     become_output += chunk
 
                 if not rfd:
                     # timeout. wrap up process communication
                     stdout = p.communicate()
-                    raise errors.AnsibleError('ssh connection error while waiting for %s password prompt' % self.runner.become_method)
+                    raise errors.AnsibleError('ssh connection error while waiting for {0!s} password prompt'.format(self.runner.become_method))
 
             if success_key in become_output:
                 no_prompt_out += become_output
@@ -393,24 +393,24 @@ class Connection(object):
             else:
                 lines = stderr.splitlines()[-1:]
             if ip and port:
-                lines.append('    while connecting to %s:%s' % (ip, port))
+                lines.append('    while connecting to {0!s}:{1!s}'.format(ip, port))
             lines.append(
                 'It is sometimes useful to re-run the command using -vvvv, '
                 'which prints SSH debug output to help diagnose the issue.')
-            raise errors.AnsibleError('SSH Error: %s' % '\n'.join(lines))
+            raise errors.AnsibleError('SSH Error: {0!s}'.format('\n'.join(lines)))
 
         return (p.returncode, '', no_prompt_out + stdout, no_prompt_err + stderr)
 
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to remote '''
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         cmd = self._password_cmd()
 
         host = self.host
         if self.ipv6:
-            host = '[%s]' % host
+            host = '[{0!s}]'.format(host)
 
         if C.DEFAULT_SCP_IF_SSH:
             cmd += ["scp"] + self.common_args
@@ -418,7 +418,7 @@ class Connection(object):
             indata = None
         else:
             cmd += ["sftp"] + self.common_args + [host]
-            indata = "put %s %s\n" % (pipes.quote(in_path), pipes.quote(out_path))
+            indata = "put {0!s} {1!s}\n".format(pipes.quote(in_path), pipes.quote(out_path))
 
         (p, stdin) = self._run(cmd, indata)
 
@@ -427,16 +427,16 @@ class Connection(object):
         (returncode, stdout, stderr) = self._communicate(p, stdin, indata)
 
         if returncode != 0:
-            raise errors.AnsibleError("failed to transfer file to %s:\n%s\n%s" % (out_path, stdout, stderr))
+            raise errors.AnsibleError("failed to transfer file to {0!s}:\n{1!s}\n{2!s}".format(out_path, stdout, stderr))
 
     def fetch_file(self, in_path, out_path):
         ''' fetch a file from remote to local '''
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
         cmd = self._password_cmd()
 
         host = self.host
         if self.ipv6:
-            host = '[%s]' % host
+            host = '[{0!s}]'.format(host)
 
         if C.DEFAULT_SCP_IF_SSH:
             cmd += ["scp"] + self.common_args
@@ -444,7 +444,7 @@ class Connection(object):
             indata = None
         else:
             cmd += ["sftp"] + self.common_args + [host]
-            indata = "get %s %s\n" % (in_path, out_path)
+            indata = "get {0!s} {1!s}\n".format(in_path, out_path)
 
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -452,7 +452,7 @@ class Connection(object):
         stdout, stderr = p.communicate(indata)
 
         if p.returncode != 0:
-            raise errors.AnsibleError("failed to transfer file from %s:\n%s\n%s" % (in_path, stdout, stderr))
+            raise errors.AnsibleError("failed to transfer file from {0!s}:\n{1!s}\n{2!s}".format(in_path, stdout, stderr))
 
     def close(self):
         ''' not applicable since we're executing openssh binaries '''

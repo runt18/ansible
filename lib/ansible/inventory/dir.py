@@ -153,7 +153,7 @@ class InventoryDirectory(object):
 
         # name
         if group.name != newgroup.name:
-            raise errors.AnsibleError("Cannot merge group %s with %s" % (group.name, newgroup.name))
+            raise errors.AnsibleError("Cannot merge group {0!s} with {1!s}".format(group.name, newgroup.name))
 
         # depth
         group.depth = max([group.depth, newgroup.depth])
@@ -203,7 +203,7 @@ class InventoryDirectory(object):
 
         # name
         if host.name != newhost.name:
-            raise errors.AnsibleError("Cannot merge host %s with %s" % (host.name, newhost.name))
+            raise errors.AnsibleError("Cannot merge host {0!s} with {1!s}".format(host.name, newhost.name))
 
         # group membership relation
         for newgroup in newhost.groups:

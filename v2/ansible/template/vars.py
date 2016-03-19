@@ -65,7 +65,7 @@ class AnsibleJ2Vars:
             if varname in self._globals:
                 return self._globals[varname]
             else:
-                raise KeyError("undefined variable: %s" % varname)
+                raise KeyError("undefined variable: {0!s}".format(varname))
 
         variable = self._templar._available_variables[varname]
 

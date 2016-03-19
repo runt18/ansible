@@ -177,13 +177,13 @@ class Role(Base, Become, Conditional, Taggable):
         # vars and default vars are regular dictionaries
         self._role_vars  = self._load_role_yaml('vars')
         if not isinstance(self._role_vars, (dict, NoneType)):
-            raise AnsibleParserError("The vars/main.yml file for role '%s' must contain a dictionary of variables" % self._role_name)
+            raise AnsibleParserError("The vars/main.yml file for role '{0!s}' must contain a dictionary of variables".format(self._role_name))
         elif self._role_vars is None:
             self._role_vars = dict()
 
         self._default_vars = self._load_role_yaml('defaults')
         if not isinstance(self._default_vars, (dict, NoneType)):
-            raise AnsibleParserError("The default/main.yml file for role '%s' must contain a dictionary of variables" % self._role_name)
+            raise AnsibleParserError("The default/main.yml file for role '{0!s}' must contain a dictionary of variables".format(self._role_name))
         elif self._default_vars is None:
             self._default_vars = dict()
 
@@ -205,7 +205,7 @@ class Role(Base, Become, Conditional, Taggable):
         )
 
         if sum([self._loader.is_file(x) for x in possible_mains]) > 1:
-            raise AnsibleError("found multiple main files at %s, only one allowed" % (basepath))
+            raise AnsibleError("found multiple main files at {0!s}, only one allowed".format((basepath)))
         else:
             for m in possible_mains:
                 if self._loader.is_file(m):

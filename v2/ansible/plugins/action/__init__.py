@@ -77,7 +77,7 @@ class ActionBase:
         if module_path is None:
             module_path2 = self._shared_loader_obj.module_loader.find_plugin('ping', module_suffixes)
             if module_path2 is not None:
-                raise AnsibleError("The module %s was not found in configured module paths" % (module_name))
+                raise AnsibleError("The module {0!s} was not found in configured module paths".format((module_name)))
             else:
                 raise AnsibleError("The module %s was not found in configured module paths. " \
                                    "Additionally, core modules are missing. If this is a checkout, " \
@@ -139,7 +139,7 @@ class ActionBase:
         Create and return a temporary path on a remote box.
         '''
 
-        basefile = 'ansible-tmp-%s-%s' % (time.time(), random.randint(0, 2**48))
+        basefile = 'ansible-tmp-{0!s}-{1!s}'.format(time.time(), random.randint(0, 2**48))
         use_system_tmp = False
 
         if self._connection_info.become and self._connection_info.become_user != 'root':
@@ -164,13 +164,13 @@ class ActionBase:
                 #    output = 'SSH encountered an unknown error. The output was:\n%s' % (result['stdout']+result['stderr'])
                 #else:
                 #    output = 'SSH encountered an unknown error during the connection. We recommend you re-run the command using -vvvv, which will enable SSH debugging output to help diagnose the issue'
-                output = 'SSH encountered an unknown error. The output was:\n%s' % (result['stdout']+result['stderr'])
+                output = 'SSH encountered an unknown error. The output was:\n{0!s}'.format((result['stdout']+result['stderr']))
             elif 'No space left on device' in result['stderr']:
                 output = result['stderr']
             else:
-                output = 'Authentication or permission failure.  In some cases, you may have been able to authenticate and did not have permissions on the remote directory. Consider changing the remote temp path in ansible.cfg to a path rooted in "/tmp". Failed command was: %s, exited with result %d' % (cmd, result['rc'])
+                output = 'Authentication or permission failure.  In some cases, you may have been able to authenticate and did not have permissions on the remote directory. Consider changing the remote temp path in ansible.cfg to a path rooted in "/tmp". Failed command was: {0!s}, exited with result {1:d}'.format(cmd, result['rc'])
             if 'stdout' in result and result['stdout'] != '':
-                output = output + ": %s" % result['stdout']
+                output = output + ": {0!s}".format(result['stdout'])
             raise AnsibleError(output)
 
         # FIXME: do we still need to do this?
@@ -180,7 +180,7 @@ class ActionBase:
         # Catch failure conditions, files should never be
         # written to locations in /.
         if rc == '/':
-            raise AnsibleError('failed to resolve remote temporary directory from %s: `%s` returned empty string' % (basefile, cmd))
+            raise AnsibleError('failed to resolve remote temporary directory from {0!s}: `{1!s}` returned empty string'.format(basefile, cmd))
 
         return rc
 
@@ -215,7 +215,7 @@ class ActionBase:
             afo.write(data)
         except Exception as e:
             #raise AnsibleError("failure encoding into utf-8: %s" % str(e))
-            raise AnsibleError("failure writing module data to temporary file for transfer: %s" % str(e))
+            raise AnsibleError("failure writing module data to temporary file for transfer: {0!s}".format(str(e)))
 
         afo.flush()
         afo.close()
@@ -265,9 +265,9 @@ class ActionBase:
             # FIXME: this should probably not print to sys.stderr, but should instead
             #        fail in a more normal way?
             sys.stderr.write("warning: Calculating checksum failed unusually, please report this to the list so it can be fixed\n")
-            sys.stderr.write("command: %s\n" % cmd)
+            sys.stderr.write("command: {0!s}\n".format(cmd))
             sys.stderr.write("----\n")
-            sys.stderr.write("output: %s\n" % data)
+            sys.stderr.write("output: {0!s}\n".format(data))
             sys.stderr.write("----\n")
             # this will signal that it changed and allow things to keep going
             return "INVALIDCHECKSUM"
@@ -281,7 +281,7 @@ class ActionBase:
         expand_path = split_path[0]
         if expand_path == '~':
             if self._connection_info.become and self._connection_info.become_user:
-                expand_path = '~%s' % self._connection_info.become_user
+                expand_path = '~{0!s}'.format(self._connection_info.become_user)
 
         cmd = self._shell.expand_user(expand_path)
         debug("calling _low_level_execute_command to expand the remote user path")
@@ -339,7 +339,7 @@ class ActionBase:
         if self._connection_info.no_log:
             module_args['_ansible_no_log'] = True
 
-        debug("in _execute_module (%s, %s)" % (module_name, module_args))
+        debug("in _execute_module ({0!s}, {1!s})".format(module_name, module_args))
 
         (module_style, shebang, module_data) = self._configure_module(module_name=module_name, module_args=module_args)
         if not shebang:
@@ -391,7 +391,7 @@ class ActionBase:
             # specified in the play, not the sudo_user
             sudoable = False
 
-        debug("calling _low_level_execute_command() for command %s" % cmd)
+        debug("calling _low_level_execute_command() for command {0!s}".format(cmd))
         res = self._low_level_execute_command(cmd, tmp, sudoable=sudoable, in_data=in_data)
         debug("_low_level_execute_command returned ok")
 
@@ -425,7 +425,7 @@ class ActionBase:
             module_name = module_name,
         )
 
-        debug("done with _execute_module (%s, %s)" % (module_name, module_args))
+        debug("done with _execute_module ({0!s}, {1!s})".format(module_name, module_args))
         return data
 
     def _low_level_execute_command(self, cmd, tmp, executable=None, sudoable=True, in_data=None):
@@ -435,7 +435,7 @@ class ActionBase:
         run the module code or python directly when pipelining.
         '''
 
-        debug("in _low_level_execute_command() (%s)" % (cmd,))
+        debug("in _low_level_execute_command() ({0!s})".format(cmd))
         if not cmd:
             # this can happen with powershell modules when there is no analog to a Windows command (like chmod)
             debug("no command, exiting _low_level_execute_command()")
@@ -450,7 +450,7 @@ class ActionBase:
         if sudoable:
             cmd, prompt, success_key = self._connection_info.make_become_cmd(cmd, executable)
 
-        debug("executing the command %s through the connection" % cmd)
+        debug("executing the command {0!s} through the connection".format(cmd))
         rc, stdin, stdout, stderr = self._connection.exec_command(cmd, tmp, executable=executable, in_data=in_data)
         debug("command execution done")
 
@@ -464,7 +464,7 @@ class ActionBase:
         else:
             err = stderr
 
-        debug("done with _low_level_execute_command() (%s)" % (cmd,))
+        debug("done with _low_level_execute_command() ({0!s})".format(cmd))
         if rc is not None:
             return dict(rc=rc, stdout=out, stderr=err)
         else:

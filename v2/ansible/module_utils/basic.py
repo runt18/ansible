@@ -506,7 +506,7 @@ class AnsibleModule(object):
             ret = selinux.lgetfilecon_raw(self._to_filesystem_str(path))
         except OSError, e:
             if e.errno == errno.ENOENT:
-                self.fail_json(path=path, msg='path %s does not exist' % path)
+                self.fail_json(path=path, msg='path {0!s} does not exist'.format(path))
             else:
                 self.fail_json(path=path, msg='failed to retrieve selinux context')
         if ret[0] == -1:
@@ -598,7 +598,7 @@ class AnsibleModule(object):
             try:
                 uid = pwd.getpwnam(owner).pw_uid
             except KeyError:
-                self.fail_json(path=path, msg='chown failed: failed to look up user %s' % owner)
+                self.fail_json(path=path, msg='chown failed: failed to look up user {0!s}'.format(owner))
         if orig_uid != uid:
             if self.check_mode:
                 return True
@@ -620,7 +620,7 @@ class AnsibleModule(object):
             try:
                 gid = grp.getgrnam(group).gr_gid
             except KeyError:
-                self.fail_json(path=path, msg='chgrp failed: failed to look up group %s' % group)
+                self.fail_json(path=path, msg='chgrp failed: failed to look up group {0!s}'.format(group))
         if orig_gid != gid:
             if self.check_mode:
                 return True
@@ -706,7 +706,7 @@ class AnsibleModule(object):
                     mode_to_apply = self._get_octal_mode_from_symbolic_perms(path_stat, user, perms)
                     new_mode = self._apply_operation_to_mode(user, operator, mode_to_apply, new_mode)
             else:
-                raise ValueError("bad symbolic permission for mode: %s" % mode)
+                raise ValueError("bad symbolic permission for mode: {0!s}".format(mode))
         return new_mode
     
     def _apply_operation_to_mode(self, user, operator, mode_to_apply, current_mode):
@@ -863,7 +863,7 @@ class AnsibleModule(object):
             os.environ['LANG']     = 'C'
             os.environ['LC_CTYPE'] = 'C'
         except Exception, e:
-            self.fail_json(msg="An unknown error was encountered while attempting to validate the locale: %s" % e)
+            self.fail_json(msg="An unknown error was encountered while attempting to validate the locale: {0!s}".format(e))
 
     def _handle_aliases(self):
         aliases_results = {} #alias:canon
@@ -874,7 +874,7 @@ class AnsibleModule(object):
             required = v.get('required', False)
             if default is not None and required:
                 # not alias specific but this is a good place to check this
-                self.fail_json(msg="internal error: required and default are mutually exclusive for %s" % k)
+                self.fail_json(msg="internal error: required and default are mutually exclusive for {0!s}".format(k))
             if aliases is None:
                 continue
             if type(aliases) != list:
@@ -906,7 +906,7 @@ class AnsibleModule(object):
             #if k in ('_ansible_check_mode', '_ansible_no_log'):
             #    continue
             if k not in self._legal_inputs:
-                self.fail_json(msg="unsupported parameter for module: %s" % k)
+                self.fail_json(msg="unsupported parameter for module: {0!s}".format(k))
 
     def _count_terms(self, check):
         count = 0
@@ -921,7 +921,7 @@ class AnsibleModule(object):
         for check in spec:
             count = self._count_terms(check)
             if count > 1:
-                self.fail_json(msg="parameters are mutually exclusive: %s" % check)
+                self.fail_json(msg="parameters are mutually exclusive: {0!s}".format(check))
 
     def _check_required_one_of(self, spec):
         if spec is None:
@@ -929,7 +929,7 @@ class AnsibleModule(object):
         for check in spec:
             count = self._count_terms(check)
             if count == 0:
-                self.fail_json(msg="one of the following is required: %s" % ','.join(check))
+                self.fail_json(msg="one of the following is required: {0!s}".format(','.join(check)))
 
     def _check_required_together(self, spec):
         if spec is None:
@@ -939,7 +939,7 @@ class AnsibleModule(object):
             non_zero = [ c for c in counts if c > 0 ]
             if len(non_zero) > 0:
                 if 0 in counts:
-                    self.fail_json(msg="parameters are required together: %s" % check)
+                    self.fail_json(msg="parameters are required together: {0!s}".format(check))
 
     def _check_required_arguments(self):
         ''' ensure all required arguments are present '''
@@ -949,7 +949,7 @@ class AnsibleModule(object):
             if required and k not in self.params:
                 missing.append(k)
         if len(missing) > 0:
-            self.fail_json(msg="missing required arguments: %s" % ",".join(missing))
+            self.fail_json(msg="missing required arguments: {0!s}".format(",".join(missing)))
 
     def _check_argument_values(self):
         ''' ensure all arguments have the requested values, and there are no stray arguments '''
@@ -961,7 +961,7 @@ class AnsibleModule(object):
                 if k in self.params:
                     if self.params[k] not in choices:
                         choices_str=",".join([str(c) for c in choices])
-                        msg="value of %s must be one of: %s, got: %s" % (k, choices_str, self.params[k])
+                        msg="value of {0!s} must be one of: {1!s}, got: {2!s}".format(k, choices_str, self.params[k])
                         self.fail_json(msg=msg)
             else:
                 self.fail_json(msg="internal error: do not know how to interpret argument_spec")
@@ -1030,7 +1030,7 @@ class AnsibleModule(object):
                             except:
                                 (result, exc) = self.safe_eval(value, dict(), include_exceptions=True)
                                 if exc is not None:
-                                    self.fail_json(msg="unable to evaluate dictionary for %s" % k)
+                                    self.fail_json(msg="unable to evaluate dictionary for {0!s}".format(k))
                                 self.params[k] = result
                         elif '=' in value:
                             self.params[k] = dict([x.strip().split("=", 1) for x in value.split(",")])
@@ -1057,10 +1057,10 @@ class AnsibleModule(object):
                     else:
                         is_invalid = True
             else:
-                self.fail_json(msg="implementation error: unknown type %s requested for %s" % (wanted, k))
+                self.fail_json(msg="implementation error: unknown type {0!s} requested for {1!s}".format(wanted, k))
 
             if is_invalid:
-                self.fail_json(msg="argument %s is of invalid type: %s, required: %s" % (k, type(value), wanted))
+                self.fail_json(msg="argument {0!s} is of invalid type: {1!s}, required: {2!s}".format(k, type(value), wanted))
 
     def _set_defaults(self, pre=True):
         for (k,v) in self.argument_spec.iteritems():
@@ -1106,7 +1106,7 @@ class AnsibleModule(object):
                     param_val = param_val.encode('utf-8')
                 log_args[param] = heuristic_log_sanitize(param_val)
 
-        module = 'ansible-%s' % os.path.basename(__file__)
+        module = 'ansible-{0!s}'.format(os.path.basename(__file__))
         msg = []
         for arg in log_args:
             arg_val = log_args[arg]
@@ -1114,9 +1114,9 @@ class AnsibleModule(object):
                 arg_val = str(arg_val)
             elif isinstance(arg_val, unicode):
                 arg_val = arg_val.encode('utf-8')
-            msg.append('%s=%s ' % (arg, arg_val))
+            msg.append('{0!s}={1!s} '.format(arg, arg_val))
         if msg:
-            msg = 'Invoked with %s' % ''.join(msg)
+            msg = 'Invoked with {0!s}'.format(''.join(msg))
         else:
             msg = 'Invoked'
 
@@ -1130,7 +1130,7 @@ class AnsibleModule(object):
             for arg in log_args:
                 journal_args.append((arg.upper(), str(log_args[arg])))
             try:
-                journal.send("%s %s" % (module, msg), **dict(journal_args))
+                journal.send("{0!s} {1!s}".format(module, msg), **dict(journal_args))
             except IOError, e:
                 # fall back to syslog since logging to journal failed
                 syslog.openlog(str(module), 0, syslog.LOG_USER)
@@ -1184,7 +1184,7 @@ class AnsibleModule(object):
                 bin_path = path
                 break
         if required and bin_path is None:
-            self.fail_json(msg='Failed to find required executable %s' % arg)
+            self.fail_json(msg='Failed to find required executable {0!s}'.format(arg))
         return bin_path
 
     def boolean(self, arg):
@@ -1198,7 +1198,7 @@ class AnsibleModule(object):
         elif arg in BOOLEANS_FALSE:
             return False
         else:
-            self.fail_json(msg='Boolean %s not in either boolean list' % arg)
+            self.fail_json(msg='Boolean {0!s} not in either boolean list'.format(arg))
 
     def jsonify(self, data):
         for encoding in ("utf-8", "latin-1"):
@@ -1255,7 +1255,7 @@ class AnsibleModule(object):
         if not os.path.exists(filename):
             return None
         if os.path.isdir(filename):
-            self.fail_json(msg="attempted to take checksum of directory: %s" % filename)
+            self.fail_json(msg="attempted to take checksum of directory: {0!s}".format(filename))
         digest = digest_method
         blocksize = 64 * 1024
         infile = open(filename, 'rb')
@@ -1298,12 +1298,12 @@ class AnsibleModule(object):
         if os.path.exists(fn):
             # backups named basename-YYYY-MM-DD@HH:MM:SS~
             ext = time.strftime("%Y-%m-%d@%H:%M:%S~", time.localtime(time.time()))
-            backupdest = '%s.%s' % (fn, ext)
+            backupdest = '{0!s}.{1!s}'.format(fn, ext)
 
             try:
                 shutil.copy2(fn, backupdest)
             except (shutil.Error, IOError), e:
-                self.fail_json(msg='Could not make backup of %s to %s: %s' % (fn, backupdest, e))
+                self.fail_json(msg='Could not make backup of {0!s} to {1!s}: {2!s}'.format(fn, backupdest, e))
 
         return backupdest
 
@@ -1312,7 +1312,7 @@ class AnsibleModule(object):
             try:
                 os.unlink(tmpfile)
             except OSError, e:
-                sys.stderr.write("could not cleanup %s: %s" % (tmpfile, e))
+                sys.stderr.write("could not cleanup {0!s}: {1!s}".format(tmpfile, e))
 
     def atomic_move(self, src, dest):
         '''atomically move src to dest, copying attributes from dest, returns true on success
@@ -1354,7 +1354,7 @@ class AnsibleModule(object):
         except (IOError,OSError), e:
             # only try workarounds for errno 18 (cross device), 1 (not permitted) and 13 (permission denied)
             if e.errno != errno.EPERM and e.errno != errno.EXDEV and e.errno != errno.EACCES:
-                self.fail_json(msg='Could not replace file: %s to %s: %s' % (src, dest, e))
+                self.fail_json(msg='Could not replace file: {0!s} to {1!s}: {2!s}'.format(src, dest, e))
 
             dest_dir = os.path.dirname(dest)
             dest_file = os.path.basename(dest)
@@ -1362,7 +1362,7 @@ class AnsibleModule(object):
                 tmp_dest = tempfile.NamedTemporaryFile(
                     prefix=".ansible_tmp", dir=dest_dir, suffix=dest_file)
             except (OSError, IOError), e:
-                self.fail_json(msg='The destination directory (%s) is not writable by the current user.' % dest_dir)
+                self.fail_json(msg='The destination directory ({0!s}) is not writable by the current user.'.format(dest_dir))
 
             try: # leaves tmp file behind when sudo and  not root
                 if switched_user and os.getuid() != 0:
@@ -1384,7 +1384,7 @@ class AnsibleModule(object):
                 os.rename(tmp_dest.name, dest)
             except (shutil.Error, OSError, IOError), e:
                 self.cleanup(tmp_dest.name)
-                self.fail_json(msg='Could not replace file: %s to %s: %s' % (src, dest, e))
+                self.fail_json(msg='Could not replace file: {0!s} to {1!s}: {2!s}'.format(src, dest, e))
 
         if creating:
             # make sure the file has the correct permissions
@@ -1451,7 +1451,7 @@ class AnsibleModule(object):
         # Set a temporary env path if a prefix is passed
         env=os.environ
         if path_prefix:
-            env['PATH']="%s:%s" % (path_prefix, env['PATH'])
+            env['PATH']="{0!s}:{1!s}".format(path_prefix, env['PATH'])
 
         # create a printable version of the command for use
         # in reporting later, which strips out things like
@@ -1476,7 +1476,7 @@ class AnsibleModule(object):
             if PASSWD_ARG_RE.match(arg):
                 sep_idx = arg.find('=')
                 if sep_idx > -1:
-                    clean_args.append('%s=********' % arg[:sep_idx])
+                    clean_args.append('{0!s}=********'.format(arg[:sep_idx]))
                     continue
                 else:
                     is_passwd = True
@@ -1508,7 +1508,7 @@ class AnsibleModule(object):
             try:
                 os.chdir(cwd)
             except (OSError, IOError), e:
-                self.fail_json(rc=e.errno, msg="Could not open %s, %s" % (cwd, str(e)))
+                self.fail_json(rc=e.errno, msg="Could not open {0!s}, {1!s}".format(cwd, str(e)))
 
         try:
             cmd = subprocess.Popen(args, **kwargs)
@@ -1594,7 +1594,7 @@ class AnsibleModule(object):
         for limit, suffix in ranges:
             if size >= limit:
                 break
-        return '%.2f %s' % (float(size)/ limit, suffix)
+        return '{0:.2f} {1!s}'.format(float(size)/ limit, suffix)
 
 def get_module_path():
     return os.path.dirname(os.path.realpath(__file__))

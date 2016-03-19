@@ -28,18 +28,18 @@ def delete_gce_resources(get_func, attr, opts):
     for item in get_func():
         val = getattr(item, attr)
         if re.search(opts.match_re, val, re.IGNORECASE):
-            prompt_and_delete(item, "Delete matching %s? [y/n]: " % (item,), opts.assumeyes)
+            prompt_and_delete(item, "Delete matching {0!s}? [y/n]: ".format(item), opts.assumeyes)
 
 def prompt_and_delete(item, prompt, assumeyes):
     if not assumeyes:
         assumeyes = raw_input(prompt).lower() == 'y'
-    assert hasattr(item, 'destroy'), "Class <%s> has no delete attribute" % item.__class__
+    assert hasattr(item, 'destroy'), "Class <{0!s}> has no delete attribute".format(item.__class__)
     if assumeyes:
         item.destroy()
-        print ("Deleted %s" % item)
+        print ("Deleted {0!s}".format(item))
 
 def parse_args():
-    parser = optparse.OptionParser(usage="%s [options]" % (sys.argv[0],),
+    parser = optparse.OptionParser(usage="{0!s} [options]".format(sys.argv[0]),
                 description=__doc__)
     gce_credentials.add_credentials_options(parser)
     parser.add_option("--yes", "-y",

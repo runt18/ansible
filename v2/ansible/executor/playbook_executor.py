@@ -73,7 +73,7 @@ class PlaybookExecutor:
 
                 i = 1
                 plays = pb.get_plays()
-                self._display.vv('%d plays in %s' % (len(plays), playbook_path))
+                self._display.vv('{0:d} plays in {1!s}'.format(len(plays), playbook_path))
 
                 for play in plays:
                     self._inventory.remove_restriction()
@@ -90,7 +90,7 @@ class PlaybookExecutor:
 
                         pname =  new_play.get_name().strip()
                         if pname == 'PLAY: <no name specified>':
-                            pname = 'PLAY: #%d' % i
+                            pname = 'PLAY: #{0:d}'.format(i)
                         p = { 'name': pname }
 
                         if self._options.listhosts:
@@ -149,7 +149,7 @@ class PlaybookExecutor:
         for h in hosts:
             t = self._tqm._stats.summarize(h)
 
-            self._display.display("%s : %s %s %s %s" % (
+            self._display.display("{0!s} : {1!s} {2!s} {3!s} {4!s}".format(
                 hostcolor(h, t),
                 colorize('ok', t['ok'], 'green'),
                 colorize('changed', t['changed'], 'yellow'),
@@ -158,7 +158,7 @@ class PlaybookExecutor:
                 screen_only=True
             )
 
-            self._display.display("%s : %s %s %s %s" % (
+            self._display.display("{0!s} : {1!s} {2!s} {3!s} {4!s}".format(
                 hostcolor(h, t, False),
                 colorize('ok', t['ok'], None),
                 colorize('changed', t['changed'], None),

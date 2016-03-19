@@ -134,7 +134,7 @@ def key_for_hostname(hostname):
         raise errors.AnsibleError('ACCELERATE_KEYS_DIR is not a directory.')
 
     if stat.S_IMODE(os.stat(key_path).st_mode) != int(C.ACCELERATE_KEYS_DIR_PERMS, 8):
-        raise errors.AnsibleError('Incorrect permissions on the private key directory. Use `chmod 0%o %s` to correct this issue, and make sure any of the keys files contained within that directory are set to 0%o' % (int(C.ACCELERATE_KEYS_DIR_PERMS, 8), C.ACCELERATE_KEYS_DIR, int(C.ACCELERATE_KEYS_FILE_PERMS, 8)))
+        raise errors.AnsibleError('Incorrect permissions on the private key directory. Use `chmod 0{0:o} {1!s}` to correct this issue, and make sure any of the keys files contained within that directory are set to 0{2:o}'.format(int(C.ACCELERATE_KEYS_DIR_PERMS, 8), C.ACCELERATE_KEYS_DIR, int(C.ACCELERATE_KEYS_FILE_PERMS, 8)))
 
     key_path = os.path.join(key_path, hostname)
 
@@ -148,7 +148,7 @@ def key_for_hostname(hostname):
         return key
     else:
         if stat.S_IMODE(os.stat(key_path).st_mode) != int(C.ACCELERATE_KEYS_FILE_PERMS, 8):
-            raise errors.AnsibleError('Incorrect permissions on the key file for this host. Use `chmod 0%o %s` to correct this issue.' % (int(C.ACCELERATE_KEYS_FILE_PERMS, 8), key_path))
+            raise errors.AnsibleError('Incorrect permissions on the key file for this host. Use `chmod 0{0:o} {1!s}` to correct this issue.'.format(int(C.ACCELERATE_KEYS_FILE_PERMS, 8), key_path))
         fh = open(key_path)
         key = AesKey.Read(fh.read())
         fh.close()
@@ -178,7 +178,7 @@ def read_vault_file(vault_password_file):
                 # STDERR not captured to make it easier for users to prompt for input in their scripts
                 p = subprocess.Popen(this_path, stdout=subprocess.PIPE)
             except OSError, e:
-                raise errors.AnsibleError("problem running %s (%s)" % (' '.join(this_path), e))
+                raise errors.AnsibleError("problem running {0!s} ({1!s})".format(' '.join(this_path), e))
             stdout, stderr = p.communicate()
             vault_pass = stdout.strip('\r\n')
         else:
@@ -187,7 +187,7 @@ def read_vault_file(vault_password_file):
                 vault_pass=f.read().strip()
                 f.close()
             except (OSError, IOError), e:
-                raise errors.AnsibleError("Could not read %s: %s" % (this_path, e))
+                raise errors.AnsibleError("Could not read {0!s}: {1!s}".format(this_path, e))
 
         return vault_pass
     else:
@@ -265,7 +265,7 @@ def check_conditional(conditional, basedir, inject, fail_on_undefined=False):
     conditional = template.template(basedir, conditional, inject, fail_on_undefined=fail_on_undefined)
     original = to_unicode(conditional, nonstring='simplerepr').replace("jinja2_compare ","")
     # a Jinja2 evaluation that results in something Python can eval!
-    presented = "{%% if %s %%} True {%% else %%} False {%% endif %%}" % conditional
+    presented = "{{% if {0!s} %}} True {{% else %}} False {{% endif %}}".format(conditional)
     conditional = template.template(basedir, presented, inject)
     val = conditional.strip()
     if val == presented:
@@ -278,13 +278,13 @@ def check_conditional(conditional, basedir, inject, fail_on_undefined=False):
         elif "is defined" in conditional:
             return False
         else:
-            raise errors.AnsibleError("error while evaluating conditional: %s" % original)
+            raise errors.AnsibleError("error while evaluating conditional: {0!s}".format(original))
     elif val == "True":
         return True
     elif val == "False":
         return False
     else:
-        raise errors.AnsibleError("unable to evaluate conditional: %s" % original)
+        raise errors.AnsibleError("unable to evaluate conditional: {0!s}".format(original))
 
 def is_executable(path):
     '''is the given path executable?'''
@@ -316,9 +316,9 @@ def prepare_writeable_dir(tree,mode=0777):
         try:
             os.makedirs(tree, mode)
         except (IOError, OSError), e:
-            raise errors.AnsibleError("Could not make dir %s: %s" % (tree, e))
+            raise errors.AnsibleError("Could not make dir {0!s}: {1!s}".format(tree, e))
     if not os.access(tree, os.W_OK):
-        raise errors.AnsibleError("Cannot write to path %s" % tree)
+        raise errors.AnsibleError("Cannot write to path {0!s}".format(tree))
     return tree
 
 def path_dwim(basedir, given):
@@ -358,7 +358,7 @@ def path_dwim_relative(original, dirname, source, playbook_base, check=True):
     if os.path.exists(obvious_local_path):
         return obvious_local_path
     if check:
-        raise errors.AnsibleError("input file not found at %s or %s" % (source2, obvious_local_path))
+        raise errors.AnsibleError("input file not found at {0!s} or {1!s}".format(source2, obvious_local_path))
     return source2 # which does not exist
 
 def repo_url_to_role_name(repo_url):
@@ -456,7 +456,7 @@ def json_loads(data):
     try:
         loaded = json.loads(data)
     except ValueError,e:
-        raise errors.AnsibleError("Unable to read provided data as JSON: %s" % str(e))
+        raise errors.AnsibleError("Unable to read provided data as JSON: {0!s}".format(str(e)))
 
     return loaded
 
@@ -562,9 +562,9 @@ def serialize_args(args):
     module_args = ""
     for (k,v) in args.iteritems():
         if isinstance(v, basestring):
-            module_args = "%s=%s %s" % (k, pipes.quote(v), module_args)
+            module_args = "{0!s}={1!s} {2!s}".format(k, pipes.quote(v), module_args)
         elif isinstance(v, bool):
-            module_args = "%s=%s %s" % (k, str(v), module_args)
+            module_args = "{0!s}={1!s} {2!s}".format(k, str(v), module_args)
     return module_args.strip()
 
 def merge_module_args(current_args, new_args):
@@ -705,12 +705,12 @@ def process_yaml_error(exc, data, path=None, show_content=True):
                 before_probline = ''
             probline = data.split("\n")[mark.line]
             arrow = " " * mark.column + "^"
-            msg = """Syntax Error while loading YAML script, %s
-Note: The error may actually appear before this position: line %s, column %s
+            msg = """Syntax Error while loading YAML script, {0!s}
+Note: The error may actually appear before this position: line {1!s}, column {2!s}
 
-%s
-%s
-%s""" % (path, mark.line + 1, mark.column + 1, before_probline, probline, arrow)
+{3!s}
+{4!s}
+{5!s}""".format(path, mark.line + 1, mark.column + 1, before_probline, probline, arrow)
 
             unquoted_var = None
             if '{{' in probline and '}}' in probline:
@@ -738,16 +738,16 @@ Should be written as:
             # most likely displaying a file with sensitive content,
             # so don't show any of the actual lines of yaml just the
             # line number itself
-            msg = """Syntax error while loading YAML script, %s
-The error appears to have been on line %s, column %s, but may actually
+            msg = """Syntax error while loading YAML script, {0!s}
+The error appears to have been on line {1!s}, column {2!s}, but may actually
 be before there depending on the exact syntax problem.
-""" % (path, mark.line + 1, mark.column + 1)
+""".format(path, mark.line + 1, mark.column + 1)
 
     else:
         # No problem markers means we have to throw a generic
         # "stuff messed up" type message. Sry bud.
         if path:
-            msg = "Could not parse YAML. Check over %s again." % path
+            msg = "Could not parse YAML. Check over {0!s} again.".format(path)
         else:
             msg = "Could not parse YAML."
     raise errors.AnsibleYAMLValidationFailed(msg)
@@ -762,7 +762,7 @@ def parse_yaml_from_file(path, vault_password=None):
     try:
         data = open(path).read()
     except IOError:
-        raise errors.AnsibleError("file could not read: %s" % path)
+        raise errors.AnsibleError("file could not read: {0!s}".format(path))
 
     vault = VaultLib(password=vault_password)
     if vault.is_encrypted(data):
@@ -770,7 +770,7 @@ def parse_yaml_from_file(path, vault_password=None):
         # the decrypt call would throw an error, but we check first
         # since the decrypt function doesn't know the file name
         if vault_password is None:
-            raise errors.AnsibleError("A vault password must be specified to decrypt %s" % path)
+            raise errors.AnsibleError("A vault password must be specified to decrypt {0!s}".format(path))
         data = vault.decrypt(data)
         show_content = False
 
@@ -800,7 +800,7 @@ def _validate_both_dicts(a, b):
 
     if not (isinstance(a, dict) and isinstance(b, dict)):
         raise errors.AnsibleError(
-            "failed to combine variables, expected dicts but got a '%s' and a '%s'" % (type(a).__name__, type(b).__name__)
+            "failed to combine variables, expected dicts but got a '{0!s}' and a '{1!s}'".format(type(a).__name__, type(b).__name__)
         )
 
 def merge_hash(a, b):
@@ -900,7 +900,7 @@ def version(prog):
     gitinfo = _gitinfo()
     if gitinfo:
         result = result + " {0}".format(gitinfo)
-    result = result + "\n  configured module search path = %s" % C.DEFAULT_MODULE_PATH
+    result = result + "\n  configured module search path = {0!s}".format(C.DEFAULT_MODULE_PATH)
     return result
 
 def version_info(gitinfo=False):
@@ -956,7 +956,7 @@ def sanitize_output(arg_string):
             v = 'VALUE_HIDDEN'
         else:
             v = heuristic_log_sanitize(v)
-        output.append('%s=%s' % (k, v))
+        output.append('{0!s}={1!s}'.format(k, v))
 
     output = ' '.join(output)
     return output
@@ -986,14 +986,14 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
         callback=increment_debug, help="verbose mode (-vvv for more, -vvvv to enable connection debugging)")
 
     parser.add_option('-f','--forks', dest='forks', default=constants.DEFAULT_FORKS, type='int',
-        help="specify number of parallel processes to use (default=%s)" % constants.DEFAULT_FORKS)
+        help="specify number of parallel processes to use (default={0!s})".format(constants.DEFAULT_FORKS))
     parser.add_option('-i', '--inventory-file', dest='inventory',
-        help="specify inventory host file (default=%s)" % constants.DEFAULT_HOST_LIST,
+        help="specify inventory host file (default={0!s})".format(constants.DEFAULT_HOST_LIST),
         default=constants.DEFAULT_HOST_LIST)
     parser.add_option('-e', '--extra-vars', dest="extra_vars", action="append",
         help="set additional variables as key=value or YAML/JSON", default=[])
     parser.add_option('-u', '--user', default=constants.DEFAULT_REMOTE_USER, dest='remote_user',
-        help='connect as this user (default=%s)' % constants.DEFAULT_REMOTE_USER)
+        help='connect as this user (default={0!s})'.format(constants.DEFAULT_REMOTE_USER))
     parser.add_option('-k', '--ask-pass', default=False, dest='ask_pass', action='store_true',
         help='ask for SSH password')
     parser.add_option('--private-key', default=constants.DEFAULT_PRIVATE_KEY_FILE, dest='private_key_file',
@@ -1005,7 +1005,7 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
     parser.add_option('--list-hosts', dest='listhosts', action='store_true',
         help='outputs a list of matching hosts; does not execute anything else')
     parser.add_option('-M', '--module-path', dest='module_path',
-        help="specify path(s) to module library (default=%s)" % constants.DEFAULT_MODULE_PATH,
+        help="specify path(s) to module library (default={0!s})".format(constants.DEFAULT_MODULE_PATH),
         default=None)
 
     if subset_opts:
@@ -1014,7 +1014,7 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
 
     parser.add_option('-T', '--timeout', default=constants.DEFAULT_TIMEOUT, type='int',
         dest='timeout',
-        help="override the SSH timeout in seconds (default=%s)" % constants.DEFAULT_TIMEOUT)
+        help="override the SSH timeout in seconds (default={0!s})".format(constants.DEFAULT_TIMEOUT))
 
     if output_opts:
         parser.add_option('-o', '--one-line', dest='one_line', action='store_true',
@@ -1035,15 +1035,15 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
         parser.add_option('-S', '--su', default=constants.DEFAULT_SU, action='store_true',
             help='run operations with su (deprecated, use become)')
         parser.add_option('-R', '--su-user', default=None,
-            help='run operations with su as this user (default=%s) (deprecated, use become)' % constants.DEFAULT_SU_USER)
+            help='run operations with su as this user (default={0!s}) (deprecated, use become)'.format(constants.DEFAULT_SU_USER))
 
         # consolidated privilege escalation (become)
         parser.add_option("-b", "--become", default=constants.DEFAULT_BECOME, action="store_true", dest='become',
             help="run operations with become (nopasswd implied)")
         parser.add_option('--become-method', dest='become_method', default=constants.DEFAULT_BECOME_METHOD, type='string',
-            help="privilege escalation method to use (default=%s), valid choices: [ %s ]" % (constants.DEFAULT_BECOME_METHOD, ' | '.join(constants.BECOME_METHODS)))
+            help="privilege escalation method to use (default={0!s}), valid choices: [ {1!s} ]".format(constants.DEFAULT_BECOME_METHOD, ' | '.join(constants.BECOME_METHODS)))
         parser.add_option('--become-user', default=None, dest='become_user', type='string',
-            help='run operations as this user (default=%s)' % constants.DEFAULT_BECOME_USER)
+            help='run operations as this user (default={0!s})'.format(constants.DEFAULT_BECOME_USER))
         parser.add_option('--ask-become-pass', default=False, dest='become_ask_pass', action='store_true',
             help='ask for privilege escalation password')
 
@@ -1051,12 +1051,12 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
     if connect_opts:
         parser.add_option('-c', '--connection', dest='connection',
                           default=constants.DEFAULT_TRANSPORT,
-                          help="connection type to use (default=%s)" % constants.DEFAULT_TRANSPORT)
+                          help="connection type to use (default={0!s})".format(constants.DEFAULT_TRANSPORT))
 
     if async_opts:
         parser.add_option('-P', '--poll', default=constants.DEFAULT_POLL_INTERVAL, type='int',
             dest='poll_interval',
-            help="set the poll interval if using -B (default=%s)" % constants.DEFAULT_POLL_INTERVAL)
+            help="set the poll interval if using -B (default={0!s})".format(constants.DEFAULT_POLL_INTERVAL))
         parser.add_option('-B', '--background', dest='seconds', type='int', default=0,
             help='run asynchronously, failing after X seconds (default=N/A)')
 
@@ -1124,11 +1124,11 @@ def ask_passwords(ask_pass=False, become_ask_pass=False, ask_vault_pass=False, b
 
     if ask_pass:
         sshpass = getpass.getpass(prompt="SSH password: ")
-        become_prompt = "%s password[defaults to SSH password]: " % become_method.upper()
+        become_prompt = "{0!s} password[defaults to SSH password]: ".format(become_method.upper())
         if sshpass:
             sshpass = to_bytes(sshpass, errors='strict', nonstring='simplerepr')
     else:
-        become_prompt = "%s password: " % become_method.upper()
+        become_prompt = "{0!s} password: ".format(become_method.upper())
 
     if become_ask_pass:
         becomepass = getpass.getpass(prompt=become_prompt)
@@ -1174,7 +1174,7 @@ def do_encrypt(result, encrypt, salt_size=None, salt=None):
         try:
             crypt = getattr(passlib.hash, encrypt)
         except:
-            raise errors.AnsibleError("passlib does not support '%s' algorithm" % encrypt)
+            raise errors.AnsibleError("passlib does not support '{0!s}' algorithm".format(encrypt))
 
         if salt_size:
             result = crypt.encrypt(result, salt_size=salt_size)
@@ -1227,7 +1227,7 @@ def make_become_cmd(cmd, user, shell, method, flags=None, exe=None):
     """
 
     randbits = ''.join(chr(random.randint(ord('a'), ord('z'))) for x in xrange(32))
-    success_key = 'BECOME-SUCCESS-%s' % randbits
+    success_key = 'BECOME-SUCCESS-{0!s}'.format(randbits)
     prompt = None
     becomecmd = None
 
@@ -1239,32 +1239,31 @@ def make_become_cmd(cmd, user, shell, method, flags=None, exe=None):
         # directly doesn't work, so we shellquote it with pipes.quote() and pass the quoted
         # string to the user's shell.  We loop reading output until we see the randomly-generated
         # sudo prompt set with the -p option.
-        prompt = '[sudo via ansible, key=%s] password: ' % randbits
+        prompt = '[sudo via ansible, key={0!s}] password: '.format(randbits)
         exe = exe or C.DEFAULT_SUDO_EXE
-        becomecmd = '%s -k && %s %s -S -p "%s" -u %s %s -c %s' % \
-            (exe, exe, flags or C.DEFAULT_SUDO_FLAGS, prompt, user, shell, pipes.quote('echo %s; %s' % (success_key, cmd)))
+        becomecmd = '{0!s} -k && {1!s} {2!s} -S -p "{3!s}" -u {4!s} {5!s} -c {6!s}'.format(exe, exe, flags or C.DEFAULT_SUDO_FLAGS, prompt, user, shell, pipes.quote('echo {0!s}; {1!s}'.format(success_key, cmd)))
 
     elif method == 'su':
         exe = exe or C.DEFAULT_SU_EXE
         flags = flags or C.DEFAULT_SU_FLAGS
-        becomecmd = '%s %s %s -c "%s -c %s"' % (exe, flags, user, shell, pipes.quote('echo %s; %s' % (success_key, cmd)))
+        becomecmd = '{0!s} {1!s} {2!s} -c "{3!s} -c {4!s}"'.format(exe, flags, user, shell, pipes.quote('echo {0!s}; {1!s}'.format(success_key, cmd)))
 
     elif method == 'pbrun':
         prompt = 'assword:'
         exe = exe or 'pbrun'
         flags = flags or ''
-        becomecmd = '%s -b -l %s -u %s "%s"' % (exe, flags, user, pipes.quote('echo %s; %s' % (success_key,cmd)))
+        becomecmd = '{0!s} -b -l {1!s} -u {2!s} "{3!s}"'.format(exe, flags, user, pipes.quote('echo {0!s}; {1!s}'.format(success_key, cmd)))
 
     elif method == 'pfexec':
         exe = exe or 'pfexec'
         flags = flags or ''
         # No user as it uses it's own exec_attr to figure it out
-        becomecmd = '%s %s "%s"' % (exe, flags, pipes.quote('echo %s; %s' % (success_key,cmd)))
+        becomecmd = '{0!s} {1!s} "{2!s}"'.format(exe, flags, pipes.quote('echo {0!s}; {1!s}'.format(success_key, cmd)))
 
     if becomecmd is None:
-        raise errors.AnsibleError("Privilege escalation method not found: %s" % method)
+        raise errors.AnsibleError("Privilege escalation method not found: {0!s}".format(method))
 
-    return (('%s -c ' % shell) + pipes.quote(becomecmd), prompt, success_key)
+    return (('{0!s} -c '.format(shell)) + pipes.quote(becomecmd), prompt, success_key)
 
 
 def make_sudo_cmd(sudo_exe, sudo_user, executable, cmd):
@@ -1293,16 +1292,16 @@ def get_diff(diff):
             if 'src_binary' in diff:
                 ret.append("diff skipped: source file appears to be binary\n")
             if 'dst_larger' in diff:
-                ret.append("diff skipped: destination file size is greater than %d\n" % diff['dst_larger'])
+                ret.append("diff skipped: destination file size is greater than {0:d}\n".format(diff['dst_larger']))
             if 'src_larger' in diff:
-                ret.append("diff skipped: source file size is greater than %d\n" % diff['src_larger'])
+                ret.append("diff skipped: source file size is greater than {0:d}\n".format(diff['src_larger']))
             if 'before' in diff and 'after' in diff:
                 if 'before_header' in diff:
-                    before_header = "before: %s" % diff['before_header']
+                    before_header = "before: {0!s}".format(diff['before_header'])
                 else:
                     before_header = 'before'
                 if 'after_header' in diff:
-                    after_header = "after: %s" % diff['after_header']
+                    after_header = "after: {0!s}".format(diff['after_header'])
                 else:
                     after_header = 'after'
                 differ = difflib.unified_diff(to_unicode(diff['before']).splitlines(True), to_unicode(diff['after']).splitlines(True), before_header, after_header, '', '', 10)
@@ -1408,12 +1407,12 @@ def safe_eval(expr, locals={}, include_exceptions=False):
     class CleansingNodeVisitor(ast.NodeVisitor):
         def generic_visit(self, node, inside_call=False):
             if type(node) not in SAFE_NODES:
-                raise Exception("invalid expression (%s)" % expr)
+                raise Exception("invalid expression ({0!s})".format(expr))
             elif isinstance(node, ast.Call):
                 inside_call = True
             elif isinstance(node, ast.Name) and inside_call:
                 if hasattr(builtin, node.id) and node.id not in CALL_WHITELIST:
-                    raise Exception("invalid function: %s" % node.id)
+                    raise Exception("invalid function: {0!s}".format(node.id))
             # iterate over all child nodes
             for child_node in ast.iter_child_nodes(node):
                 self.generic_visit(child_node, inside_call)
@@ -1465,7 +1464,7 @@ def listify_lookup_plugin_terms(terms, basedir, inject):
             # if not already a list, get ready to evaluate with Jinja2
             # not sure why the "/" is in above code :)
             try:
-                new_terms = template.template(basedir, "{{ %s }}" % terms, inject)
+                new_terms = template.template(basedir, "{{{{ {0!s} }}}}".format(terms), inject)
                 if isinstance(new_terms, basestring) and "{{" in new_terms:
                     pass
                 else:
@@ -1584,7 +1583,7 @@ def _load_vars_from_path(path, results, vault_password=None):
         data = parse_yaml_from_file(path, vault_password=vault_password)
         if data and type(data) != dict:
             raise errors.AnsibleError(
-                "%s must be stored as a dictionary/hash" % path)
+                "{0!s} must be stored as a dictionary/hash".format(path))
         elif data is None:
             data = {}
 
@@ -1609,8 +1608,7 @@ def _load_vars_from_folder(folder_path, results, vault_password=None):
         names = os.listdir(folder_path)
     except os.error, err:
         raise errors.AnsibleError(
-            "This folder cannot be listed: %s: %s."
-             % ( folder_path, err.strerror))
+            "This folder cannot be listed: {0!s}: {1!s}.".format(folder_path, err.strerror))
 
     # evaluate files in a stable order rather than whatever order the
     # filesystem lists them.

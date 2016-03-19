@@ -72,7 +72,7 @@ class SphinxBuilder(object):
         except ImportError, ie:
             traceback.print_exc()
         except Exception, ex:
-            print >> sys.stderr, "FAIL! exiting ... (%s)" % ex
+            print >> sys.stderr, "FAIL! exiting ... ({0!s})".format(ex)
 
     def build_docs(self):
         self.app.builder.build_all()

@@ -48,5 +48,5 @@ class LookupModule(object):
             if p.returncode == 0:
                 ret.append(stdout.decode("utf-8").rstrip())
             else:
-                raise errors.AnsibleError("lookup_plugin.pipe(%s) returned %d" % (term, p.returncode))
+                raise errors.AnsibleError("lookup_plugin.pipe({0!s}) returned {1:d}".format(term, p.returncode))
         return ret

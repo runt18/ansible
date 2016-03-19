@@ -73,29 +73,28 @@ class ActionModule(object):
                     self.seconds = int(args['seconds'])
                     self.duration_unit = 'seconds'
             except ValueError, e:
-                raise ae("non-integer value given for prompt duration:\n%s" % str(e))
+                raise ae("non-integer value given for prompt duration:\n{0!s}".format(str(e)))
         # Is 'prompt' a key in 'args'?
         elif 'prompt' in args:
             self.pause_type = 'prompt'
-            self.prompt = "[%s]\n%s:\n" % (hosts, args['prompt'])
+            self.prompt = "[{0!s}]\n{1!s}:\n".format(hosts, args['prompt'])
         # Is 'args' empty, then this is the default prompted pause
         elif len(args.keys()) == 0:
             self.pause_type = 'prompt'
-            self.prompt = "[%s]\nPress enter to continue:\n" % hosts
+            self.prompt = "[{0!s}]\nPress enter to continue:\n".format(hosts)
         # I have no idea what you're trying to do. But it's so wrong.
         else:
-            raise ae("invalid pause type given. must be one of: %s" % \
-                         ", ".join(self.PAUSE_TYPES))
+            raise ae("invalid pause type given. must be one of: {0!s}".format( \
+                         ", ".join(self.PAUSE_TYPES)))
 
-        vv("created 'pause' ActionModule: pause_type=%s, duration_unit=%s, calculated_seconds=%s, prompt=%s" % \
-                (self.pause_type, self.duration_unit, self.seconds, self.prompt))
+        vv("created 'pause' ActionModule: pause_type={0!s}, duration_unit={1!s}, calculated_seconds={2!s}, prompt={3!s}".format(self.pause_type, self.duration_unit, self.seconds, self.prompt))
 
         ########################################################################
         # Begin the hard work!
         try:
             self._start()
             if not self.pause_type == 'prompt':
-                print "[%s]\nPausing for %s seconds" % (hosts, self.seconds)
+                print "[{0!s}]\nPausing for {1!s} seconds".format(hosts, self.seconds)
                 time.sleep(self.seconds)
             else:
                 # Clear out any unflushed buffered input which would
@@ -136,4 +135,4 @@ class ActionModule(object):
         else:
             duration = round(duration, 2)
 
-        self.result['stdout'] = "Paused for %s %s" % (duration, self.duration_unit)
+        self.result['stdout'] = "Paused for {0!s} {1!s}".format(duration, self.duration_unit)

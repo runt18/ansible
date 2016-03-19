@@ -78,7 +78,7 @@ class Connection(object):
         self.zlogin_cmd = self._search_executable('zlogin')
         
         if not self.zone in self.list_zones():
-            raise errors.AnsibleError("incorrect zone name %s" % self.zone)
+            raise errors.AnsibleError("incorrect zone name {0!s}".format(self.zone))
 
 
         self.host = host
@@ -97,14 +97,14 @@ class Connection(object):
         if executable:
             local_cmd = [self.zlogin_cmd, self.zone, executable, cmd]
         else:
-            local_cmd = '%s "%s" %s' % (self.zlogin_cmd, self.zone, cmd)
+            local_cmd = '{0!s} "{1!s}" {2!s}'.format(self.zlogin_cmd, self.zone, cmd)
         return local_cmd
 
     def exec_command(self, cmd, tmp_path, become_user=None, sudoable=False, executable=None, in_data=None):
         ''' run a command on the zone '''
 
         if sudoable and self.runner.become and self.runner.become_method not in self.become_methods_supported:
-            raise errors.AnsibleError("Internal Error: this module does not support running commands via %s" % self.runner.become_method)
+            raise errors.AnsibleError("Internal Error: this module does not support running commands via {0!s}".format(self.runner.become_method))
 
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
@@ -114,7 +114,7 @@ class Connection(object):
           executable = None
         local_cmd = self._generate_cmd(executable, cmd)
 
-        vvv("EXEC %s" % (local_cmd), host=self.zone)
+        vvv("EXEC {0!s}".format((local_cmd)), host=self.zone)
         p = subprocess.Popen(local_cmd, shell=isinstance(local_cmd, basestring),
                              cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,
@@ -131,21 +131,21 @@ class Connection(object):
 
     def _copy_file(self, in_path, out_path):
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         try:
             shutil.copyfile(in_path, out_path)
         except shutil.Error:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to copy: %s and %s are the same" % (in_path, out_path))
+            raise errors.AnsibleError("failed to copy: {0!s} and {1!s} are the same".format(in_path, out_path))
         except IOError:
             traceback.print_exc()
-            raise errors.AnsibleError("failed to transfer file to %s" % out_path)
+            raise errors.AnsibleError("failed to transfer file to {0!s}".format(out_path))
 
     def put_file(self, in_path, out_path):
         ''' transfer a file from local to zone '''
 
         out_path = self._normalize_path(out_path, self.get_zone_path())
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.zone)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.zone)
 
         self._copy_file(in_path, out_path)
 
@@ -153,7 +153,7 @@ class Connection(object):
         ''' fetch a file from zone to local '''
 
         in_path = self._normalize_path(in_path, self.get_zone_path())
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.zone)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.zone)
 
         self._copy_file(in_path, out_path)
 

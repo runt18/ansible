@@ -48,9 +48,9 @@ class AnsibleError(Exception):
         if obj and isinstance(obj, AnsibleBaseYAMLObject):
             extended_error = self._get_extended_error()
             if extended_error:
-                self.message = 'ERROR! %s\n\n%s' % (message, extended_error)
+                self.message = 'ERROR! {0!s}\n\n{1!s}'.format(message, extended_error)
         else:
-            self.message = 'ERROR! %s' % message
+            self.message = 'ERROR! {0!s}'.format(message)
 
     def __str__(self):
         return self.message
@@ -100,7 +100,7 @@ class AnsibleError(Exception):
                     stripped_line = target_line.replace(" ","")
                     arrow_line    = (" " * (col_number-1)) + "^ here"
                     #header_line   = ("=" * 73)
-                    error_message += "\nThe offending line appears to be:\n\n%s\n%s\n%s\n" % (prev_line.rstrip(), target_line.rstrip(), arrow_line)
+                    error_message += "\nThe offending line appears to be:\n\n{0!s}\n{1!s}\n{2!s}\n".format(prev_line.rstrip(), target_line.rstrip(), arrow_line)
 
                     # common error/remediation checking here:
                     # check for unquoted vars starting lines

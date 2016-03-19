@@ -119,8 +119,8 @@ class Inventory(object):
                         self.groups = self.parser.groups.values()
                     except:
                         if not shebang_present:
-                            raise errors.AnsibleError("The file %s is marked as executable, but failed to execute correctly. " % host_list + \
-                                                      "If this is not supposed to be an executable script, correct this with `chmod -x %s`." % host_list)
+                            raise errors.AnsibleError("The file {0!s} is marked as executable, but failed to execute correctly. ".format(host_list) + \
+                                                      "If this is not supposed to be an executable script, correct this with `chmod -x {0!s}`.".format(host_list))
                         else:
                             raise
                 else:
@@ -129,8 +129,8 @@ class Inventory(object):
                         self.groups = self.parser.groups.values()
                     except:
                         if shebang_present:
-                            raise errors.AnsibleError("The file %s looks like it should be an executable inventory script, but is not marked executable. " % host_list + \
-                                                      "Perhaps you want to correct this with `chmod +x %s`?" % host_list)
+                            raise errors.AnsibleError("The file {0!s} looks like it should be an executable inventory script, but is not marked executable. ".format(host_list) + \
+                                                      "Perhaps you want to correct this with `chmod +x {0!s}`?".format(host_list))
                         else:
                             raise
 
@@ -156,7 +156,7 @@ class Inventory(object):
             else:
                 return fnmatch.fnmatch(str, pattern_str)
         except Exception, e:
-            raise errors.AnsibleError('invalid host pattern: %s' % pattern_str)
+            raise errors.AnsibleError('invalid host pattern: {0!s}'.format(pattern_str))
 
     def _match_list(self, items, item_attr, pattern_str):
         results = []
@@ -166,7 +166,7 @@ class Inventory(object):
             else:
                 pattern = re.compile(pattern_str[1:])
         except Exception, e:
-            raise errors.AnsibleError('invalid host pattern: %s' % pattern_str)
+            raise errors.AnsibleError('invalid host pattern: {0!s}'.format(pattern_str))
 
         for item in items:
             if pattern.match(getattr(item, item_attr)):
@@ -314,7 +314,7 @@ class Inventory(object):
             else:
                 return [ hosts[left] ]
         except IndexError:
-            raise errors.AnsibleError("no hosts matching the pattern '%s' were found" % pat)
+            raise errors.AnsibleError("no hosts matching the pattern '{0!s}' were found".format(pat))
 
     def _create_implicit_localhost(self, pattern):
         new_host = Host(pattern)
@@ -420,7 +420,7 @@ class Inventory(object):
 
         group = self.get_group(groupname)
         if group is None:
-            raise errors.AnsibleError("group not found: %s" % groupname)
+            raise errors.AnsibleError("group not found: {0!s}".format(groupname))
 
         vars = {}
 
@@ -439,7 +439,7 @@ class Inventory(object):
 
         host = self.get_host(hostname)
         if not host:
-            raise errors.AnsibleError("host not found: %s" % hostname)
+            raise errors.AnsibleError("host not found: {0!s}".format(hostname))
         return host.get_variables()
 
     def get_host_variables(self, hostname, update_cached=False, vault_password=None):
@@ -452,7 +452,7 @@ class Inventory(object):
 
         host = self.get_host(hostname)
         if host is None:
-            raise errors.AnsibleError("host not found: %s" % hostname)
+            raise errors.AnsibleError("host not found: {0!s}".format(hostname))
 
         vars = {}
 
@@ -484,7 +484,7 @@ class Inventory(object):
             self.groups.append(group)
             self._groups_list = None  # invalidate internal cache 
         else:
-            raise errors.AnsibleError("group already in inventory: %s" % group.name)
+            raise errors.AnsibleError("group already in inventory: {0!s}".format(group.name))
 
     def list_hosts(self, pattern="all"):
 
@@ -641,12 +641,12 @@ class Inventory(object):
 
             if group and host is None:
                 # load vars in dir/group_vars/name_of_group
-                base_path = os.path.join(basedir, "group_vars/%s" % group.name)
+                base_path = os.path.join(basedir, "group_vars/{0!s}".format(group.name))
                 results = utils.load_vars(base_path, results, vault_password=self._vault_password)
 
             elif host and group is None:
                 # same for hostvars in dir/host_vars/name_of_host
-                base_path = os.path.join(basedir, "host_vars/%s" % host.name)
+                base_path = os.path.join(basedir, "host_vars/{0!s}".format(host.name))
                 results = utils.load_vars(base_path, results, vault_password=self._vault_password)
 
         # all done, results is a dictionary of variables for this particular host.

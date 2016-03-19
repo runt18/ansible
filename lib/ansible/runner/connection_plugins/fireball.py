@@ -64,7 +64,7 @@ class Connection(object):
         # this is rough/temporary and will likely be optimized later ...
         self.context = zmq.Context()
         socket = self.context.socket(zmq.REQ)
-        addr = "tcp://%s:%s" % (self.host, self.port)
+        addr = "tcp://{0!s}:{1!s}".format(self.host, self.port)
         socket.connect(addr)
         self.socket = socket
 
@@ -76,7 +76,7 @@ class Connection(object):
         if in_data:
             raise errors.AnsibleError("Internal Error: this module does not support optimized module pipelining")
 
-        vvv("EXEC COMMAND %s" % cmd)
+        vvv("EXEC COMMAND {0!s}".format(cmd))
 
         if self.runner.become and sudoable:
             raise errors.AnsibleError(
@@ -104,10 +104,10 @@ class Connection(object):
     def put_file(self, in_path, out_path):
 
         ''' transfer a file from local to remote '''
-        vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("PUT {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         if not os.path.exists(in_path):
-            raise errors.AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+            raise errors.AnsibleFileNotFound("file or module does not exist: {0!s}".format(in_path))
         data = file(in_path).read()
         data = base64.b64encode(data)
 
@@ -125,7 +125,7 @@ class Connection(object):
 
     def fetch_file(self, in_path, out_path):
         ''' save a remote file to the specified path '''
-        vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        vvv("FETCH {0!s} TO {1!s}".format(in_path, out_path), host=self.host)
 
         data = dict(mode='fetch', in_path=in_path)
         data = utils.jsonify(data)

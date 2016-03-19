@@ -124,9 +124,9 @@ class PlaybookCLI(CLI):
         # before we start running anything through the playbook executor
         for playbook in self.args:
             if not os.path.exists(playbook):
-                raise AnsibleError("the playbook: %s could not be found" % playbook)
+                raise AnsibleError("the playbook: {0!s} could not be found".format(playbook))
             if not (os.path.isfile(playbook) or stat.S_ISFIFO(os.stat(playbook).st_mode)):
-                raise AnsibleError("the playbook: %s does not appear to be a file" % playbook)
+                raise AnsibleError("the playbook: {0!s} does not appear to be a file".format(playbook))
 
         # create the variable manager, which will be shared throughout
         # the code, ensuring a consistent view of global variables
@@ -161,20 +161,20 @@ class PlaybookCLI(CLI):
         if isinstance(results, list):
             for p in results:
 
-                self.display.display('\nplaybook: %s\n' % p['playbook'])
+                self.display.display('\nplaybook: {0!s}\n'.format(p['playbook']))
                 for play in p['plays']:
                     if self.options.listhosts:
-                        self.display.display("\n  %s (%s): host count=%d" % (play['name'], play['pattern'], len(play['hosts'])))
+                        self.display.display("\n  {0!s} ({1!s}): host count={2:d}".format(play['name'], play['pattern'], len(play['hosts'])))
                         for host in play['hosts']:
-                            self.display.display("    %s" % host)
+                            self.display.display("    {0!s}".format(host))
                     if self.options.listtasks: #TODO: do we want to display block info?
-                        self.display.display("\n  %s" % (play['name']))
+                        self.display.display("\n  {0!s}".format((play['name'])))
                         for task in play['tasks']:
-                            self.display.display("    %s" % task)
+                            self.display.display("    {0!s}".format(task))
                     if self.options.listtags: #TODO: fix once we figure out block handling above
-                        self.display.display("\n  %s: tags count=%d" % (play['name'], len(play['tags'])))
+                        self.display.display("\n  {0!s}: tags count={1:d}".format(play['name'], len(play['tags'])))
                         for tag in play['tags']:
-                            self.display.display("    %s" % tag)
+                            self.display.display("    {0!s}".format(tag))
             return 0
         else:
             return results

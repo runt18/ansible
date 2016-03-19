@@ -47,7 +47,7 @@ class ActionModule(object):
         if not 'key' in args:
             raise ae("'key' is a required argument.")
 
-        vv("created 'group_by' ActionModule: key=%s"%(args['key']))
+        vv("created 'group_by' ActionModule: key={0!s}".format((args['key'])))
 
         inventory = self.runner.inventory
 

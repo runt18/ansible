@@ -43,7 +43,7 @@ class ActionModule(object):
         for f in sorted(os.listdir(src_path)):
             if compiled_regexp and not compiled_regexp.search(f):
                 continue
-            fragment = "%s/%s" % (src_path, f)
+            fragment = "{0!s}/{1!s}".format(src_path, f)
             if not os.path.isfile(fragment):
                 continue
             fragment_content = file(fragment).read()
@@ -115,13 +115,13 @@ class ActionModule(object):
         if path_checksum != remote_checksum:
             resultant = file(path).read()
             if self.runner.diff:
-                dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path=%s" % dest, inject=inject, persist_files=True)
+                dest_result = self.runner._execute_module(conn, tmp, 'slurp', "path={0!s}".format(dest), inject=inject, persist_files=True)
                 if 'content' in dest_result.result:
                     dest_contents = dest_result.result['content']
                     if dest_result.result['encoding'] == 'base64':
                         dest_contents = base64.b64decode(dest_contents)
                     else:
-                        raise Exception("unknown encoding, failed: %s" % dest_result.result)
+                        raise Exception("unknown encoding, failed: {0!s}".format(dest_result.result))
             xfered = self.runner._transfer_str(conn, tmp, 'src', resultant)
 
             # fix file permissions when the copy is done as a different user

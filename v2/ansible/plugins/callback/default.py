@@ -39,18 +39,18 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if 'exception' in result._result and self._display.verbosity < 3:
             del result._result['exception']
-        self._display.display("fatal: [%s]: FAILED! => %s" % (result._host.get_name(), json.dumps(result._result, ensure_ascii=False)), color='red')
+        self._display.display("fatal: [{0!s}]: FAILED! => {1!s}".format(result._host.get_name(), json.dumps(result._result, ensure_ascii=False)), color='red')
 
     def v2_runner_on_ok(self, result):
 
         if result._task.action == 'include':
-            msg = 'included: %s for %s' % (result._task.args.get('_raw_params'), result._host.name)
+            msg = 'included: {0!s} for {1!s}'.format(result._task.args.get('_raw_params'), result._host.name)
             color = 'cyan'
         elif result._result.get('changed', False):
-            msg = "changed: [%s]" % result._host.get_name()
+            msg = "changed: [{0!s}]".format(result._host.get_name())
             color = 'yellow'
         else:
-            msg = "ok: [%s]" % result._host.get_name()
+            msg = "ok: [{0!s}]".format(result._host.get_name())
             color = 'green'
 
         if (self._display._verbosity > 0 or 'verbose_always' in result._result) and result._task.action not in ('setup', 'include'):
@@ -58,21 +58,21 @@ class CallbackModule(CallbackBase):
             if 'verbose_always' in result._result:
                 indent = 4
                 del result._result['verbose_always']
-            msg += " => %s" % json.dumps(result._result, indent=indent, ensure_ascii=False)
+            msg += " => {0!s}".format(json.dumps(result._result, indent=indent, ensure_ascii=False))
         self._display.display(msg, color=color)
 
     def v2_runner_on_skipped(self, result):
-        msg = "skipping: [%s]" % result._host.get_name()
+        msg = "skipping: [{0!s}]".format(result._host.get_name())
         if self._display._verbosity > 0 or 'verbose_always' in result._result:
             indent = None
             if 'verbose_always' in result._result:
                 indent = 4
                 del result._result['verbose_always']
-            msg += " => %s" % json.dumps(result._result, indent=indent, ensure_ascii=False)
+            msg += " => {0!s}".format(json.dumps(result._result, indent=indent, ensure_ascii=False))
         self._display.display(msg, color='cyan')
 
     def v2_runner_on_unreachable(self, result):
-        self._display.display("fatal: [%s]: UNREACHABLE! => %s" % (result._host.get_name(), result._result), color='red')
+        self._display.display("fatal: [{0!s}]: UNREACHABLE! => {1!s}".format(result._host.get_name(), result._result), color='red')
 
     def v2_runner_on_no_hosts(self, task):
         pass
@@ -102,13 +102,13 @@ class CallbackModule(CallbackBase):
         self._display.banner("NO MORE HOSTS LEFT")
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self._display.banner("TASK [%s]" % task.get_name().strip())
+        self._display.banner("TASK [{0!s}]".format(task.get_name().strip()))
 
     def v2_playbook_on_cleanup_task_start(self, task):
-        self._display.banner("CLEANUP TASK [%s]" % task.get_name().strip())
+        self._display.banner("CLEANUP TASK [{0!s}]".format(task.get_name().strip()))
 
     def v2_playbook_on_handler_task_start(self, task):
-        self._display.banner("RUNNING HANDLER [%s]" % task.get_name().strip())
+        self._display.banner("RUNNING HANDLER [{0!s}]".format(task.get_name().strip()))
 
     def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None, confirm=False, salt_size=None, salt=None, default=None):
         pass
@@ -127,7 +127,7 @@ class CallbackModule(CallbackBase):
         if not name:
             msg = "PLAY"
         else:
-            msg = "PLAY [%s]" % name
+            msg = "PLAY [{0!s}]".format(name)
 
         self._display.banner(name)
 

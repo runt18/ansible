@@ -62,8 +62,8 @@ def api_get(link, config):
             request = urllib2.Request(link['href']+'?limit=0')
             request.add_header("Accept",link['type'])
         # Auth
-        base64string = base64.encodestring('%s:%s' % (config.get('auth','apiuser'),config.get('auth','apipass'))).replace('\n', '')
-        request.add_header("Authorization", "Basic %s" % base64string)
+        base64string = base64.encodestring('{0!s}:{1!s}'.format(config.get('auth','apiuser'), config.get('auth','apipass'))).replace('\n', '')
+        request.add_header("Authorization", "Basic {0!s}".format(base64string))
         result = urllib2.urlopen(request)
         return json.loads(result.read())
     except:

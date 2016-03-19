@@ -58,7 +58,7 @@ class RegistrationBase(object):
         raise NotImplementedError("Must be implemented by a sub-class")
 
     def update_plugin_conf(self, plugin, enabled=True):
-        plugin_conf = '/etc/yum/pluginconf.d/%s.conf' % plugin
+        plugin_conf = '/etc/yum/pluginconf.d/{0!s}.conf'.format(plugin)
         if os.path.isfile(plugin_conf):
             cfg = ConfigParser.ConfigParser()
             cfg.read([plugin_conf])
@@ -127,7 +127,7 @@ class Rhsm(RegistrationBase):
         # 'server_hostname' becomes '--system.hostname'.
         for k,v in kwargs.items():
             if re.search(r'^(system|rhsm)_', k):
-                args.append('--%s=%s' % (k.replace('_','.'), v))
+                args.append('--{0!s}={1!s}'.format(k.replace('_','.'), v))
         
         self.module.run_command(args, check_rc=True)
 
@@ -161,7 +161,7 @@ class Rhsm(RegistrationBase):
 
         # Generate command arguments
         if activationkey:
-            args.append('--activationkey "%s"' % activationkey)
+            args.append('--activationkey "{0!s}"'.format(activationkey))
         else:
             if autosubscribe:
                 args.append('--autosubscribe')
@@ -220,7 +220,7 @@ class RhsmPool(object):
         return str(self.__getattribute__('_name'))
 
     def subscribe(self):
-        args = "subscription-manager subscribe --pool %s" % self.PoolId
+        args = "subscription-manager subscribe --pool {0!s}".format(self.PoolId)
         rc, stdout, stderr = self.module.run_command(args, check_rc=True)
         if rc == 0:
             return True

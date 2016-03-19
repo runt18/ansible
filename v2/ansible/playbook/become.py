@@ -45,9 +45,9 @@ class Become:
         if has_become:
             msg = 'The become params ("become", "become_user") and'
             if has_sudo:
-                raise AnsibleParserError('%s sudo params ("sudo", "sudo_user") cannot be used together' % msg)
+                raise AnsibleParserError('{0!s} sudo params ("sudo", "sudo_user") cannot be used together'.format(msg))
             elif has_su:
-                raise AnsibleParserError('%s su params ("su", "su_user") cannot be used together' % msg)
+                raise AnsibleParserError('{0!s} su params ("su", "su_user") cannot be used together'.format(msg))
         elif has_sudo and has_su:
             raise AnsibleParserError('sudo params ("sudo", "sudo_user") and su params ("su", "su_user") cannot be used together')
 
