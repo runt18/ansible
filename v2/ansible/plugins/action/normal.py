@@ -21,9 +21,11 @@ from ansible.plugins.action import ActionBase
 
 class ActionModule(ActionBase):
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
         #vv("REMOTE_MODULE %s %s" % (module_name, module_args), host=conn.host)
+        if task_vars is None:
+            task_vars = dict()
         return self._execute_module(tmp)
 
 

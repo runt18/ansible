@@ -29,13 +29,15 @@ class ActionModule(ActionBase):
     BYPASS_HOST_LOOP = True
     TRANSFERS_FILES = False
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
         # FIXME: is this necessary in v2?
         #if self.runner.noop_on_check(inject):
         #    return ReturnData(conn=conn, comm_ok=True, result=dict(skipped=True, msg='check mode not supported for this module'))
 
         # Parse out any hostname:port patterns
+        if task_vars is None:
+            task_vars = dict()
         new_name = self._task.args.get('name', self._task.args.get('hostname', None))
         #vv("creating host via 'add_host': hostname=%s" % new_name)
 

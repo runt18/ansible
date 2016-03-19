@@ -72,7 +72,9 @@ class ModuleArgsParser:
     Args may also be munged for certain shell command parameters.
     """
 
-    def __init__(self, task_ds=dict()):
+    def __init__(self, task_ds=None):
+        if task_ds is None:
+            task_ds = dict()
         assert isinstance(task_ds, dict)
         self._task_ds = task_ds
 
@@ -112,10 +114,12 @@ class ModuleArgsParser:
 
         return (action, args)
 
-    def _normalize_parameters(self, thing, action=None, additional_args=dict()):
+    def _normalize_parameters(self, thing, action=None, additional_args=None):
         '''
         arguments can be fuzzy.  Deal with all the forms.
         '''
+        if additional_args is None:
+            additional_args = dict()
 
         # final args are the ones we'll eventually return, so first update
         # them with any additional args specified, which have lower priority

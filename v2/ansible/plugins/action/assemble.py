@@ -75,8 +75,10 @@ class ActionModule(ActionBase):
         tmp.close()
         return temp_path
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
+        if task_vars is None:
+            task_vars = dict()
         src        = self._task.args.get('src', None)
         dest       = self._task.args.get('dest', None)
         delimiter  = self._task.args.get('delimiter', None)

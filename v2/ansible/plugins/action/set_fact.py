@@ -26,7 +26,9 @@ class ActionModule(ActionBase):
 
     TRANSFERS_FILES = False
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
+        if task_vars is None:
+            task_vars = dict()
         templar = Templar(loader=self._loader, variables=task_vars)
         facts = dict()
         if self._task.args:

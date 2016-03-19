@@ -53,7 +53,9 @@ class Templar:
     The main class for templating, with the main entry-point of template().
     '''
 
-    def __init__(self, loader, shared_loader_obj=None, variables=dict(), fail_on_undefined=C.DEFAULT_UNDEFINED_VAR_BEHAVIOR):
+    def __init__(self, loader, shared_loader_obj=None, variables=None, fail_on_undefined=C.DEFAULT_UNDEFINED_VAR_BEHAVIOR):
+        if variables is None:
+            variables = dict()
         self._loader              = loader
         self._basedir             = loader.get_basedir()
         self._filters             = None

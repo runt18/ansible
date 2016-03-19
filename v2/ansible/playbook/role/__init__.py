@@ -298,7 +298,7 @@ class Role(Base, Become, Conditional, Taggable):
 
         return self._had_task_run and self._completed
 
-    def compile(self, play, dep_chain=[]):
+    def compile(self, play, dep_chain=None):
         '''
         Returns the task list for this role, which is created by first
         recursively compiling the tasks for all direct dependencies, and
@@ -308,6 +308,8 @@ class Role(Base, Become, Conditional, Taggable):
         with each task, so tasks know by which route they were found, and
         can correctly take their parent's tags/conditionals into account.
         '''
+        if dep_chain is None:
+            dep_chain = []
 
         block_list = []
 

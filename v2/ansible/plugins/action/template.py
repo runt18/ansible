@@ -47,8 +47,10 @@ class ActionModule(ActionBase):
 
         return remote_checksum
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' handler for template operations '''
+        if task_vars is None:
+            task_vars = dict()
 
         source = self._task.args.get('src', None)
         dest   = self._task.args.get('dest', None)

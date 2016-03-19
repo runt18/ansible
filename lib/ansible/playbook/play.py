@@ -243,8 +243,10 @@ class Play(object):
 
         return (role_path, role_vars)
 
-    def _build_role_dependencies(self, roles, dep_stack, passed_vars={}, level=0):
+    def _build_role_dependencies(self, roles, dep_stack, passed_vars=None, level=0):
         # this number is arbitrary, but it seems sane
+        if passed_vars is None:
+            passed_vars = {}
         if level > 20:
             raise errors.AnsibleError("too many levels of recursion while resolving role dependencies")
         for role in roles:

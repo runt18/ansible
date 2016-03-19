@@ -25,8 +25,10 @@ from ansible.utils.boolean import boolean
 
 class ActionModule(ActionBase):
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
+        if task_vars is None:
+            task_vars = dict()
         src        = self._task.args.get('src', None)
         dest       = self._task.args.get('dest', None)
         remote_src = boolean(self._task.args.get('remote_src', 'no'))

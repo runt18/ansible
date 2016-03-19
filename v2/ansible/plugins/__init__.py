@@ -55,8 +55,10 @@ class PluginLoader:
     The first match is used.
     '''
 
-    def __init__(self, class_name, package, config, subdir, aliases={}):
+    def __init__(self, class_name, package, config, subdir, aliases=None):
 
+        if aliases is None:
+            aliases = {}
         self.class_name         = class_name
         self.package            = package
         self.config             = config

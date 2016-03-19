@@ -27,8 +27,10 @@ class ActionModule(ActionBase):
     BYPASS_HOST_LOOP = True
     TRANSFERS_FILES = False
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
+        if task_vars is None:
+            task_vars = dict()
         if not 'key' in self._task.args:
             return dict(failed=True, msg="the 'key' param is required when using group_by")
 

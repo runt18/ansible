@@ -25,7 +25,9 @@ from ansible.parsing import DataLoader
 
 class DictDataLoader(DataLoader):
 
-    def __init__(self, file_mapping=dict()):
+    def __init__(self, file_mapping=None):
+        if file_mapping is None:
+            file_mapping = dict()
         assert type(file_mapping) == dict
 
         self._file_mapping = file_mapping

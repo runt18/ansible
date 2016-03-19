@@ -1351,7 +1351,7 @@ def contains_vars(data):
     '''
     return "$" in data or "{{" in data
 
-def safe_eval(expr, locals={}, include_exceptions=False):
+def safe_eval(expr, locals=None, include_exceptions=False):
     '''
     This is intended for allowing things like:
     with_items: a_list_variable
@@ -1365,6 +1365,8 @@ def safe_eval(expr, locals={}, include_exceptions=False):
     Based on:
     http://stackoverflow.com/questions/12523516/using-ast-and-whitelists-to-make-pythons-eval-safe
     '''
+    if locals is None:
+        locals = {}
 
     # this is the whitelist of AST nodes we are going to
     # allow in the evaluation. Any node type other than
