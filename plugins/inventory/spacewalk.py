@@ -121,7 +121,7 @@ if options.list:
         for group, systems in groups.iteritems():
             print '[%s]\n%s\n' % (group, '\n'.join(systems))
     else:
-        print json.dumps(dict([ (k, list(s)) for k, s in groups.iteritems() ]))
+        print json.dumps({k: list(s) for k, s in groups.iteritems()})
 
     sys.exit(0)
 

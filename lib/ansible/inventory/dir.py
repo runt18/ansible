@@ -160,7 +160,7 @@ class InventoryDirectory(object):
 
         # hosts list (host objects are by now already added to self.hosts)
         for host in newgroup.hosts:
-            grouphosts = dict([(h.name, h) for h in group.hosts])
+            grouphosts = {h.name: h for h in group.hosts}
             if host.name in grouphosts:
                 # same host name but different object, merge
                 self._merge_hosts(grouphosts[host.name], host)
@@ -178,7 +178,7 @@ class InventoryDirectory(object):
         # group child membership relation
         for newchild in newgroup.child_groups:
             # dict with existing child groups:
-            childgroups = dict([(g.name, g) for g in group.child_groups])
+            childgroups = {g.name: g for g in group.child_groups}
             # check if child of new group is already known as a child
             if newchild.name not in childgroups:
                 self.groups[group.name].add_child_group(newchild)
@@ -186,7 +186,7 @@ class InventoryDirectory(object):
         # group parent membership relation
         for newparent in newgroup.parent_groups:
             # dict with existing parent groups:
-            parentgroups = dict([(g.name, g) for g in group.parent_groups])
+            parentgroups = {g.name: g for g in group.parent_groups}
             # check if parent of new group is already known as a parent
             if newparent.name not in parentgroups:
                 if newparent.name not in self.groups:
@@ -208,7 +208,7 @@ class InventoryDirectory(object):
         # group membership relation
         for newgroup in newhost.groups:
             # dict with existing groups:
-            hostgroups = dict([(g.name, g) for g in host.groups])
+            hostgroups = {g.name: g for g in host.groups}
             # check if new group is already known as a group
             if newgroup.name not in hostgroups:
                 if newgroup.name not in self.groups:
