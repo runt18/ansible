@@ -201,11 +201,13 @@ class PlayBook(object):
 
     # *****************************************************
 
-    def _get_include_info(self, play_ds, basedir, existing_vars={}):
+    def _get_include_info(self, play_ds, basedir, existing_vars=None):
         '''
         Gets any key=value pairs specified with the included file
         name and returns the merged vars along with the path
         '''
+        if existing_vars is None:
+            existing_vars = {}
         new_vars = existing_vars.copy()
         tokens = split_args(play_ds.get('include', ''))
         for t in tokens[1:]:
@@ -227,10 +229,12 @@ class PlayBook(object):
 
     # *****************************************************
 
-    def _extend_play_vars(self, play, vars={}):
+    def _extend_play_vars(self, play, vars=None):
         '''
         Extends the given play's variables with the additional specified vars.
         '''
+        if vars is None:
+            vars = {}
 
         if 'vars' not in play or not play['vars']:
             # someone left out or put an empty "vars:" entry in their playbook
@@ -249,10 +253,14 @@ class PlayBook(object):
 
     # *****************************************************
 
-    def _load_playbook_from_file(self, path, vars={}, vars_files=[]):
+    def _load_playbook_from_file(self, path, vars=None, vars_files=None):
         '''
         run top level error checking on playbooks and allow them to include other playbooks.
         '''
+        if vars is None:
+            vars = {}
+        if vars_files is None:
+            vars_files = []
 
         playbook_data = utils.parse_yaml_from_file(path, vault_password=self.vault_password)
         accumulated_plays = []
@@ -375,8 +383,10 @@ class PlayBook(object):
 
     # *****************************************************
 
-    def _trim_unavailable_hosts(self, hostlist=[], keep_failed=False):
+    def _trim_unavailable_hosts(self, hostlist=None, keep_failed=False):
         ''' returns a list of hosts that haven't failed and aren't dark '''
+        if hostlist is None:
+            hostlist = []
 
         return [ h for h in hostlist if (keep_failed or h not in self.stats.failures) and (h not in self.stats.dark)]
 

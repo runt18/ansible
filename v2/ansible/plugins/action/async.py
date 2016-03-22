@@ -25,8 +25,10 @@ from ansible.plugins.action import ActionBase
 
 class ActionModule(ActionBase):
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' transfer the given module name, plus the async module, then run it '''
+        if task_vars is None:
+            task_vars = dict()
 
         # FIXME: noop stuff needs to be sorted ut
         #if self.runner.noop_on_check(inject):

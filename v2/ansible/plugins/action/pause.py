@@ -32,8 +32,10 @@ class ActionModule(ActionBase):
     PAUSE_TYPES = ['seconds', 'minutes', 'prompt', '']
     BYPASS_HOST_LOOP = True
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' run the pause action module '''
+        if task_vars is None:
+            task_vars = dict()
 
         duration_unit = 'minutes'
         prompt = None

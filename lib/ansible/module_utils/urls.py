@@ -159,7 +159,9 @@ class RequestWithMethod(urllib2.Request):
     Originally contained in library/net_infrastructure/dnsmadeeasy
     '''
 
-    def __init__(self, url, method, data=None, headers={}):
+    def __init__(self, url, method, data=None, headers=None):
+        if headers is None:
+            headers = {}
         self._method = method
         urllib2.Request.__init__(self, url, data, headers)
 
@@ -241,10 +243,12 @@ class SSLValidationHandler(urllib2.BaseHandler):
 
         return (tmp_path, paths_checked)
 
-    def validate_proxy_response(self, response, valid_codes=[200]):
+    def validate_proxy_response(self, response, valid_codes=None):
         '''
         make sure we get back a valid code from the proxy
         '''
+        if valid_codes is None:
+            valid_codes = [200]
         try:
             (http_version, resp_code, msg) = re.match(r'(HTTP/\d\.\d) (\d\d\d) (.*)', response).groups()
             if int(resp_code) not in valid_codes:

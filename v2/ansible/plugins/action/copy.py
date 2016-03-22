@@ -35,8 +35,10 @@ from ansible.parsing.vault import VaultLib
 
 class ActionModule(ActionBase):
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' handler for file transfer operations '''
+        if task_vars is None:
+            task_vars = dict()
 
         source  = self._task.args.get('src', None)
         content = self._task.args.get('content', None)

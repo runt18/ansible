@@ -23,9 +23,11 @@ class ReturnData(object):
     __slots__ = [ 'result', 'comm_ok', 'host', 'diff' ]
 
     def __init__(self, conn=None, host=None, result=None, 
-        comm_ok=True, diff=dict()):
+        comm_ok=True, diff=None):
 
         # which host is this ReturnData about?
+        if diff is None:
+            diff = dict()
         if conn is not None:
             self.host = conn.host
             delegate = getattr(conn, 'delegate', None)

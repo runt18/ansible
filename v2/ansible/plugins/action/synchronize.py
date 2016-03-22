@@ -66,8 +66,10 @@ class ActionModule(ActionBase):
 
         return return_data
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' generates params and passes them on to the rsync module '''
+        if task_vars is None:
+            task_vars = dict()
 
         original_transport   = task_vars.get('ansible_connection', self._connection_info.connection)
         transport_overridden = False

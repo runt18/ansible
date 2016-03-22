@@ -32,8 +32,10 @@ from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 
 class ActionModule(ActionBase):
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
         ''' handler for fetch operations '''
+        if task_vars is None:
+            task_vars = dict()
 
         # FIXME: is this even required anymore?
         #if self.runner.noop_on_check(inject):

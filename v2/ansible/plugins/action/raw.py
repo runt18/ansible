@@ -22,13 +22,15 @@ from ansible.plugins.action import ActionBase
 class ActionModule(ActionBase):
     TRANSFERS_FILES = False
 
-    def run(self, tmp=None, task_vars=dict()):
+    def run(self, tmp=None, task_vars=None):
 
         # FIXME: need to rework the noop stuff still
         #if self.runner.noop_on_check(inject):
         #    # in --check mode, always skip this module execution
         #    return ReturnData(conn=conn, comm_ok=True, result=dict(skipped=True))
 
+        if task_vars is None:
+            task_vars = dict()
         executable = self._task.args.get('executable')
         result = self._low_level_execute_command(self._task.args.get('_raw_params'), tmp=tmp, executable=executable)
 
