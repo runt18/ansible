@@ -72,7 +72,7 @@ class TestSynchronize(unittest.TestCase):
 
         assert runner.executed_inject['delegate_to'] == "127.0.0.1", "was not delegated to 127.0.0.1"
         assert runner.executed_complex_args == {"dest":"root@el6.lab.net:/tmp/bar", "src":"/tmp/foo"}, "wrong args used"
-        assert runner.sudo == None, "sudo was not reset to None" 
+        assert runner.sudo is None, "sudo was not reset to None" 
 
     def test_synchronize_action_sudo(self):
 

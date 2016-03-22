@@ -55,7 +55,7 @@ except ImportError:
 
 def api_get(link, config):
     try:
-        if link == None:
+        if link is None:
             request = urllib2.Request(config.get('api','uri')+config.get('api','login_path'))
             request.add_header("Accept",config.get('api','login_type'))
         else:
@@ -150,7 +150,7 @@ def generate_inv_from_api(enterprise_entity,config):
             if ((config.getboolean('defaults', 'deployed_only') == True) and (vmcollection['state'] == 'NOT_ALLOCATED')):
                 vm_state = False
 
-            if not vm_nic == None and vm_state:
+            if not vm_nic is None and vm_state:
                 if not vm_vapp in inventory.keys():
                     inventory[vm_vapp] = {}
                     inventory[vm_vapp]['children'] = []
